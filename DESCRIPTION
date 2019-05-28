@@ -1,0 +1,16 @@
+Package: AIPWsubtype
+Title: An augmented inverse weighted semiparametric cause-specific competing risks model with partially missing cause of failure
+Version: 1.0
+Authors@R: person("Jooyoung", "Lee", email = "joolee0918@gmail.com", role = c("aut", "cre"))
+Description: An augmented inverse weighted Cox proportional hazard model to evaluate the effect of exposures on various disease subtypes under the competing-risk settings in the presence of partially or completely missing cause of failures. The cause of failures are defined by multiple markers. A missingness model is fitted wit
+Depends: R (>= 3.4.2), survival
+License: GPL-2
+URL: http:://github.com/joolee0918/AIPWsubtype
+BugReports: http:://github.com/joolee0918/AIPWsubtype/issues
+Encoding: UTF-8
+LazyData: true
+LinkingTo: 
+    Rcpp, RcppArmadillo, survival
+Imports: 
+    Rcpp, RcppArmadillo,  survival, Matrix, sandwich, data.table
+RoxygenNote: 6.1.1
