@@ -167,7 +167,7 @@ AIPW_fit <- AIPW_agreg_cpp(maxiter,
 	    rr <- drop(rowsum(rr, collapse))
 
     afit <- list(coefficients  = coef,
-    var    = var,
+    naive.var    = var,
     Ithegam = AIPW_fit$Ithegam,
     Ithealp = AIPW_fit$Ithealp,
     loglik = AIPW_fit$loglik,

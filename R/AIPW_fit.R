@@ -366,109 +366,6 @@ AIPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE,
     gamma <- model_subtype$coefficients
     ngamma <- length(gamma)
 
-
-    Igam <- vcov(model_subtype)
-    Ialp <- vcov(model_missing[[1]])
-    if (nvecR > 1) {
-        for (k in 2:nvecR) {
-            Ialp <- bdiag(Ialp, vcov(model_missing[[k]]))
-        }
-    }
-    Ialp <- as.matrix(Ialp)
-
-    Salp = as.data.frame(data[, id])
-    names(Salp) <- id
-
-    Salp = as.data.frame(uniqid)
-    names(Salp) <- id
-    Ualp <- list()
-    tmp_id = edata[, id]
-    for (k in 1:n_marker) {
-        Ualp[[k]] <- estfun(model_missing[[k]])
-    }
-    if (two_stage == TRUE) {
-        Ualp_ts <- estfun(model_missing[[nvecR]])
-    }
-    Ualp <- do.call(cbind, Ualp)
-    if (two_stage == FALSE) {
-        Ualp <- cbind(tmp_id, Ualp)
-        colnames(Ualp)[1] <- id
-    } else {
-        Ualp <- cbind(edata[edata[, tstage_name] == 1, id], Ualp)
-        colnames(Ualp)[1] <- id
-        Ualp_ts <- cbind(tmp_id, Ualp_ts)
-        colnames(Ualp_ts)[1] <- id
-        Ualp <- merge(Ualp, Ualp_ts, by = id, all = T)
-        Ualp[is.na(Ualp)] <- 0
-    }
-
-    Salp <- merge(Salp, Ualp, by = id, all = T)
-    Salp[is.na(Salp)] <- 0
-    Salp <- as.matrix(Salp[, -1])
-
-
-    Sgam <- as.data.frame(uniqid)
-    names(Sgam) <- id
-
-    subset_data <- cbind(subset_data, s_X)
-    s0 <- by(subset_data, subset_data[, id], function(x) sum(exp(x$lp)))
-    s1 <- by(subset_data, subset_data[, id], function(x) t(x[, colnames(s_X)]) %*% exp(x$lp))
-    term1 <- by(subset_data, subset_data[, id], function(x) x[, colnames(s_X)][x[, event] == 1, ])
-    Ugam <- lapply(1:length(term1), function(i) term1[[i]] - s1[[i]]/s0[[i]])
-    Ugam <- as.matrix(rbindlist(Ugam))
-    Ugam <- cbind(as.numeric(names(term1)), Ugam)
-    colnames(Ugam)[1] <- id
-
-    Sgam <- merge(Sgam, Ugam, by = id, all = T)
-    Sgam[is.na(Sgam)] <- 0
-    Sgam <- as.matrix(Sgam[, -1])
-
-
-    Salp = as.data.frame(uniqid)
-    names(Salp) <- id
-    Ualp <- list()
-    tmp_id = edata[, id]
-    for (k in 1:n_marker) {
-        Ualp[[k]] <- estfun(model_missing[[k]])
-    }
-    if (two_stage == TRUE) {
-        Ualp_ts <- estfun(model_missing[[nvecR]])
-    }
-    Ualp <- do.call(cbind, Ualp)
-    if (two_stage == FALSE) {
-        Ualp <- cbind(tmp_id, Ualp)
-        colnames(Ualp)[1] <- id
-    } else {
-        Ualp <- cbind(edata[edata[, tstage_name] == 1, id], Ualp)
-        colnames(Ualp)[1] <- id
-        Ualp_ts <- cbind(tmp_id, Ualp_ts)
-        colnames(Ualp_ts)[1] <- id
-        Ualp <- merge(Ualp, Ualp_ts, by = id, all = T)
-        Ualp[is.na(Ualp)] <- 0
-    }
-
-    Salp <- merge(Salp, Ualp, by = id, all = T)
-    Salp[is.na(Salp)] <- 0
-    Salp <- as.matrix(Salp[, -1])
-
-    Sgam <- as.data.frame(uniqid)
-    names(Sgam) <- id
-
-    subset_data <- cbind(subset_data, s_X)
-    s0 <- by(subset_data, subset_data[, id], function(x) sum(exp(x$lp)))
-    s1 <- by(subset_data, subset_data[, id], function(x) t(x[, colnames(s_X)]) %*% exp(x$lp))
-    term1 <- by(subset_data, subset_data[, id], function(x) x[, colnames(s_X)][x[, event] == 1, ])
-    Ugam <- lapply(1:length(term1), function(i) term1[[i]] - s1[[i]]/s0[[i]])
-    Ugam <- as.matrix(rbindlist(Ugam))
-
-    Ugam <- cbind(as.numeric(names(term1)), Ugam)
-    colnames(Ugam)[1] <- id
-
-    Sgam <- merge(Sgam, Ugam, by = id, all = T)
-    Sgam[is.na(Sgam)] <- 0
-    Sgam <- as.matrix(Sgam[, -1])
-
-
     newformula <- update.formula(formula, paste("~.+", order_bl, order_rr, "+", "cluster", "(", id, ")"))
     mf <- model.frame(newformula, data = newdata)
     special <- c("strata", "cluster")
@@ -652,8 +549,6 @@ AIPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE,
 
     }
 
-
-
     if (sum(Y[, ncol(Y)]) == 0) {
         stop("No events in the data!")
     }
@@ -696,11 +591,115 @@ AIPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE,
                 warning(msg) else stop(msg)
         }
 
+
+
+        Igam <- vcov(model_subtype)
+        Ialp <- vcov(model_missing[[1]])
+        if (nvecR > 1) {
+          for (k in 2:nvecR) {
+            Ialp <- bdiag(Ialp, vcov(model_missing[[k]]))
+          }
+        }
+        Ialp <- as.matrix(Ialp)
+
+        Salp = as.data.frame(data[, id])
+        names(Salp) <- id
+
+        Salp = as.data.frame(uniqid)
+        names(Salp) <- id
+        Ualp <- list()
+        tmp_id = edata[, id]
+        for (k in 1:n_marker) {
+          Ualp[[k]] <- estfun(model_missing[[k]])
+        }
+        if (two_stage == TRUE) {
+          Ualp_ts <- estfun(model_missing[[nvecR]])
+        }
+        Ualp <- do.call(cbind, Ualp)
+        if (two_stage == FALSE) {
+          Ualp <- cbind(tmp_id, Ualp)
+          colnames(Ualp)[1] <- id
+        } else {
+          Ualp <- cbind(edata[edata[, tstage_name] == 1, id], Ualp)
+          colnames(Ualp)[1] <- id
+          Ualp_ts <- cbind(tmp_id, Ualp_ts)
+          colnames(Ualp_ts)[1] <- id
+          Ualp <- merge(Ualp, Ualp_ts, by = id, all = T)
+          Ualp[is.na(Ualp)] <- 0
+        }
+
+        Salp <- merge(Salp, Ualp, by = id, all = T)
+        Salp[is.na(Salp)] <- 0
+        Salp <- as.matrix(Salp[, -1])
+
+
+        Sgam <- as.data.frame(uniqid)
+        names(Sgam) <- id
+
+        subset_data <- cbind(subset_data, s_X)
+        s0 <- by(subset_data, subset_data[, id], function(x) sum(exp(x$lp)))
+        s1 <- by(subset_data, subset_data[, id], function(x) t(x[, colnames(s_X)]) %*% exp(x$lp))
+        term1 <- by(subset_data, subset_data[, id], function(x) x[, colnames(s_X)][x[, event] == 1, ])
+        Ugam <- lapply(1:length(term1), function(i) term1[[i]] - s1[[i]]/s0[[i]])
+        Ugam <- as.matrix(rbindlist(Ugam))
+        Ugam <- cbind(as.numeric(names(term1)), Ugam)
+        colnames(Ugam)[1] <- id
+
+        Sgam <- merge(Sgam, Ugam, by = id, all = T)
+        Sgam[is.na(Sgam)] <- 0
+        Sgam <- as.matrix(Sgam[, -1])
+
+
+        Salp = as.data.frame(uniqid)
+        names(Salp) <- id
+        Ualp <- list()
+        tmp_id = edata[, id]
+        for (k in 1:n_marker) {
+          Ualp[[k]] <- estfun(model_missing[[k]])
+        }
+        if (two_stage == TRUE) {
+          Ualp_ts <- estfun(model_missing[[nvecR]])
+       }
+        Ualp <- do.call(cbind, Ualp)
+        if (two_stage == FALSE) {
+          Ualp <- cbind(tmp_id, Ualp)
+          colnames(Ualp)[1] <- id
+        } else {
+          Ualp <- cbind(edata[edata[, tstage_name] == 1, id], Ualp)
+          colnames(Ualp)[1] <- id
+          Ualp_ts <- cbind(tmp_id, Ualp_ts)
+          colnames(Ualp_ts)[1] <- id
+          Ualp <- merge(Ualp, Ualp_ts, by = id, all = T)
+          Ualp[is.na(Ualp)] <- 0
+        }
+
+        Salp <- merge(Salp, Ualp, by = id, all = T)
+        Salp[is.na(Salp)] <- 0
+        Salp <- as.matrix(Salp[, -1])
+
+        Sgam <- as.data.frame(uniqid)
+        names(Sgam) <- id
+
+        subset_data <- cbind(subset_data, s_X)
+        s0 <- by(subset_data, subset_data[, id], function(x) sum(exp(x$lp)))
+        s1 <- by(subset_data, subset_data[, id], function(x) t(x[, colnames(s_X)]) %*% exp(x$lp))
+        term1 <- by(subset_data, subset_data[, id], function(x) x[, colnames(s_X)][x[, event] == 1, ])
+        Ugam <- lapply(1:length(term1), function(i) term1[[i]] - s1[[i]]/s0[[i]])
+        Ugam <- as.matrix(rbindlist(Ugam))
+
+        Ugam <- cbind(as.numeric(names(term1)), Ugam)
+        colnames(Ugam)[1] <- id
+
+        Sgam <- merge(Sgam, Ugam, by = id, all = T)
+        Sgam[is.na(Sgam)] <- 0
+        Sgam <- as.matrix(Sgam[, -1])
+
+
         resid = fit$resid - as.matrix(Sgam) %*% Igam %*% t(fit$Ithegam) - as.matrix(Salp) %*% Ialp %*% t(fit$Ithealp)
 
-        fit$var <- fit$naive.var %*% t(resid) %*% resid %*% fit$naive.var
+        var <- fit$naive.var %*% t(resid) %*% resid %*% fit$naive.var
 
-        afit <- list(coefficients = fit$coef, var = fit$var, loglik = fit$loglik, iter = fit$iter, conv = fit$conv,
+        afit <- list(coefficients = fit$coef, naive.var = fit$naive.var, var = var, loglik = fit$loglik, iter = fit$iter, conv = fit$conv,
             Ithealp = fit$Ithealp, Ithegam = fit$Ithegam, model_missing = model_missing, model_subtype = model_subtype,
             res = resid, n = n, nevent = nevent, call = Call, terms = Terms, assign = assign, method = "AIPW")
 

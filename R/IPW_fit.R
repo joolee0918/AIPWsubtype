@@ -282,7 +282,6 @@ IPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE, 
         }
 
         x <- fit$x
-        vv <- fit$naive.var
         weights <- fit$weights
         strata <- fit$strata
         lp <- fit$linear.predictors + sum(fit$coefficients * fit$means)
@@ -383,12 +382,10 @@ IPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE, 
         Salp[is.na(Salp)] <- 0
         Salp <- as.matrix(Salp[, -1])
 
-
-        resid <- as.matrix(Stheta)
         resid <- as.matrix(Stheta) - as.matrix(Salp) %*% Ialp %*% t(Ithealp)
-        var_IPW <- fit$naive.var %*% t(resid) %*% resid %*% fit$naive.var
+        var <- fit$naive.var %*% t(resid) %*% resid %*% fit$naive.var
 
-        afit <- list(coefficients = fit$coefficients, var = var_IPW, loglik = fit$loglik, iter = fit$iter,
+        afit <- list(coefficients = fit$coefficients, naive.var = fit$naive.var, var = var, loglik = fit$loglik, iter = fit$iter,
             weights = fit$weights, Ithealp = Ithealp, model_missing = model_missing, res = resid, n = n, nevent = nevent,
             ndata = ndata, nnevent = nnevent, call = Call, terms = fit$terms, assign = fit$assign, method = "IPW")
 
