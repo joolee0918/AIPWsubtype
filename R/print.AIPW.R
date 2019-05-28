@@ -41,6 +41,7 @@ print.AIPWcprisk <- function(object, ...) {
 
     printCoefmat(tmp, digits = digits, P.values = TRUE, has.Pvalue = TRUE, signif.stars = signif.stars, ...)
 
+    cat("  n=", object$n)
     if (!is.null(object$nevent))
         cat(", number of events=", object$nevent, "\n")
 

@@ -40,8 +40,12 @@ print.IPWcprisk <- function(object, ...) {
 
     printCoefmat(tmp, digits = digits, P.values = TRUE, has.Pvalue = TRUE, signif.stars = signif.stars, ...)
 
+    cat("  n=", object$n)
     if (!is.null(object$nevent))
-        cat(", number of events=", object$nevent, "\n")
+      cat(", number of events=", object$nevent, "\n") else cat("\n")
+    cat("  complete-case n=", object$ndata)
+    if (!is.null(object$nnevent))
+      cat(", number of complete-case events=", object$nnevent, "\n") else cat("\n")
 
 
     invisible(object)
