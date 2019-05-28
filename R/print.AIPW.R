@@ -12,7 +12,7 @@ print.AIPWcprisk <- function(object, ...) {
     cat("\n\n")
 
 
-    if (!is.null(cl <- x$call)) {
+    if (!is.null(cl <- object$call)) {
         cat("Call:\n")
         dput(cl)
         cat("\n")
@@ -41,7 +41,7 @@ print.AIPWcprisk <- function(object, ...) {
 
     printCoefmat(tmp, digits = digits, P.values = TRUE, has.Pvalue = TRUE, signif.stars = signif.stars, ...)
 
-    if (!is.null(x$nevent))
+    if (!is.null(object$nevent))
         cat(", number of events=", object$nevent, "\n")
 
 

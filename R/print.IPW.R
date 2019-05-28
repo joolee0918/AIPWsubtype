@@ -11,7 +11,7 @@ print.IPWcprisk <- function(object, ...) {
     cat("#### IPW semiparametric cause-specific competing risks model  ####")
     cat("\n\n")
 
-    if (!is.null(cl <- x$call)) {
+    if (!is.null(cl <- object$call)) {
         cat("Call:\n")
         dput(cl)
         cat("\n")
@@ -40,7 +40,7 @@ print.IPWcprisk <- function(object, ...) {
 
     printCoefmat(tmp, digits = digits, P.values = TRUE, has.Pvalue = TRUE, signif.stars = signif.stars, ...)
 
-    if (!is.null(x$nevent))
+    if (!is.null(object$nevent))
         cat(", number of events=", object$nevent, "\n")
 
 
