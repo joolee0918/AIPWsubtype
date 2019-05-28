@@ -751,10 +751,6 @@ Rcpp::List AIPW_agreg_cpp(int maxiter, NumericVector start, NumericVector tstop,
      **  When this happens back up one iteration and quit
      */
 
-    Rcout << u << "\n";
-    Rcout << newbeta << "\n";
-    Rcout << iter << "\n";
-
     NumericVector nnewlk(1);
     nnewlk[0] = newlk;
 

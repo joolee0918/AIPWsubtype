@@ -438,8 +438,6 @@ Rcpp::List AIPW_coxfit_cpp(int maxiter, NumericVector time, IntegerVector status
     conv = 0;
     goto finish;
   }
-  Rcout << u << "\n";
-  Rcout << newbeta << "\n";
   /*
    ** here is the main loop
    */
