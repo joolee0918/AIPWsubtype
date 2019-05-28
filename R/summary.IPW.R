@@ -24,7 +24,7 @@ summary.IPWcprisk <- function(object, conf.int = 0.95, scale = 1, ...) {
         stop("Input is not valid")
     se <- sqrt(diag(object$var))
 
-    rval <- list(call = object$call, fail = object$fail, loglik = object$loglik, , n = object$n, ndata = object$ndata,
+    rval <- list(call = object$call, fail = object$fail, loglik = object$loglik, n = object$n, ndata = object$ndata,
         nevent = object$nevent, nnevent = object$nnevent)
 
     tmp <- cbind(beta, exp(beta), se, beta/se, pchisq((beta/se)^2, 1, lower.tail = FALSE))

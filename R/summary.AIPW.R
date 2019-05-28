@@ -8,7 +8,7 @@
 summary.AIPWcprisk <- function(object, conf.int = 0.95, scale = 1, ...) {
 
     if (!is.null(object$fail)) {
-        class(object) <- "summary.IPWcprisk"
+        class(object) <- "summary.AIPWcprisk"
         return(object)
     }
 

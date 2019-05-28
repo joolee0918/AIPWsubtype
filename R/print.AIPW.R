@@ -32,7 +32,7 @@ print.AIPWcprisk <- function(object, ...) {
 
     coef <- object$coef
     se <- sqrt(diag(object$var))
-    if (is.null(est) | is.null(se))
+    if (is.null(coef) | is.null(se))
         stop("Input is not valid")
 
     tmp <- cbind(coef, exp(coef), se, coef/se, pchisq((coef/se)^2, 1, lower.tail = FALSE))
