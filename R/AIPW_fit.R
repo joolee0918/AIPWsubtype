@@ -696,6 +696,13 @@ AIPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE,
                 warning(msg) else stop(msg)
         }
 
+        print(dim(Sgam))
+        print(dim(Igam))
+        print(dim(fit$Ithegam))
+        print(dim(Salp))
+        print(dim(Ialp))
+        print(dim(fit$Ithealp))
+        print(dim(resid))
         resid = resid - as.matrix(Sgam) %*% Igam %*% t(fit$Ithegam) - as.matrix(Salp) %*% Ialp %*% t(fit$Ithealp)
 
         fit$var <- fit$naive.var %*% t(resid) %*% resid %*% fit$naive.var
