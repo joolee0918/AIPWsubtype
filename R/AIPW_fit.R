@@ -145,7 +145,7 @@ AIPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE,
             if (i == n_marker)
                 break
             tmp_mname <- missing_name[1:i]
-            if (missing_ind == FALSE)
+            if (missing_indep == FALSE)
                 missing_model[[i + 1]] <- paste(paste(missing_model[[i + 1]], collapse = ""), paste(tmp_mname,
                   collapse = "+"), sep = "+")
             tmp_model <- as.formula(paste(missing_name[i + 1], paste(missing_model[[i + 1]], collapse = "")))
@@ -156,7 +156,7 @@ AIPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE,
             if (i == n_marker)
                 break
             tmp_mname <- c(missing_name[1:i])
-            if (missing_ind == FALSE)
+            if (missing_indep == FALSE)
                 missing_model[[i + 1]] <- paste(paste(missing_model[[i + 1]], collapse = ""), paste(tmp_mname,
                   collapse = "+"), sep = "+")
             tmp_model <- as.formula(paste(missing_name[i + 1], paste(missing_model[[i + 1]], collapse = "")))
