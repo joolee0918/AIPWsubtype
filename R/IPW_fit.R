@@ -66,7 +66,6 @@ IPW_fit <- function(formula, data, id, missing_model, missing_indep = FALSE, two
         Rmat[, i] <- ifelse(data[, event] == 1, 1 - as.integer(is.na(marker[, i])), 1)
     }
 
-    print(tstage_name)
     R = rep(1, n)
     if (two_stage == T)
         R[data[, tstage_name] == 0] <- nR
@@ -261,7 +260,7 @@ IPW_fit <- function(formula, data, id, missing_model, missing_indep = FALSE, two
     m_c <- coxph(formula = newformula, data = newdata, robust = T, method = "breslow")
 
 
-    m_IPW <- coxph(formula = newformula, data = newdata, weights = 1/pi1, robust = T, model = TRUE, x = TRUE,
+    fit <- coxph(formula = newformula, data = newdata, weights = 1/pi1, robust = T, model = TRUE, x = TRUE,
         method = "breslow")
     if (!is.null(fit$fail)) {
         fit <- list(fail = fit)
@@ -271,8 +270,7 @@ IPW_fit <- function(formula, data, id, missing_model, missing_indep = FALSE, two
 
         eid <- newdata[newdata[, event] == 1, id][1]
         ss <- newdata[, id] %in% eid
-        print(summary(m_IPW))
-        y <- m_IPW$y
+        y <- fit$y
         ny <- ncol(y)
         if (ny == 2) {
             time <- as.double(y[, 1])
@@ -283,11 +281,11 @@ IPW_fit <- function(formula, data, id, missing_model, missing_indep = FALSE, two
             status <- as.integer(y[, 3])
         }
 
-        x <- m_IPW$x
-        vv <- m_IPW$naive.var
-        weights <- m_IPW$weights
-        strata <- m_IPW$strata
-        lp <- m_IPW$linear.predictors + sum(m_IPW$coefficients * m_IPW$means)
+        x <- fit$x
+        vv <- fit$naive.var
+        weights <- fit$weights
+        strata <- fit$strata
+        lp <- fit$linear.predictors + sum(fit$coefficients * fit$means)
 
         nused <- nrow(y)
         nvar <- ncol(x)
@@ -331,7 +329,7 @@ IPW_fit <- function(formula, data, id, missing_model, missing_indep = FALSE, two
         }
 
 
-        score_theta <- as.data.frame(residuals(m_IPW, type = "score", collapse = newdata[, id], weighted = T))
+        score_theta <- as.data.frame(residuals(fit, type = "score", collapse = newdata[, id], weighted = T))
         Stheta <- as.data.frame(uniqid)
         names(Stheta) <- id
         score_theta <- cbind(nuniqid, score_theta)
@@ -344,8 +342,8 @@ IPW_fit <- function(formula, data, id, missing_model, missing_indep = FALSE, two
 
         ## Only fully observed data
 
-        Itheta <- m_IPW$naive.var
-        RVar_theta <- m_IPW$var
+        Itheta <- fit$naive.var
+        RVar_theta <- fit$var
 
         # For all data
 
@@ -388,11 +386,11 @@ IPW_fit <- function(formula, data, id, missing_model, missing_indep = FALSE, two
 
         resid <- as.matrix(Stheta)
         resid <- as.matrix(Stheta) - as.matrix(Salp) %*% Ialp %*% t(Ithealp)
-        var_IPW <- m_IPW$naive.var %*% t(resid) %*% resid %*% m_IPW$naive.var
+        var_IPW <- fit$naive.var %*% t(resid) %*% resid %*% fit$naive.var
 
-        afit <- list(coefficients = m_IPW$coefficients, var = var_IPW, loglik = m_IPW$loglik, iter = m_IPW$iter,
-            weights = m_IPW$weights, Ithealp = Ithealp, model_missing = model_missing, res = resid, n = n, nevent = nevent,
-            ndata = ndata, nnevent = nnevent, call = Call, terms = m_IPW$terms, assign = m_IPW$assign, method = "IPW")
+        afit <- list(coefficients = fit$coefficients, var = var_IPW, loglik = fit$loglik, iter = fit$iter,
+            weights = fit$weights, Ithealp = Ithealp, model_missing = model_missing, res = resid, n = n, nevent = nevent,
+            ndata = ndata, nnevent = nnevent, call = Call, terms = fit$terms, assign = fit$assign, method = "IPW")
 
         class(afit) <- "IPWcprisk"
     }

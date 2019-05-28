@@ -470,7 +470,6 @@ AIPW_fit <- function(formula, data, id, missing_model, missing_indep = FALSE, tw
 
 
     newformula <- update.formula(formula, paste("~.+", order_bl, order_rr, "+", "cluster", "(", id, ")"))
-    print(newformula)
     mf <- model.frame(newformula, data = newdata)
     special <- c("strata", "cluster")
     Terms <- terms(newformula, special)
@@ -671,7 +670,6 @@ AIPW_fit <- function(formula, data, id, missing_model, missing_indep = FALSE, tw
     m_c <- fitter(X[miss, ], Y[miss, ], strats[miss], offset[miss], init = init, control, weights = NULL, method = "breslow",
         row.names(mf)[miss])
     init = m_c$coefficients
-    for (i in 1:length(model_missing)) print(summary(model_missing[[i]]))
 
     ## Fitting model
 
