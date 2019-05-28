@@ -6,7 +6,7 @@
 #' @importFrom sandwich estfun
 #'
 #' @export
-AIPW_fit <- function(formula, data, id, missing_model, missing_indep = FALSE, two_stage, tstage_name = NULL,
+AIPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE, two_stage, tstage_name = NULL,
     n_marker, marker_name, second_cont_bl = FALSE, second_cont_rr = FALSE, constvar = NULL, init, control, ...) {
 
 

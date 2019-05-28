@@ -1,6 +1,6 @@
 
 #' @export
-IPW_fit <- function(formula, data, id, missing_model, missing_indep = FALSE, two_stage = FALSE, tstage_name = NULL, n_marker, marker_name,
+IPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE, two_stage = FALSE, tstage_name = NULL, n_marker, marker_name,
     second_cont_bl = FALSE, second_cont_rr = FALSE, constvar = NULL, init, control, ...) {
 
 
