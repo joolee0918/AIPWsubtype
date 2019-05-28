@@ -17,7 +17,7 @@ AIPW_coxph.fit <- function(x, y, eventid, id, strata, offset, whereX, whereW, in
     }
     ny <- ncol(y)
     ngamma = as.integer(length(gamma))
-    nalp = as.integer(dim(dmissing_prob[[1]])[2])
+    nalp = as.integer(dim(dpR[[1]])[2])
 
     time <- y[,1]
     status <- y[,2]

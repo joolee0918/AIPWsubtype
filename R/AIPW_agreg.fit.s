@@ -19,7 +19,7 @@ AIPW_agreg.fit <- function(x, y, eventid, id, strata, offset, whereX, whereW, in
     }
 
     ngamma = as.integer(length(gamma))
-    nalp = as.integer(dim(dmissing_prob[[1]])[2])
+    nalp = as.integer(dim(dpR[[1]])[2])
 
     # Sort the data (or rather, get a list of sorted indices)
     #  For both stop and start times, the indices go from last to first
