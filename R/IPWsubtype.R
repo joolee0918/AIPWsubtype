@@ -323,7 +323,7 @@ IPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE, 
     }
 
     fit <- coxph(formula = newformula, data = newdata, weights = 1/pi1, robust = T, model = TRUE, x = TRUE,
-        method = "breslow")
+        method = "breslow", init=init)
     if (!is.null(fit$fail)) {
         fit <- list(fail = fit)
         class(fit) <- "IPWcprisk"
@@ -469,7 +469,7 @@ IPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE, 
           #not for intercept only models, or if test is already done
           nabeta <- !is.na(fit$coefficients)
           # The init vector might be longer than the betas, for a sparse term
-          if (is.null(init)) temp <- fit$coefficients[nabeta]
+          if (missing(init)) temp <- fit$coefficients[nabeta]
           else temp <- (fit$coefficients -
                           init[1:length(fit$coefficients)])[nabeta]
           wald.test <-  survival::coxph.wtest(var[nabeta,nabeta], temp,
