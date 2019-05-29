@@ -314,8 +314,13 @@ IPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE, 
     }
 
     newformula <- update.formula(formula, paste("~.+", order_bl, order_rr, "+", "cluster", "(", id, ")"))
-    m_c <- coxph(formula = newformula, data = newdata, robust = T, method = "breslow")
 
+    if (missing(control)) {
+      control = coxph.control()
+      control$eps = 1e-12
+      control$iter.max = 1000
+      control$toler.inf = sqrt(control$eps)
+    }
 
     fit <- coxph(formula = newformula, data = newdata, weights = 1/pi1, robust = T, model = TRUE, x = TRUE,
         method = "breslow")
