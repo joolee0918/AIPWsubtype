@@ -747,14 +747,35 @@ AIPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE,
         Sgam[is.na(Sgam)] <- 0
         Sgam <- as.matrix(Sgam[, -1])
 
-
-        resid = fit$resid - as.matrix(Sgam) %*% Igam %*% t(fit$Ithegam) - as.matrix(Salp) %*% Ialp %*% t(fit$Ithealp)
-
+        resid <- fit$resid - as.matrix(Sgam) %*% Igam %*% t(fit$Ithegam) - as.matrix(Salp) %*% Ialp %*% t(fit$Ithealp)
         var <- fit$naive.var %*% t(resid) %*% resid %*% fit$naive.var
 
-        afit <- list(coefficients = fit$coef, naive.var = fit$naive.var, var = var, loglik = fit$loglik, score.residual = fit$resid, iter = fit$iter, conv = fit$conv,
-            Ithealp = fit$Ithealp, Ithegam = fit$Ithegam, model.missing = model_missing, model.subtype = model_subtype,
-            n = n, nevent = nevent, call = Call, terms = Terms, assign = assign, method = "AIPW")
+        ## robust log-rank statistic
+
+        temp0 <- fit$score0 - as.matrix(Sgam) %*% Igam %*% t(fit$Ithegam) - as.matrix(Salp) %*% Ialp %*% t(fit$Ithealp)
+        u <- apply(as.matrix(temp0), 2, sum)
+        rscore <- survival::coxph.wtest(t(temp0)%*%temp0, u, control$toler.chol)$test
+
+
+        #Wald test
+        if (length(fit$coefficients)) {
+          #not for intercept only models, or if test is already done
+          nabeta <- !is.na(fit$coefficients)
+          # The init vector might be longer than the betas, for a sparse term
+          if (is.null(init)) temp <- fit$coefficients[nabeta]
+          else temp <- (fit$coefficients -
+                          init[1:length(fit$coefficients)])[nabeta]
+          wald.test <-  survival::coxph.wtest(var[nabeta,nabeta], temp,
+                                                   control$toler.chol)$test
+        }
+
+        afit <- list(coefficients = fit$coef, naive.var = fit$naive.var, var = var, score = fit$sctest, loglik = fit$loglik,
+                     rscore = rscore, wald.test = wald.test, score.residual = resid, iter = fit$iter, conv = fit$conv,
+                     Ithealp = fit$Ithealp, Ithegam = fit$Ithegam, model.missing = model_missing, model.subtype = model_subtype,
+                     n = n, nevent = nevent, call = Call, terms = Terms, assign = assign, method = "AIPW")
+
+
+
 
         if(rmodel){afit$model <- mf}
         if (rx)  {

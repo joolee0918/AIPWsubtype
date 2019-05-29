@@ -19,6 +19,7 @@ summary.IPWcprisk <- function(object, conf.int = 0.95, scale = 1, ...) {
         return(object)  #The summary method is the same as print in this case
     }
     nabeta <- !(is.na(beta))  #non-missing coefs
+    beta2 <- beta[nabeta]
 
     if (is.null(beta) | is.null(object$var))
         stop("Input is not valid")
@@ -38,6 +39,23 @@ summary.IPWcprisk <- function(object, conf.int = 0.95, scale = 1, ...) {
         rval$conf.int <- tmp
     }
 
+    df <- length(beta2)
+    logtest <- -2 * (object$loglik[1] - object$loglik[2])
+    rval$logtest <- c(test=logtest,
+                      df=df,
+                      pvalue= pchisq(logtest, df, lower.tail=FALSE))
+    rval$sctest <- c(test=object$score,
+                     df=df,
+                     pvalue= pchisq(object$score, df, lower.tail=FALSE))
+    rval$waldtest<-c(test=as.vector(round(object$wald.test, 2)),
+                     df=df,
+                     pvalue= pchisq(as.vector(object$wald.test), df,
+                                    lower.tail=FALSE))
+    if (!is.null(object$rscore))
+      rval$robscore<-c(test=object$rscore,
+                       df=df,
+                       pvalue= pchisq(object$rscore, df, lower.tail=FALSE))
+    rval$used.robust<-!is.null(object$naive.var)
 
     class(rval) <- "summary.IPWcprisk"
     rval

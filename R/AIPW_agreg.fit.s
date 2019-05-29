@@ -107,7 +107,7 @@ AIPW_fit <- AIPW_agreg_cpp(maxiter,
         if (AIPW_fit$conv == 2)
         warning("Ran out of iterations and did not converge")
     }
-    lp <- c(x %*% coef)
+    lp <- c(x %*% coef) + offset
     names(coef) <- dimnames(x)[[2]]
 
 	  # Sort the data
@@ -163,18 +163,50 @@ AIPW_fit <- AIPW_agreg_cpp(maxiter,
 
 	    } else {
 	        rr[ord] <- resid
-	}
+	    }
 
 	    rr <- drop(rowsum(rr, collapse))
+
+	    temp <- 0*coef
+	    score <- exp( sx %*% temp + soffset)
+	    score0 <- AIPW_agscore_cpp(as.double(sy[,1]),
+	                              as.double(sy[,2]),
+	                              as.double(sy[,3]),
+	                              sx,
+	                              eventid,
+	                              sid,
+	                              score,
+	                              newstrat,
+	                              smarker,
+	                              sR,
+	                              pR,
+	                              as.matrix(total_R),
+	                              marker_r,
+	                              whereX,
+	                              whereW,
+	                              gamma,
+	                              comb_y,
+	                              nvar,
+	                              n_marker,
+	                              nR,
+	                              ngamma,
+	                              nalp,
+	                              second_cont_bl,
+	                              second_cont_rr)
+
+
+
 
     afit <- list(coefficients  = coef,
     naive.var    = var,
     Ithegam = AIPW_fit$Ithegam,
     Ithealp = AIPW_fit$Ithealp,
     loglik = AIPW_fit$loglik,
+    sctest = AIPW_fit$sctest,
     iter   = AIPW_fit$iter,
     conv   = AIPW_fit$conv,
     linear.predictors = as.vector(lp),
+    score0 = score0,
     resid = rr,
 	  method='AIPW')
 

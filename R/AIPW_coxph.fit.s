@@ -108,7 +108,7 @@ AIPW_fit <- AIPW_coxfit_cpp(control$iter.max,
     }
 
     names(coef) <- dimnames(x)[[2]]
-    lp <- c(x %*% coef)
+    lp <- c(x %*% coef) + offset
 
       # Sort the data
 	    if(length(strata) == 0){
@@ -162,15 +162,45 @@ AIPW_fit <- AIPW_coxfit_cpp(control$iter.max,
 
 		rr <- drop(rowsum(rr, collapse))
 
+		temp <- 0*coef
+		score <- exp( sx %*% temp + soffset)
+		score0 <- AIPW_coxscore_cpp(
+		  stime,
+		  sstatus,
+		  sx,
+		  eventid,
+		  sid,
+		  score,
+		  newstrat,
+		  smarker,
+		  sR,
+		  pR,
+		  as.matrix(total_R),
+		  marker_r,
+		  whereX,
+		  whereW,
+		  gamma,
+		  comb_y,
+		  nvar,
+		  n_marker,
+		  nR,
+		  ngamma,
+		  nalp,
+		  second_cont_bl,
+		  second_cont_rr)
+
+
     afit <- list(coefficients  = coef,
     naive.var    = var,
     Ithegam = AIPW_fit$Ithegam,
     Ithealp = AIPW_fit$Ithealp,
     loglik = AIPW_fit$loglik,
+    sctest = AIPW_fit$sctest,
     iter   = AIPW_fit$iter,
     conv   = AIPW_fit$conv,
     linear.predictors = as.vector(lp),
     resid = rr,
+    score0 = score0,
     method='AIPW')
 
     return(afit)

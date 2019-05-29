@@ -40,6 +40,13 @@ print.AIPWcprisk <- function(object, ...) {
 
 
     printCoefmat(tmp, digits = digits, P.values = TRUE, has.Pvalue = TRUE, signif.stars = signif.stars, ...)
+    logtest <- -2 * (object$loglik[1] - object$loglik[2])
+    df <- sum(!is.na(coef))
+    cat("\n")
+    cat("Likelihood ratio test=", format(round(logtest, 2)), "  on ",
+        df, " df,", " p=",
+        format.pval(pchisq(logtest, df, lower.tail=FALSE), digits=digits),
+        "\n",  sep="")
 
     cat("  n=", object$n)
     if (!is.null(object$nevent))

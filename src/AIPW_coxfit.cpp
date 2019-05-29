@@ -23,12 +23,13 @@ Rcpp::List AIPW_coxfit_cpp(int maxiter, NumericVector time, IntegerVector status
   int i, j, k, l, h, person, pid, r, ty;
 
   double denom = 0, zbeta, risk;
-  double temp2;
+  double temp, temp2;
   int ndead;
   double newlk = 0;
   double dtime;
   double deadwt;
   double denom2;
+  double sctest;
 
   int halving;
   int nrisk;
@@ -380,6 +381,10 @@ Rcpp::List AIPW_coxfit_cpp(int maxiter, NumericVector time, IntegerVector status
     a[i] = a[i] * imat(i, i);
   }
 
+  sctest = 0;
+  for (i=0; i<nvar; i++)
+    sctest +=  u[i]*a[i]; /* score test */
+
   /*
    **  Never, never complain about convergence on the first step.  That way,
    **  if someone HAS to they can force one iter at a time.
@@ -666,6 +671,7 @@ Rcpp::List AIPW_coxfit_cpp(int maxiter, NumericVector time, IntegerVector status
     Named("Ithegam") = Ithegam,
     Named("Ithealp") = Ithealp,
     Named("loglik") = loglik,
+    Named("sctest") = sctest,
     Named("iter") = iter,
     Named("conv") = conv);
 

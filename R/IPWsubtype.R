@@ -442,9 +442,10 @@ IPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE, 
         resid <- as.matrix(Stheta) - as.matrix(Salp) %*% Ialp %*% t(Ithealp)
         var <- fit$naive.var %*% t(resid) %*% resid %*% fit$naive.var
 
-        afit <- list(coefficients = fit$coefficients, naive.var = fit$naive.var, var = var, loglik = fit$loglik,  score.residual = as.matrix(Stheta), iter = fit$iter,
-            weights = fit$weights, Ithealp = Ithealp, model_missing = model_missing, n = n, nevent = nevent,
-            nc = ndata, ncevent = nnevent, call = Call, terms = fit$terms, assign = fit$assign, method = "IPW")
+        afit <- list(coefficients = fit$coefficients, naive.var = fit$naive.var, var = var, loglik = fit$loglik, score = fit$sctest,
+                     rscore = fit$rscore, wald.test = fit$wald.test, score.residual = resid, iter = fit$iter,
+                     weights = fit$weights, Ithealp = Ithealp, model_missing = model_missing, n = n, nevent = nevent,
+                     nc = ndata, ncevent = nnevent, call = Call, terms = fit$terms, assign = fit$assign, method = "IPW")
 
         if(rmodel){afit$model <- mf}
         if (rx)  {

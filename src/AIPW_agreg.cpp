@@ -29,6 +29,7 @@ Rcpp::List AIPW_agreg_cpp(int maxiter, NumericVector start, NumericVector tstop,
   double dtime;
   double meanwt;
   double denom2;
+  double sctest;
   int deaths;
   int halving;
   int nrisk;
@@ -480,6 +481,10 @@ Rcpp::List AIPW_agreg_cpp(int maxiter, NumericVector start, NumericVector tstop,
     a[i] = a[i] * imat(i, i);
   }
 
+  sctest=0;
+  for (i=0; i<nvar; i++)
+    sctest +=  u[i]*a[i];
+
    for (i = 0; i < nvar; i++) {
     newbeta[i] = beta[i] + a[i];
   }
@@ -853,6 +858,7 @@ Rcpp::List AIPW_agreg_cpp(int maxiter, NumericVector start, NumericVector tstop,
     Named("Ithegam") = Ithegam,
     Named("Ithealp") = Ithealp,
     Named("loglik") = loglik,
+    Named("sctest") = sctest,
     Named("iter") = iter,
     Named("conv") = conv);
 
