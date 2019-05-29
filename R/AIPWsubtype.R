@@ -62,6 +62,7 @@ AIPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE,
 
     Call <- match.call()
     rx <- x
+    ry <- y
     rmodel <- model
     data <- data[order(data[, id]), ]
 
@@ -762,7 +763,7 @@ AIPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE,
             afit$strata <- strata.keep
           }
         }
-        if (y)  afit$y <- Y
+        if (ry)  afit$y <- Y
 
         class(afit) <- "AIPWcprisk"
     }

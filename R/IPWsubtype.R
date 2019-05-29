@@ -58,6 +58,7 @@ IPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE, 
 
     Call <- match.call()
     rx <- x
+    ry <- y
     rmodel <- model
 
     data <- data[order(data[, id]), ]
@@ -452,7 +453,7 @@ IPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE, 
             afit$strata <- fit$strata
           }
         }
-        if (y)  afit$y <- fit$y
+        if (ry)  afit$y <- fit$y
 
         class(afit) <- "IPWcprisk"
     }
