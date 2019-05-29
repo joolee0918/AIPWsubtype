@@ -76,6 +76,7 @@ subtype <- function(formula, data, id,  marker_name,
   }
 
   data$cause <- cause
+  event <- tail(survival:::terms.inner(formula[1:2]), 1)
   newdata <- lapply(1:n, function(i) data[rep(i, each = n_subtype), ])
   lf <- function(x) {
     if (!is.na(x$cause[1])) {
