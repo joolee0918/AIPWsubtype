@@ -27,7 +27,7 @@ cumHaz <- function(Y, strats, score, weights = NULL){
       if(is.null(weights)) {
         haz[i, 2] <- sum(event[exit == time[i]]) /sum(sco[rs])
       } else{
-        haz[i, 2] <- sum(weights[event==time[i]])*event[exit == time[i]]) /sum(sco[rs])
+        haz[i, 2] <- sum(weights[event==time[i]]*event[exit == time[i]]) /sum(sco[rs])
       }
     }
     out[[j]] <- haz
