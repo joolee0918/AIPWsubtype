@@ -1,12 +1,13 @@
 
+#' @export
 CIF <- function(fit, newdata){
 
+  n_marker <- length(fit$subtype$marker_name)
   cumhaz <- lapply(1:length(fit$basehaz), function(i) cbind(fit$basehaz[[i]][,1], cumsum(fit$basehaz[[i]][,2])))
 
   event <- tail(survival:::terms.inner(fit$formula[1:2]), 1)
   nvar <- length(fit$coefficients)
   n_subtype <- fit$subtype$n_subtype
-  n_marker <- fit$subtype$n_marker
   total_subtype <- fit$subtype$total_subtype
 
   if(missing(newdata)){
@@ -17,15 +18,15 @@ CIF <- function(fit, newdata){
     names(marker) <- fit$subtype$marker_name
     newdata <- cbind(newdata, marker)
   } else{
-    marker <- newdata[, fit$subtpye$marker_name]
-    if(any(marker)==0) stop("Newdata should not have misisng markers")
+    marker <- newdata[, fit$subtype$marker_name]
+    if(any(marker==0)) stop("Newdata should not have misisng markers")
   }
 
   n <- nrow(newdata)
   cause <- rep(0, n)
   for (i in 1:n) {
-    for (j in 1:n_subtype) {
-      if (all(marker[i, ] == total_subtype[j, 1:n_marker]))
+    for (j in 1:fit$subtype$n_subtype) {
+      if (all(marker[i, ] == fit$subtype$total_subtype[j, 1:n_marker]))
         cause[i] <- j
       }
     }
@@ -35,21 +36,23 @@ CIF <- function(fit, newdata){
   ## Data duplication
   lf <- function(x) {
     if (!is.na(x$cause[1])) {
-      x$cause <- c(x$cause[1], seq(1, n_subtype)[!(seq(1, n_subtype) %in% x$cause[1])])
+      x$cause <- c(x$cause[1], seq(1, fit$subtype$n_subtype)[!(seq(1, fit$subtype$n_subtype) %in% x$cause[1])])
     }
     x
   }
 
   newdata$id <- seq(1, n)
-  dnewdata <- lapply(1:n, function(i) newdata[rep(i, each = n_subtype), ])
+  dnewdata <- lapply(1:n, function(i) newdata[rep(i, each = fit$subtype$n_subtype), ])
   dnewdata <- lapply(dnewdata, lf)
   dnewdata <- as.data.frame(rbindlist(dnewdata))
-  dnewdata[, marker_name] <- data.frame(total_subtype[dnewdata$cause, ])
+  dnewdata[, marker_name] <- data.frame(fit$subtype$total_subtype[dnewdata$cause, ])
 
   Terms <- fit$terms
   has.strata <- !is.null(fit$strata)
-  if (length(fit$strata))  strata <- rep(0L,n)
-  else strata <- fit$strata
+  if (length(fit$strata)){
+    strata <- rep(0L,n)
+  }else { strata <- fit$strata
+  }
 
   subterms <- function(tt, i) {
     dataClasses <- attr(tt, "dataClasses")

@@ -768,9 +768,9 @@ AIPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE,
         if(rmodel){afit$model <- mf}
         if (rx)  {
           afit$x <- X
-          if (length(strats)) {
-            afit$strata <- strata.keep
-          }
+        }
+        if (length(strats)) {
+          afit$strata <- strata.keep
         }
         if (ry)  afit$y <- Y
 
