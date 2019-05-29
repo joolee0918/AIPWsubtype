@@ -1,6 +1,6 @@
 ## Modify getHaz in eha packages
 
-cumHaz <- function(Y, strats, score, weights = NULL){
+baseHaz <- function(Y, strats, score, weights = NULL){
   if (NCOL(Y) == 2) {
     Y <- cbind(rep(0, NROW(Y)), Y)
    }else{
@@ -33,6 +33,6 @@ cumHaz <- function(Y, strats, score, weights = NULL){
     out[[j]] <- haz
   }
   names(out) <- Strata
-  class(out) <- "hazdata"
+  class(out) <- "base.hazard"
   out
 }

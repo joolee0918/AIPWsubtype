@@ -774,10 +774,10 @@ AIPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE,
           stratum <- strats
         }
         s0 <- exp(fit$linear.predictors)
-        baseHaz <- cumHaz(Y, stratum, s0)
+        basehaz <- baseHaz(Y, stratum, s0)
 
         afit <- list(coefficients = fit$coef, naive.var = fit$naive.var, var = var, linear.predictors = fit$linear.predictors,
-                     score = fit$sctest, loglik = fit$loglik, rscore = rscore, wald.test = wald.test, score.residual = resid, iter = fit$iter, conv = fit$conv, baseHaz = baseHaz,
+                     score = fit$sctest, loglik = fit$loglik, rscore = rscore, wald.test = wald.test, score.residual = resid, iter = fit$iter, conv = fit$conv, basehaz = basehaz,
                      Ithealp = fit$Ithealp, Ithegam = fit$Ithegam, model.missing = model_missing, model.subtype = model_subtype,
                      n = n, nevent = nevent, call = Call, terms = Terms, assign = assign, method = "AIPW")
 
