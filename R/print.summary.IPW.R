@@ -29,9 +29,9 @@ print.summary.IPWcprisk <- function(x, digits = max(getOption("digits") - 3, 3),
     cat("  n=", x$n)
     if (!is.null(x$nevent))
         cat(", number of events=", x$nevent, "\n") else cat("\n")
-    cat("  complete-case n=", x$ndata)
-    if (!is.null(x$nnevent))
-        cat(", number of complete-case events=", x$nnevent, "\n") else cat("\n")
+    cat("  complete-case n=", x$nc)
+    if (!is.null(x$ncevent))
+        cat(", number of complete-case events=", x$ncevent, "\n") else cat("\n")
 
     if (nrow(x$coef) == 0) {
         # Null model

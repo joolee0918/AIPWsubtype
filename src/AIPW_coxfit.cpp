@@ -1,50 +1,5 @@
-/*
- ** AIPW competing risk model - using data dupliocation method
- **  the input parameters are
- **
- **       maxiter      :number of iterations
- **       time(n)      :time of event or censoring for person i
- **       status(n)    :status for the ith person    1=dead , 0=censored
- **       covar(nv,n)  :covariates for person i.
- **                        Note that S sends this in column major order.
- **       strata(n)    :marks the strata.  Will be 1 if this person is the
- **                       last one in a strata.  If there are no strata, the
- **                       vector can be identically zero, since the nth person's
- **                       value is always assumed to be = to 1.
- **       offset(n)    :offset for the linear predictor
- **       weights(n)   :case weights
- **       init         :initial estimate for the coefficients
- **       eps          :tolerance for convergence.  Iteration continues until
- **                       the percent change in loglikelihood is <= eps.
- **       chol_tol     : tolerance for the Cholesky decompostion
- **       method       : 0=Breslow, 1=Efron
- **       doscale      : 0=don't scale the X matrix, 1=scale the X matrix
- **
- **  returned parameters
- **       means(nv)    : vector of column means of X
- **       beta(nv)     :the vector of answers (at start contains initial est)
- **       u(nv)        :score vector
- **       imat(nv,nv)  :the variance matrix at beta=final
- **                      (returned as a vector)
- **       loglik(2)    :loglik at beta=initial values, at beta=final
- **       sctest       :the score test at beta=initial
- **       flag         :success flag  1000  did not converge
- **                                   1 to nvar: rank of the solution
- **       iter         :actual number of iterations used
- **
- **  work arrays
- **       mark(n)
- **       wtave(n)
- **       a(nvar), a2(nvar)
- **       cmat(nvar,nvar)       ragged array
- **       cmat2(nvar,nvar)
- **       newbeta(nvar)         always contains the "next iteration"
- **
- **  calls functions:  cholesky2, chsolve2, chinv2
- **
- **  the data must be sorted by ascending time within strata
- */
-
+/* Modification of Therneau T (2015). _A Package for Survival Analysis in S_. version
+ 2.38, <URL: https://CRAN.R-project.org/package=survival>.*/
 //[[Rcpp::depends(RcppArmadillo)]]
 
 #include <RcppArmadillo.h>
@@ -68,14 +23,14 @@ Rcpp::List AIPW_coxfit_cpp(int maxiter, NumericVector time, IntegerVector status
 
   double denom = 0, zbeta, risk;
   double temp2;
-  int ndead; /* number of death obs at a time point */
+  int ndead;
   double newlk = 0;
   double dtime;
-  double deadwt; /*sum of case weights for the deaths*/
-  double denom2; /* sum of weighted risk scores for the deaths*/
+  double deadwt;
+  double denom2;
 
-  int halving; /*are we doing step halving at the moment? */
-  int nrisk; /* number of subjects in the current risk set */
+  int halving;
+  int nrisk;
   int conv;
   int col1, col2;
   int nused, nX, nW, nevent;
@@ -560,10 +515,7 @@ Rcpp::List AIPW_coxfit_cpp(int maxiter, NumericVector time, IntegerVector status
     /* am I done?
      **   update the betas and test for convergence
      */
-    Rcout << "u " << u << "\n";
-    Rcout << "Beta " << newbeta << "\n";
-    Rcout << "iter " << iter << "\n";
-    if (fabs(1 - (loglik[1] / newlk)) <= eps && halving == 0) {
+     if (fabs(1 - (loglik[1] / newlk)) <= eps && halving == 0) {
       /* all done */
       loglik[1] = newlk;
 
@@ -588,11 +540,7 @@ Rcpp::List AIPW_coxfit_cpp(int maxiter, NumericVector time, IntegerVector status
 
     if (is_nan(nnewlk)[0] || 0 != is_infinite(nnewlk)[0]) {
       for (i = 0; i < nvar; i++) newbeta[i] = beta[i];
-      /* we want to recompute imat, as it is likely NaN or Inf as well
-       **  The "fabs()" check further above will test true on the next
-       **  iteration, but just in case this was the last force one more
-       */
-      maxiter++;
+       maxiter++;
       continue;
     }
 
@@ -622,16 +570,7 @@ Rcpp::List AIPW_coxfit_cpp(int maxiter, NumericVector time, IntegerVector status
       for (i = 0; i < nvar; i++) {
         beta[i] = newbeta[i];
         newbeta[i] = newbeta[i] + u2[i];
-        /*
-        ** This code was a mistake.  If X is collinear we can easlily
-        **  create a beta which is large while eta is restrained
-
-        if (newbeta[i] > maxbeta[i]) {
-        newbeta[i] = maxbeta[i];
-        }
-        else if (newbeta[i] < -maxbeta[i]) newbeta[i] = -maxbeta[i];
-        */
-      }
+           }
     }
   } /* return for another iteration */
 

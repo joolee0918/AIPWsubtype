@@ -1,38 +1,5 @@
-/*
- ** AIPW competing risk model - using data dupliocation method
- **  the input parameters are
- **
- **       maxiter      :number of iterations
- **       y(n)         : survival objects including start end status
- **       covar(nv,n)  :covariates for person i.
- **                        Note that S sends this in column major order.
- **       strata(n)    :marks the strata.  Will be 1 if this person is the
- **                       last one in a strata.  If there are no strata, the
- **                       vector can be identically zero, since the nth person's
- **                       value is always assumed to be = to 1.
- **       offset(n)    :offset for the linear predictor
- **
- **       init         :initial estimate for the coefficients
- **       eps          :tolerance for convergence.  Iteration continues until
- **                       the percent change in loglikelihood is <= eps.
- **       chol_tol     : tolerance for the Cholesky decompostion
- **       method       : 0=Breslow, 1=Efron
- **       doscale      : 0=don't scale the X matrix, 1=scale the X matrix
- **
- **  returned parameters
- **       means(nv)    : vector of column means of X
- **       beta(nv)     :the vector of answers (at start contains initial est)
- **       u(nv)        :score vector
- **       imat(nv,nv)  :the variance matrix at beta=final
- **                      (returned as a vector)
- **       loglik(2)    :loglik at beta=initial values, at beta=final
- **       sctest       :the score test at beta=initial
- **       flag         :success flag  1000  did not converge
- **                                   1 to nvar: rank of the solution
- **       iter         :actual number of iterations used
- **
- **  the data must be sorted by ascending time within strata
- */
+/* Modification of Therneau T (2015). _A Package for Survival Analysis in S_. version
+ 2.38, <URL: https://CRAN.R-project.org/package=survival>.*/
 
 //[[Rcpp::depends(RcppArmadillo)]]
 
@@ -60,11 +27,11 @@ Rcpp::List AIPW_agreg_cpp(int maxiter, NumericVector start, NumericVector tstop,
   double temp;
   double newlk = 0;
   double dtime;
-  double meanwt; /*sum of case weights for the deaths*/
-  double denom2; /* sum of weighted risk scores for the deaths*/
+  double meanwt;
+  double denom2;
   int deaths;
-  int halving; /*are we doing step halving at the moment? */
-  int nrisk; /* number of subjects in the current risk set */
+  int halving;
+  int nrisk;
   int conv;
   int col1, col2;
   int nused, nX, nW, nstrat, istrat, nevent;
@@ -262,10 +229,7 @@ Rcpp::List AIPW_agreg_cpp(int maxiter, NumericVector start, NumericVector tstop,
           tmp_numw[j] += tmp_w[j] * exp(zgamma);
         }
 
-        /*   Rcout<<tmp_denom<<"\n";
-        for(i=0;i<nvar;i++)
-        Rcout<<tmp_num[i]<<"\n"; */
-      }
+         }
       for (i = 0; i < ngamma; i++) {
         EZ[(tmp_r - 1) * ngamma * nevent + i * nevent + pid] = tmp_num[i] / tmp_denom;
         for (j = 0; j < ngamma; j++) {
@@ -287,9 +251,7 @@ Rcpp::List AIPW_agreg_cpp(int maxiter, NumericVector start, NumericVector tstop,
 
   for (person = 0; person < nused;) {
     if (person == strata[istrat]) {
-      /* first subject in a new stratum */
-      /* finish the work for the prior stratum */
-      for (; indx1 < person; indx1++) {
+       for (; indx1 < person; indx1++) {
         p1 = sort1[indx1];
         keep[p1] += deaths;
       }
@@ -329,13 +291,7 @@ Rcpp::List AIPW_agreg_cpp(int maxiter, NumericVector start, NumericVector tstop,
       zbeta += beta[i] * covar(person, i);
     eta[person] = zbeta + offset[person];
   }
-  /*
-   **  'person' walks through the the data from 1 to n,
-   **     sort1[0] points to the largest stop time, sort1[1] the next, ...
-   **  'dtime' is a scratch variable holding the time of current interest
-   **  'indx1' walks through the start times.
-   */
-  newlk = 0;
+   newlk = 0;
   for (i = 0; i < nvar; i++) {
     u[i] = 0;
     for (j = 0; j < nvar; j++)
@@ -524,13 +480,7 @@ Rcpp::List AIPW_agreg_cpp(int maxiter, NumericVector start, NumericVector tstop,
     a[i] = a[i] * imat(i, i);
   }
 
-  /*
-   **  Never, never complain about convergence on the first step.  That way,
-   **  if someone HAS to they can force one iter at a time.
-   ** A non-finite loglik comes from exp overflow and requires almost
-   **  malicious initial values.
-   */
-  for (i = 0; i < nvar; i++) {
+   for (i = 0; i < nvar; i++) {
     newbeta[i] = beta[i] + a[i];
   }
 
@@ -607,13 +557,7 @@ Rcpp::List AIPW_agreg_cpp(int maxiter, NumericVector start, NumericVector tstop,
       if (k == nused)
         person = k; /* no more deaths to be processed */
       else {
-        /* remove any subjects no longer at risk */
-        /*
-         ** subtract out the subjects whose start time is to the right
-         ** If everyone is removed reset the totals to zero.  (This happens when
-         ** the survSplit function is used, so it is worth checking).
-         */
-        for (; indx1 < strata[istrat]; indx1++) {
+          for (; indx1 < strata[istrat]; indx1++) {
           p1 = sort1[indx1];
           if (start[p1] < dtime)
             break;
@@ -745,11 +689,6 @@ Rcpp::List AIPW_agreg_cpp(int maxiter, NumericVector start, NumericVector tstop,
       conv = 1;
       goto finish;
     }
-    /*
-     ** a non-finite loglik is very rare: a step so bad that we get
-     ** an overflow of the exp function.
-     **  When this happens back up one iteration and quit
-     */
 
     NumericVector nnewlk(1);
     nnewlk[0] = newlk;
@@ -757,11 +696,7 @@ Rcpp::List AIPW_agreg_cpp(int maxiter, NumericVector start, NumericVector tstop,
     if (is_nan(nnewlk)[0] || 0 != is_infinite(nnewlk)[0]) {
       for (i = 0; i < nvar; i++)
         newbeta[i] = beta[i];
-      /* we want to recompute imat, as it is likely NaN or Inf as well
-       **  The "fabs()" check further above will test true on the next
-       **  iteration, but just in case this was the last force one more
-       */
-      maxiter++;
+       maxiter++;
       continue;
     }
 

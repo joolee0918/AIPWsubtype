@@ -1,10 +1,5 @@
-//
-//  IPW_Ithealp.cpp
-//
-//
-//  Created by LeeJooyoung on 2019-01-17.
-//
-
+/* Modification of Therneau T (2015). _A Package for Survival Analysis in S_. version
+ 2.38, <URL: https://CRAN.R-project.org/package=survival>.*/
 //[[Rcpp::depends(RcppArmadillo)]]
 
 #include <RcppArmadillo.h>
@@ -14,31 +9,6 @@
 #include <math.h>
 using namespace Rcpp;
 
-
-/* $Id: coxscore.c 11357 2009-09-04 15:22:46Z therneau $
- **
- ** Compute the score residuals for a Cox model
- **
- ** Input
- **      nx      number of subjects
- **      nvarx   number of variables in the covariance matrix
- **      y       matrix of time and status values
- **      strata  =1 for the last obs of each strata
- **      covar2  the matrix of covariates, rows=variables, columns=subjects
- **                (the S executive stores matrices in the Fortran ordering)
- **      score   the vector of subject scores, i.e., exp(beta*z)
- **      weights case weight
- **      method  ==1 for efron method
- **
- ** Output
- **      resid   a matrix of the same shape as x
- **
- ** Scratch
- **      scratch,  from which a and a2 are carved
- **
- ** Data must be sorted by strata, ascending time within strata, death before
- **                      censor within time.
- */
 
 //[[Rcpp::export()]]
 NumericMatrix IPW_ithealp_cox(NumericVector time, IntegerVector status, NumericVector lp, IntegerVector strata, NumericMatrix covar, NumericMatrix dpi,
@@ -153,7 +123,6 @@ NumericMatrix IPW_ithealp_cox(NumericVector time, IntegerVector status, NumericV
       for (k = 0; k < nalp; k++)
         aa02[k] = 0;
       for (i = 0; i < nvar; i++) {
-        /*in anticipation */
         a2[i] = 0;
         for (k = 0; k < nalp; k++) aa12(i, k) = 0;
       }

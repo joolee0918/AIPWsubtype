@@ -1,38 +1,6 @@
-/*
- ** AIPW competing risk model - using data dupliocation method
- **  the input parameters are
- **
- **       maxiter      :number of iterations
- **       y(n)         : survival objects including start end status
- **       covar(nv,n)  :covariates for person i.
- **                        Note that S sends this in column major order.
- **       strata(n)    :marks the strata.  Will be 1 if this person is the
- **                       last one in a strata.  If there are no strata, the
- **                       vector can be identically zero, since the nth person's
- **                       value is always assumed to be = to 1.
- **       offset(n)    :offset for the linear predictor
- **
- **       init         :initial estimate for the coefficients
- **       eps          :tolerance for convergence.  Iteration continues until
- **                       the percent change in loglikelihood is <= eps.
- **       chol_tol     : tolerance for the Cholesky decompostion
- **       method       : 0=Breslow, 1=Efron
- **       doscale      : 0=don't scale the X matrix, 1=scale the X matrix
- **
- **  returned parameters
- **       means(nv)    : vector of column means of X
- **       beta(nv)     :the vector of answers (at start contains initial est)
- **       u(nv)        :score vector
- **       imat(nv,nv)  :the variance matrix at beta=final
- **                      (returned as a vector)
- **       loglik(2)    :loglik at beta=initial values, at beta=final
- **       sctest       :the score test at beta=initial
- **       flag         :success flag  1000  did not converge
- **                                   1 to nvar: rank of the solution
- **       iter         :actual number of iterations used
- **
- **  the data must be sorted by ascending time within strata
- */
+/* Modification of Therneau T (2015). _A Package for Survival Analysis in S_. version
+ 2.38, <URL: https://CRAN.R-project.org/package=survival>.*/
+
 
 //[[Rcpp::depends(RcppArmadillo)]]
 

@@ -1,3 +1,4 @@
+## Modification of Therneau T (2015). _A Package for Survival Analysis in S_. version 2.38, <URL: https://CRAN.R-project.org/package=survival>.*/
 
 AIPW_coxph.fit <- function(x, y, eventid, id, strata, offset, whereX, whereW, init, control, marker, gamma,  pR, R, dpR, total_R, marker_r, two_stage, n_marker, second_cont_bl, second_cont_rr,  rownames, collapse)
 {
