@@ -496,23 +496,6 @@ AIPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE,
     }
 
     if (length(dropterms)) {
-        temppred <- attr(Terms, "predvars")
-        Terms2 <- Terms[-dropterms]
-        if (!is.null(temppred)) {
-            # subscripting a Terms object currently drops predvars, in error
-            attr(Terms2, "predvars") <- temppred[-(1 + dropterms)]  # 'Call' object
-        }
-        X <- model.matrix(Terms2, mf, constrasts = contrast.arg)
-        # we want to number the terms wrt the original model matrix Do not forget the intercept, which will be a
-        # zero
-        renumber <- match(colnames(attr(Terms2, "factors")), colnames(attr(Terms, "factors")))
-        attr(X, "assign") <- c(0, renumber)[1 + attr(X, "assign")]
-    } else {
-        X <- model.matrix(Terms, mf, contrasts = contrast.arg)
-    }
-
-
-    if (length(dropterms)) {
         Terms2 <- Terms[-dropterms]
         X <- model.matrix(Terms2, mf, constrasts = contrast.arg)
         # we want to number the terms wrt the original model matrix

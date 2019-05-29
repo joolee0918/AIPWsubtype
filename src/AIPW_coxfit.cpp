@@ -518,6 +518,8 @@ Rcpp::List AIPW_coxfit_cpp(int maxiter, NumericVector time, IntegerVector status
       }
     } /* end  of accumulation loop  */
 
+    Rcout<<"iter: "<<iter<<"\n";
+    Rcout<<"beta"" "<<beta<<"\n";
     /* am I done?
      **   update the betas and test for convergence
      */
