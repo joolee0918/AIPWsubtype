@@ -129,6 +129,13 @@ Rcpp::NumericMatrix AIPW_coxscore_cpp(NumericVector time, NumericVector status,
       tmp_r = R[person] - 1;
       NumericMatrix tmp_marker_r = marker_r[tmp_r - 1];
 
+      for (i = 0; i < nevent; i++) {
+        if (eventid[i] == id[person]) {
+          pid = i;
+          break;
+        }
+      }
+
       tmp_denom = 0;
       for (i = 0; i < ngamma; i++) {
         tmp_num[i] = 0;
