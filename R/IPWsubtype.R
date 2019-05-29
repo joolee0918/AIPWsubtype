@@ -476,7 +476,7 @@ IPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE, 
                                               control$toler.chol)$test
         }
 
-        afit <- list(coefficients = fit$coefficients, naive.var = fit$naive.var, var = var, loglik = fit$loglik, score = fit$sctest,
+        afit <- list(coefficients = fit$coefficients, naive.var = fit$naive.var, var = var, loglik = fit$loglik, score = fit$score,
                      rscore = rscore, wald.test = wald.test, score.residual = resid, iter = fit$iter,
                      weights = fit$weights, Ithealp = Ithealp, model_missing = model_missing, n = n, nevent = nevent,
                      nc = ndata, ncevent = nnevent, call = Call, terms = fit$terms, assign = fit$assign, method = "IPW")

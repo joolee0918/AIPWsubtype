@@ -156,15 +156,14 @@ AIPW_fit <- AIPW_coxfit_cpp(control$iter.max,
 	        second_cont_bl,
 	        second_cont_rr)
 
-	       	rr <- resid
-	        rr[ord,] <- rr
-	        dimnames(rr) =list(names(rownames), names(coef))
-
+	  rr <- resid
+	  rr[ord,] <- rr
+	  dimnames(rr) =list(names(rownames), names(coef))
 		rr <- drop(rowsum(rr, collapse))
 
 		temp <- 0*coef
 		score <- exp( sx %*% temp)
-		score0 <- AIPW_coxscore_cpp(
+		resid0 <- AIPW_coxscore_cpp(
 		  stime,
 		  sstatus,
 		  sx,
@@ -189,6 +188,11 @@ AIPW_fit <- AIPW_coxfit_cpp(control$iter.max,
 		  second_cont_bl,
 		  second_cont_rr)
 
+		rr0 <- resid0
+		rr0[ord,] <- rr0
+		dimnames(rr0) =list(names(rownames), names(coef))
+		rr0 <- drop(rowsum(rr0, collapse))
+
 
     afit <- list(coefficients  = coef,
     naive.var    = var,
@@ -200,7 +204,7 @@ AIPW_fit <- AIPW_coxfit_cpp(control$iter.max,
     conv   = AIPW_fit$conv,
     linear.predictors = as.vector(lp),
     resid = rr,
-    score0 = score0,
+    score0 = rr0,
     method='AIPW')
 
     return(afit)

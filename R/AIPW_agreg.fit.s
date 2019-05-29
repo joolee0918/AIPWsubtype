@@ -155,21 +155,14 @@ AIPW_fit <- AIPW_agreg_cpp(maxiter,
 	        second_cont_bl,
 	        second_cont_rr)
 
-
-	    if (nvar >1) {
-	        rr <- matrix(0, nrow=n, ncol=nvar)
-	        rr[ord,] <- resid
-	        dimnames(rr) =list(names(rownames), names(coef))
-
-	    } else {
-	        rr[ord] <- resid
-	    }
-
+	    rr <- resid
+	    rr[ord,] <- rr
+	    dimnames(rr) =list(names(rownames), names(coef))
 	    rr <- drop(rowsum(rr, collapse))
 
 	    temp <- 0*coef
 	    score <- exp( sx %*% temp)
-	    score0 <- AIPW_agscore_cpp(as.double(sy[,1]),
+	    resid0 <- AIPW_agscore_cpp(as.double(sy[,1]),
 	                              as.double(sy[,2]),
 	                              as.double(sy[,3]),
 	                              sx,
@@ -194,7 +187,10 @@ AIPW_fit <- AIPW_agreg_cpp(maxiter,
 	                              second_cont_bl,
 	                              second_cont_rr)
 
-
+	    rr0 <- resid0
+	    rr0[ord,] <- rr0
+	    dimnames(rr0) =list(names(rownames), names(coef))
+	    rr0 <- drop(rowsum(rr0, collapse))
 
 
     afit <- list(coefficients  = coef,
@@ -206,8 +202,8 @@ AIPW_fit <- AIPW_agreg_cpp(maxiter,
     iter   = AIPW_fit$iter,
     conv   = AIPW_fit$conv,
     linear.predictors = as.vector(lp),
-    score0 = score0,
     resid = rr,
+    score0 = rr0,
 	  method='AIPW')
 
     return(afit)
