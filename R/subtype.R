@@ -152,6 +152,7 @@ subtype <- function(formula, data, id,  marker_name,
   newformula <- update.formula(formula, paste("~.+", order_bl, order_rr, "+", "cluster", "(", id, ")"))
   fit <- coxph(formula = newformula, data = newdata, robust = T, method = "breslow", model = rmodel, x = rx)
   fit$n <- n
+  fit$call <- Call
   return(fit)
 
 }

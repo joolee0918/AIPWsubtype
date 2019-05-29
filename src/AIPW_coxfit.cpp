@@ -128,9 +128,9 @@ Rcpp::List AIPW_coxfit_cpp(int maxiter, NumericVector time, IntegerVector status
             tmp_w[k] = tmp_y[k];
           }
 
-          for (k = 0; k < ny_rr; k++) {
-            for (j = 0; j < nX; j++) {
-              tmp_w[ny + nX * k + j] = covar(person, whereX[j] - 1) * tmp_yr[k];
+          for (j = 0; j < nX; j++) {
+            for (k = 0; k < ny_rr; k++) {
+              tmp_w[ny + ny_rr * j + k] = covar(person, whereX[j] - 1) * tmp_yr[k];
             }
           }
 
@@ -208,9 +208,9 @@ Rcpp::List AIPW_coxfit_cpp(int maxiter, NumericVector time, IntegerVector status
           tmp_w[k] = tmp_y[k];
         }
 
-        for (k = 0; k < ny_rr; k++) {
-          for (j = 0; j < nX; j++) {
-            tmp_w[ny + nX * k + j] = covar(person, whereX[j] - 1) * tmp_yr[k];
+        for (j = 0; j < nX; j++) {
+          for (k = 0; k < ny_rr; k++) {
+            tmp_w[ny + ny_rr * j + k] = covar(person, whereX[j] - 1) * tmp_yr[k];
           }
         }
 
