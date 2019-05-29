@@ -76,7 +76,7 @@ subtype <- function(formula, data, id,  marker_name,
   }
 
   data$cause <- cause
-  newdata <- lapply(1:n, function(i) newdata[rep(i, each = n_subtype), ])
+  newdata <- lapply(1:n, function(i) data[rep(i, each = n_subtype), ])
   lf <- function(x) {
     if (!is.na(x$cause[1])) {
       x$cause <- c(x$cause[1], seq(1, n_subtype)[!(seq(1, n_subtype) %in% x$cause[1])])
