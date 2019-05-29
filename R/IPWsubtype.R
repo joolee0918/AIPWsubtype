@@ -271,6 +271,10 @@ IPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE, 
     }
 
     unconstvar <- Xattr[!(Xattr %in% constvar)]
+    whichX <- which(dimnames(attr(Tf, "factors"))[[2]] %in% c(unconstvar))
+
+    # where is the main effect for uonstrained variables in X matrix
+    whichW <- which(dimnames(attr(Tf, "factors"))[[2]] %in% c(constvar))
 
     nuvar <- length(unconstvar)
     order_rr <- NULL
