@@ -1,6 +1,6 @@
-/* Modification of Therneau T (2015). _A Package for Survival Analysis in S_. version 2.38, <URL: https://CRAN.R-project.org/package=survival>. */
-*
+/* Modification of Therneau T (2015). _A Package for Survival Analysis in S_. version 2.38, <URL: https://CRAN.R-project.org/package=survival>.
 */
+
 //[[Rcpp::depends(RcppArmadillo)]]
 
 #include <RcppArmadillo.h>
