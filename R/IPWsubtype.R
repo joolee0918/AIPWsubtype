@@ -345,7 +345,7 @@ IPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE, 
 
         x <- fit$x
         weights <- fit$weights
-        strata <- coxph.detail(fit)$strata
+        strata <- fit$strata
         lp <- fit$linear.predictors + sum(fit$coefficients * fit$means)
 
         nused <- nrow(y)
@@ -479,7 +479,7 @@ IPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE, 
         if(is.null(fit$strata)) {
           stratum <- rep(1, nrow(fit$y))
         }else {
-          stratum <- coxph.detail(fit)$strata
+          stratum <- fit$strata
         }
         s0 <- exp(lp)*weights
         basehaz <- baseHaz(fit$y, stratum, s0, weights = weights)
@@ -487,13 +487,13 @@ IPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE, 
         afit <- list(coefficients = fit$coefficients, naive.var = fit$naive.var, var = var,  linear.predictors = lp, loglik = fit$loglik, score = fit$score,
                      rscore = rscore, wald.test = wald.test, score.residual = resid, iter = fit$iter,
                      weights = fit$weights, basehaz = basehaz, Ithealp = Ithealp, model_missing = model_missing, n = n, nevent = nevent,
-                     nc = ndata, ncevent = nnevent, call = Call, terms = fit$terms, assign = fit$assign, method = "IPW")
+                     nc = ndata, ncevent = nnevent, subtype = list(n_subtype = n_subtype, marker_name = marker_name, total_subtype = total_subtype, nX = length(whichX), nW = length(whichW)), formula = formula, call = Call, terms = fit$terms, assign = fit$assign, method = "IPW")
 
         if(rmodel){afit$model <- mf}
         if (rx)  {
           afit$x <- fit$x
-          if (length(strats)) {
-            afit$strata <- fit$strata
+          if (length(strata)) {
+            afit$strata <- strata
           }
         }
         if (ry)  afit$y <- fit$y

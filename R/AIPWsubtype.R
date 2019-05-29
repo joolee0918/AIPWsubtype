@@ -762,7 +762,7 @@ AIPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE,
         afit <- list(coefficients = fit$coef, naive.var = fit$naive.var, var = var, linear.predictors = fit$linear.predictors,
                      score = fit$sctest, loglik = fit$loglik, rscore = rscore, wald.test = wald.test, score.residual = resid, iter = fit$iter, conv = fit$conv, basehaz = basehaz,
                      Ithealp = fit$Ithealp, Ithegam = fit$Ithegam, model.missing = model_missing, model.subtype = model_subtype,
-                     n = n, nevent = nevent, call = Call, terms = Terms, assign = assign, method = "AIPW")
+                     n = n, nevent = nevent, subtype = list(n_subtype = n_subtype, marker_name = marker_name, total_subtype = total_subtype, nX = length(whichX), nW = length(whichW)), formula = formula, call = Call, terms = Terms, assign = assign, method = "AIPW")
 
 
         if(rmodel){afit$model <- mf}
@@ -773,6 +773,7 @@ AIPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE,
           }
         }
         if (ry)  afit$y <- Y
+
 
         class(afit) <- "AIPWcprisk"
     }
