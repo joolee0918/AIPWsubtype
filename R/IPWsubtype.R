@@ -476,9 +476,17 @@ IPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE, 
                                               control$toler.chol)$test
         }
 
+        if(is.null(fit$strata)) {
+          stratum <- rep(1, nrow(fit$y))
+        }else {
+          stratum <- fit$strata
+        }
+        s0 <- exp(lp)*weights
+        baseHaz <- cumHaz(fit$y, stratum, s0, weights = weights)
+
         afit <- list(coefficients = fit$coefficients, naive.var = fit$naive.var, var = var, loglik = fit$loglik, score = fit$score,
                      rscore = rscore, wald.test = wald.test, score.residual = resid, iter = fit$iter,
-                     weights = fit$weights, Ithealp = Ithealp, model_missing = model_missing, n = n, nevent = nevent,
+                     weights = fit$weights, baseHaz = baseHaz, Ithealp = Ithealp, model_missing = model_missing, n = n, nevent = nevent,
                      nc = ndata, ncevent = nnevent, call = Call, terms = fit$terms, assign = fit$assign, method = "IPW")
 
         if(rmodel){afit$model <- mf}
