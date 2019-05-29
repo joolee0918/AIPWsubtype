@@ -163,7 +163,7 @@ AIPW_fit <- AIPW_coxfit_cpp(control$iter.max,
 		rr <- drop(rowsum(rr, collapse))
 
 		temp <- 0*coef
-		score <- exp( sx %*% temp + soffset)
+		score <- exp( sx %*% temp)
 		score0 <- AIPW_coxscore_cpp(
 		  stime,
 		  sstatus,

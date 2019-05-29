@@ -751,7 +751,6 @@ AIPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE,
         var <- fit$naive.var %*% t(resid) %*% resid %*% fit$naive.var
 
         ## robust log-rank statistic
-
         temp0 <- fit$score0 - as.matrix(Sgam) %*% Igam %*% t(fit$Ithegam) - as.matrix(Salp) %*% Ialp %*% t(fit$Ithealp)
         u <- apply(as.matrix(temp0), 2, sum)
         rscore <- survival::coxph.wtest(t(temp0)%*%temp0, u, control$toler.chol)$test
@@ -773,8 +772,6 @@ AIPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE,
                      rscore = rscore, wald.test = wald.test, score.residual = resid, iter = fit$iter, conv = fit$conv,
                      Ithealp = fit$Ithealp, Ithegam = fit$Ithegam, model.missing = model_missing, model.subtype = model_subtype,
                      n = n, nevent = nevent, call = Call, terms = Terms, assign = assign, method = "AIPW")
-
-
 
 
         if(rmodel){afit$model <- mf}

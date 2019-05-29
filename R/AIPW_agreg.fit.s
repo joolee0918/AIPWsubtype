@@ -168,7 +168,7 @@ AIPW_fit <- AIPW_agreg_cpp(maxiter,
 	    rr <- drop(rowsum(rr, collapse))
 
 	    temp <- 0*coef
-	    score <- exp( sx %*% temp + soffset)
+	    score <- exp( sx %*% temp)
 	    score0 <- AIPW_agscore_cpp(as.double(sy[,1]),
 	                              as.double(sy[,2]),
 	                              as.double(sy[,3]),

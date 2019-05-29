@@ -394,6 +394,18 @@ IPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE, 
         Stheta[is.na(Stheta)] <- 0
         Stheta <- as.matrix(Stheta[, -1])
 
+        fit2 <- fit
+        fit2$linear.predictors <- 0*fit$linear.predictors
+        score_theta0 <- as.data.frame(residuals(fit2, type = "score", collapse = newdata[, id], weighted = T))
+        Stheta0 <- as.data.frame(uniqid)
+        names(Stheta0) <- id
+        score_theta0 <- cbind(nuniqid, score_theta0)
+        colnames(score_theta0)[1] <- id
+        Stheta0 <- merge(Stheta0, score_theta0, by = id, all = T)
+        Stheta0[is.na(Stheta0)] <- 0
+        Stheta0 <- as.matrix(Stheta0[, -1])
+
+
         # P I_thealp = t(tmp_score)%*%as.matrix(dpR)
 
         ## Only fully observed data
@@ -442,8 +454,25 @@ IPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE, 
         resid <- as.matrix(Stheta) - as.matrix(Salp) %*% Ialp %*% t(Ithealp)
         var <- fit$naive.var %*% t(resid) %*% resid %*% fit$naive.var
 
+        ## robust log-rank statistic
+        temp0 <-  as.matrix(Stheta0) - as.matrix(Salp) %*% Ialp %*% t(Ithealp)
+        u <- apply(as.matrix(temp0), 2, sum)
+        rscore <- survival::coxph.wtest(t(temp0)%*%temp0, u, control$toler.chol)$test
+
+        #Wald test
+        if (length(fit$coefficients)) {
+          #not for intercept only models, or if test is already done
+          nabeta <- !is.na(fit$coefficients)
+          # The init vector might be longer than the betas, for a sparse term
+          if (is.null(init)) temp <- fit$coefficients[nabeta]
+          else temp <- (fit$coefficients -
+                          init[1:length(fit$coefficients)])[nabeta]
+          wald.test <-  survival::coxph.wtest(var[nabeta,nabeta], temp,
+                                              control$toler.chol)$test
+        }
+
         afit <- list(coefficients = fit$coefficients, naive.var = fit$naive.var, var = var, loglik = fit$loglik, score = fit$sctest,
-                     rscore = fit$rscore, wald.test = fit$wald.test, score.residual = resid, iter = fit$iter,
+                     rscore = rscore, wald.test = wald.test, score.residual = resid, iter = fit$iter,
                      weights = fit$weights, Ithealp = Ithealp, model_missing = model_missing, n = n, nevent = nevent,
                      nc = ndata, ncevent = nnevent, call = Call, terms = fit$terms, assign = fit$assign, method = "IPW")
 
