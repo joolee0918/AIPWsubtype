@@ -52,7 +52,7 @@ Rcpp::NumericMatrix AIPW_coxscore_cpp(NumericVector time, NumericVector status,
   NumericVector tmp_w(ngamma);
 
   NumericMatrix Ecov(nR - 1, nvar);
-  NumericVector EZ((nR - 1) * ngamma * nused);
+  NumericVector EZ((nR - 1) * ngamma * nevent);
 
   int r, ty;
   int tmp_r;
@@ -60,6 +60,14 @@ Rcpp::NumericMatrix AIPW_coxscore_cpp(NumericVector time, NumericVector status,
   for (person = 0; person < nused; person++) {
 
     if (status[person] == 1 && R[person] == 1) {
+
+      for (i = 0; i < nevent; i++) {
+        if (eventid[i] == id[person]) {
+          pid = i;
+          break;
+        }
+      }
+
 
       for (r = 1; r < nR; r++) {
         tmp_denom = 0;
@@ -112,7 +120,7 @@ Rcpp::NumericMatrix AIPW_coxscore_cpp(NumericVector time, NumericVector status,
           }
         }
         for (i = 0; i < ngamma; i++) {
-          EZ[(r - 1) * ngamma * nused + i * nused + person] = tmp_num[i] / tmp_denom;
+          EZ[(r - 1) * ngamma * nevent + i * nevent + pid] = tmp_num[i] / tmp_denom;
         }
 
       }
@@ -175,7 +183,7 @@ Rcpp::NumericMatrix AIPW_coxscore_cpp(NumericVector time, NumericVector status,
          Rcout<<tmp_num[i]<<"\n"; */
       }
       for (i = 0; i < ngamma; i++) {
-        EZ[(tmp_r - 1) * ngamma * nused + i * nused + person] = tmp_num[i] / tmp_denom;
+        EZ[(tmp_r - 1) * ngamma * nevent + i * nevent + pid] = tmp_num[i] / tmp_denom;
 
       }
 
@@ -244,7 +252,7 @@ Rcpp::NumericMatrix AIPW_coxscore_cpp(NumericVector time, NumericVector status,
             }
             for (r = 1; r < nR; r++) {
               for (l = 0; l < ngamma; l++) {
-                Ecov(r - 1, nX + nW + l) = EZ[(r - 1) * ngamma * nused + l * nused + k];
+                Ecov(r - 1, nX + nW + l) = EZ[(r - 1) * ngamma * nevent + l * nevent + pid];
 
               }
             }

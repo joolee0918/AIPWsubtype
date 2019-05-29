@@ -345,7 +345,7 @@ IPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE, 
 
         x <- fit$x
         weights <- fit$weights
-        strata <- fit$strata
+        strata <- coxph.detail(fit)$strata
         lp <- fit$linear.predictors + sum(fit$coefficients * fit$means)
 
         nused <- nrow(y)
@@ -479,7 +479,7 @@ IPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE, 
         if(is.null(fit$strata)) {
           stratum <- rep(1, nrow(fit$y))
         }else {
-          stratum <- fit$strata
+          stratum <- coxph.detail(fit)$strata
         }
         s0 <- exp(lp)*weights
         basehaz <- baseHaz(fit$y, stratum, s0, weights = weights)
