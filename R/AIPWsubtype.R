@@ -76,7 +76,7 @@ AIPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE,
 
     if (missing(control)) {
       control = coxph.control()
-      control$eps = 1e-12
+      control$eps = 1e-09
       control$iter.max = 2000
       control$toler.inf = sqrt(control$eps)
     }
