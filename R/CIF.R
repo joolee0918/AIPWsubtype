@@ -1,6 +1,6 @@
 
 #' @export
-CIF <- function(fit, newdata){
+CIF <- function(fit, newdata, na.action = na.pass){
 
   n_marker <- length(fit$subtype$marker_name)
   cumhaz <- lapply(1:length(fit$basehaz), function(i) cbind(fit$basehaz[[i]][,1], cumsum(fit$basehaz[[i]][,2])))
@@ -14,7 +14,7 @@ CIF <- function(fit, newdata){
     newdata <- data.frame(rep(0, fit$subtype$nX + fit$subtype$nW))   #create a dummy newdata
     names(newdata) <- names(fit$coefficients[1:(fit$subtype$nX + fit$subtype$nW)])
     found.strata <- FALSE
-    marker <- rep(1, n_marker)
+    marker <- data.frame(t(rep(1, n_marker)))
     names(marker) <- fit$subtype$marker_name
     newdata <- cbind(newdata, marker)
   } else{
@@ -49,9 +49,9 @@ CIF <- function(fit, newdata){
 
   Terms <- fit$terms
   has.strata <- !is.null(fit$strata)
-  if (length(fit$strata)){
-    strata <- rep(0L,n)
-  }else { strata <- fit$strata
+  if (has.strata){
+    stangle <- untangle.specials(Terms, 'strata')
+    strata <- fit$strata
   }
 
   subterms <- function(tt, i) {
@@ -93,9 +93,11 @@ CIF <- function(fit, newdata){
         any(unlist(lapply(temp, class))== "function"))
       found.strata <- FALSE
     }
-    if(!found.strata) stop("Newdata has no strata values")
+    if (!found.strata) stop("Newdata should not be missing with strata")
     if (found.strata) mf2 <- stats::model.frame(Terms2, data=newdata,
                                             na.action=na.action, xlev=fit$xlevels)
+  }else{
+    found.strata <- has.strata
   }
 
   if (has.strata && found.strata) { #pull them off
@@ -107,15 +109,16 @@ CIF <- function(fit, newdata){
     # An expression like age:strata(sex) will have temp$vars= "strata(sex)"
     #  and temp$terms = integer(0).  This does not work as a subscript
     if (length(temp$terms) >0) Terms2 <- Terms2[-temp$terms]
+  }else{
+    strata2 <- factor(rep(1, n))
   }
-  else strata2 <- factor(rep(1, n))
 
   Strata <- levels(strata2)
   ns <- length(Strata)
   ntarget <- length(strata2)
   whichstr <- match(strata2, Strata)
 
-  mf2 <- stats::model.frame(Terms2, data=dnewdata, na.action=na.pass, xlev=fit$xlevels)
+  mf2 <- stats::model.frame(Terms2, data=dnewdata, na.action=na.action, xlev=fit$xlevels)
 
   offset2 <- model.offset(mf2)
   if (length(offset2) == 0)  offset2 <- 0
@@ -129,7 +132,10 @@ CIF <- function(fit, newdata){
     temp1 <- cumhaz[[whichstr[i]]]
     temp2 <- fit$basehaz[[whichstr[i]]]
     newcumhaz <- outer(temp1[,2], newrisk[[i]], '*')
-    newhaz <- temp2[,2]*newrisk[[i]][1]
+    newhaz1 <- temp2[,2]*newrisk[[i]][1]
+    newhaz2 <- temp2[,2]*newrisk[[i]][2]
+    newhaz3 <- temp2[,2]*newrisk[[i]][3]
+    newhaz4 <- temp2[,2]*newrisk[[i]][4]
     surv <- exp(-drop(rowSums(newcumhaz)))
     pt[[i]] <- cbind(temp1[,1], cumsum(newhaz*surv))
   }
