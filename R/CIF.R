@@ -139,8 +139,9 @@ CIF <- function(fit, newdata, na.action = na.pass){
     newcumhaz <- outer(temp1[,2], newrisk[[i]], '*')
     newhaz <- temp2[,2]*newrisk[[i]][1]
     surv <- exp(-drop(rowSums(newcumhaz)))
-    pt[[i]] <- cbind(temp1[,1], cumsum(newhaz*surv))
-    names(pt[[i]]) <- c("time", "CIF")
+    tmp <- cbind(temp1[,1], cumsum(newhaz*surv))
+    colnames(tmp) <- c("time", "CIF")
+    pt[[i]] <- tmp
   }
 
   class(pt) <- "CIF"

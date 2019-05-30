@@ -2,7 +2,7 @@
 #' @export
 plot.CIF <- function(x, xlab ="TIME", ylab ="CUMULATIVE INCIDENCE FUNCTION",
                      xlim = NULL, ylim = NULL, main = NULL,
-                     type = "l", lty = 1, lwd = 1,  col = NULL, legend = TRUE){
+                     type = "l", lty = 1, lwd = 1,  col = NULL, legend = FALSE){
 
   if (is.null(x)){
     cat("object must be CIF.")
@@ -11,8 +11,8 @@ plot.CIF <- function(x, xlab ="TIME", ylab ="CUMULATIVE INCIDENCE FUNCTION",
 
   n <- length(x)
 
-  max.x <- max(sapply(1:n, function(i) x[[i]]$time))
-  min.x <- min(sapply(1:n, function(i) x[[i]]$time))
+  max.x <- max(sapply(1:n, function(i) x[[i]][,1]))
+  min.x <- min(sapply(1:n, function(i) x[[i]][,1]))
   if(is.null(xlim)) xlim <- c(min.x, max.x)
 
   if(is.null(col))
@@ -28,7 +28,8 @@ plot.CIF <- function(x, xlab ="TIME", ylab ="CUMULATIVE INCIDENCE FUNCTION",
       graphics::matlines(x = x[[i]][,1], y = x[[i]][,2], type = type, lty = lty,  lwd = lwd, col = col[i])
 
     }
-
   }
+  legend("topleft", legend = 1:n, col = rainbow(n), lty = 1,
+         title = "Individual", bty="n")
 
 }
