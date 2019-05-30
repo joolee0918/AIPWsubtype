@@ -458,11 +458,11 @@ IPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE, 
             colnames(Ualp)[1] <- id
             Ualp_ts <- cbind(tmp_id, Ualp_ts)
             colnames(Ualp_ts)[1] <- id
-            Ualp <- merge(Ualp, Ualp_ts, by = id, all = T)
+            Ualp <- suppressWarnings(merge(Ualp, Ualp_ts, by = id, all = T))
             Ualp[is.na(Ualp)] <- 0
         }
 
-        Salp <- merge(Salp, Ualp, by = id, all = T)
+        Salp <- suppressWarnings(merge(Salp, Ualp, by = id, all = T))
         Salp[is.na(Salp)] <- 0
         Salp <- as.matrix(Salp[, -1])
 

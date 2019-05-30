@@ -669,11 +669,11 @@ AIPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE,
           colnames(Ualp)[1] <- id
           Ualp_ts <- cbind(tmp_id, Ualp_ts)
           colnames(Ualp_ts)[1] <- id
-          Ualp <- merge(Ualp, Ualp_ts, by = id, all = T)
+          Ualp <- suppressWarnings(merge(Ualp, Ualp_ts, by = id, all = T))
           Ualp[is.na(Ualp)] <- 0
         }
 
-        Salp <- merge(Salp, Ualp, by = id, all = T)
+        Salp <- suppressWarnings(merge(Salp, Ualp, by = id, all = T))
         Salp[is.na(Salp)] <- 0
         Salp <- as.matrix(Salp[, -1])
 
@@ -690,7 +690,7 @@ AIPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE,
         Ugam <- cbind(as.numeric(names(term1)), Ugam)
         colnames(Ugam)[1] <- id
 
-        Sgam <- merge(Sgam, Ugam, by = id, all = T)
+        Sgam <- suppressWarnings(merge(Sgam, Ugam, by = id, all = T))
         Sgam[is.na(Sgam)] <- 0
         Sgam <- as.matrix(Sgam[, -1])
 
@@ -714,11 +714,11 @@ AIPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE,
           colnames(Ualp)[1] <- id
           Ualp_ts <- cbind(tmp_id, Ualp_ts)
           colnames(Ualp_ts)[1] <- id
-          Ualp <- merge(Ualp, Ualp_ts, by = id, all = T)
+          Ualp <- suppressWarnings(merge(Ualp, Ualp_ts, by = id, all = T))
           Ualp[is.na(Ualp)] <- 0
         }
 
-        Salp <- merge(Salp, Ualp, by = id, all = T)
+        Salp <- suppressWarnings(merge(Salp, Ualp, by = id, all = T))
         Salp[is.na(Salp)] <- 0
         Salp <- as.matrix(Salp[, -1])
 
@@ -735,7 +735,7 @@ AIPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE,
         Ugam <- cbind(as.numeric(names(term1)), Ugam)
         colnames(Ugam)[1] <- id
 
-        Sgam <- merge(Sgam, Ugam, by = id, all = T)
+        Sgam <- suppressWarnings(merge(Sgam, Ugam, by = id, all = T))
         Sgam[is.na(Sgam)] <- 0
         Sgam <- as.matrix(Sgam[, -1])
 

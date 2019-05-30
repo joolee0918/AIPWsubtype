@@ -6,7 +6,7 @@
 #'
 #' @param fit \code{subtype}, \code{IPWsubtype} or \code{AIPWsubtype} object.
 #' @param newdata a data.frame which has variables in formula and markers. This value must be specified.
-#' @param individual a logical value: if \code{FALSE}, each row of newdata is considered as a different subject. If \code{TRUE}, \code{id} must be specified indicating variable name of subjects and multiple rows represent different time points for one subject.
+#' @param individual a logical value: if \code{FALSE}, each row of newdata is considered as a different subject. If \code{TRUE}, \code{id} must be specified indicating variable name of subjects and time interval must be included in \code{newdata} (start, stop, status). Multiple rows represent different time points for one subject.
 #' @param id a variable name identifying subject id.
 #' @param na.action na.action to be passed
 #'
@@ -219,14 +219,12 @@ cif <- function(fit, newdata, individual = FALSE, id, na.action = na.pass){
       names(result) <- uid
     }
   }else{
-    ntarget <- length(strata2)
-    whichstr <- match(strata2, Strata)
-
+  whichstr <- match(strata2, Strata)
   offset2 <- model.offset(mf2)
   if (length(offset2) == 0)  offset2 <- 0
   x2 <- model.matrix(Terms2, mf2)[,-1, drop=FALSE]  #no intercept
   risk <- exp(c(x2 %*% fit$coefficients) + offset2)
-
+  ntarget <- nrow(x2)/n_subtype
   newrisk <- split(risk, newdata$id)
 
   result <- list()
