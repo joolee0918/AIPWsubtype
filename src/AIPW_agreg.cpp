@@ -18,7 +18,7 @@ Rcpp::List AIPW_agreg_cpp(int maxiter, NumericVector start, NumericVector tstop,
   IntegerMatrix total_R, List marker_r, IntegerVector whereX, IntegerVector whereW,
   NumericVector gamma, NumericMatrix comb_y,
   int nvar, int n_marker, int nR, int ngamma, int nalp,
-  double eps, double toler, bool second_cont_bl, bool second_cont_rr, NumericVector init_beta) {
+  double eps, bool second_cont_bl, bool second_cont_rr, NumericVector init_beta) {
 
   int i, j, k, l, h, person, pid, r, ty;
 

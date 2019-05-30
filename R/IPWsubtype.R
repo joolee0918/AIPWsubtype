@@ -14,7 +14,7 @@
 #' @param second_cont_rr a logical value: if \code{TRUE}, the second order contrasts are included in modeling cause-specific relative risks based on log-linear representation. Otherwise the first contrasts are only included.
 #' @param constvar a vector of character strings specifying constrained varaibles of which the effects on the outcome are to be the same across subtypes of outcome. The variables which are not specified in \code{constvar} are considered as unconstrained variabales of which the associations with the outcome may be different across the outcome subtypes.
 #' @param init a vector of initial values of the iteration. Default value is zero for all variables.
-#' @param control an object of class \code{\link[survival]{coxph.control}} in \code{survival} packages. The default value of \code{iter.max} is 1000 and that of \code{eps} is 1e-12. See \code{\link[survival]{coxph.control}} for other values.
+#' @param control an object of class \code{\link[survival]{coxph.control}} in \code{survival} packages. The default value of \code{iter.max} is 2000 and that of \code{eps} is 1e-12. See \code{\link[survival]{coxph.control}} for other values.
 
 #' @details The Cox proportional hazard model with weights is used to model cause-specific hazard functions. To examine the association between exposures and the specific subtypes of disease, the log-linear is used for reparameterization. The weights for the complete cases are obtained by fitting logistic regression models \code{\link[stats]{glm}}.
 #' The data duplication method is used so that the returned value \code{x}, \code{y}, and \code{weights} are duplicated the number of subtypes of outcome. Special terms including \code{+strata()} and \code{+offset()} can be used. \code{+cluster()} should be avoided since we automatically include it in the formula. Breslow method is used for handling tied event times.
@@ -63,6 +63,26 @@ IPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE, 
 
 
     Call <- match.call()
+
+    if(missing(id)) stop("id must be specified")
+    if(missing(marker_name)) stop("marker_name must be specified")
+    if(missing(missing_model)) stop("missing_model must be specified")
+
+    extraArgs <- list(...)
+    if (length(extraArgs)) {
+      controlargs <- names(formals(coxph.control))  #legal arg names
+      indx <- pmatch(names(extraArgs), controlargs, nomatch = 0L)
+      if (any(indx == 0L))
+        stop(gettextf("Argument %s not matched", names(extraArgs)[indx == 0L]), domain = NA)
+    }
+
+    if (missing(control)) {
+      control = coxph.control(...)
+      control$eps = 1e-12
+      control$iter.max = 2000
+      control$toler.inf = sqrt(control$eps)
+    }
+
     rx <- x
     ry <- y
     rmodel <- model
@@ -107,6 +127,8 @@ IPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE, 
         colnames(total_R) <- c(paste("R", c(1:n_marker), sep = ""), "R")
     }
     total_R <- as.matrix(total_R)
+
+    if(length(missing_model) != nvecR) stop("the length of missing model does not match with a vector of missing indicators")
 
     # possible marker combination
 
@@ -325,14 +347,8 @@ IPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE, 
 
     newformula <- update.formula(formula, paste("~.+", order_bl, order_rr, "+", "cluster", "(", id, ")"))
 
-    if (missing(control)) {
-      control = coxph.control()
-      control$eps = 1e-12
-      control$iter.max = 1000
-      control$toler.inf = sqrt(control$eps)
-    }
 
-    fit <- coxph(formula = newformula, data = newdata, weights = 1/pi1, robust = T, model = TRUE, x = TRUE,
+    fit <- coxph(formula = newformula, data = newdata, weights = 1/pi1, control = control, robust = T, model = TRUE, x = TRUE,
         method = "breslow", init=init)
     if (!is.null(fit$fail)) {
         fit <- list(fail = fit)

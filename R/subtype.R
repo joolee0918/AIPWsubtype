@@ -35,6 +35,11 @@ subtype <- function(formula, data, id,  marker_name,
   rx <- x
   rmodel <- model
 
+  if (missing(control)) {
+    control = coxph.control(...)
+     }
+
+
   data <- data[order(data[, id]), ]
   n <- nrow(data)
   n_marker <- length(marker_name)
@@ -155,7 +160,7 @@ subtype <- function(formula, data, id,  marker_name,
   }
 
   newformula <- update.formula(formula, paste("~.+", order_bl, order_rr, "+", "cluster", "(", id, ")"))
-  fit <- coxph(formula = newformula, data = newdata, robust = T, method = "breslow", model = rmodel, x = TRUE)
+  fit <- coxph(formula = newformula, data = newdata, control = control, robust = T, method = "breslow", model = rmodel, x = TRUE)
 
   if(is.null(fit$strata)) {
     stratum <- rep(1, nrow(fit$y))

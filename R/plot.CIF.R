@@ -40,17 +40,17 @@ plot.cif <- function(x, xlab ="TIME", ylab ="CUMULATIVE INCIDENCE FUNCTION", mai
   if(is.null(col)) col <-  grDevices::rainbow(n)
 
   if(n == 1){
-    graphics::matplot(x = x[[1]]$time, y = x[[1]]$cif, type = type, lty = lty,  lwd = lwd, col = col, xlab = xlab, ylab = ylab, ...)
+    graphics::matplot(x = x[[1]]$time, y = x[[1]]$cif, type = type, lty = lty,  lwd = lwd, lend = lend, pch = pch, col = col, xlab = xlab, ylab = ylab, ...)
 
   }else{
-    graphics::matplot(x = x[[1]]$time, y = x[[1]]$cif, type = type, lty = lty,  lwd = lwd, col = col[1], xlab = xlab, ylab = ylab, xlim = xlim, ylim = ylim, ...)
+    graphics::matplot(x = x[[1]]$time, y = x[[1]]$cif, type = type, lty = lty,  lwd = lwd, lend = lend, pch = pch, col = col[1], xlab = xlab, ylab = ylab, xlim = xlim, ylim = ylim, ...)
 
     for(i in 2:n){
-      graphics::matlines(x = x[[i]]$time, y = x[[i]]$cif, type = type, lty = lty,  lwd = lwd, col = col[i], ...)
+      graphics::matlines(x = x[[i]]$time, y = x[[i]]$cif, type = type, lty = lty,  lwd = lwd, lend = lend, pch = pch, col = col[i], ...)
 
     }
   }
-  legend("topleft", legend = 1:n, col = col, lty = 1,
+  legend("topleft", legend = 1:n, col = col, lty = 1,lend = lend, pch = pch,
          title = "Individual", bty="n")
 
 }

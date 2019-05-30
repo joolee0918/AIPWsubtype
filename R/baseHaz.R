@@ -1,4 +1,7 @@
 ## Modify getHaz in eha packages
+# =========================================================
+# Calculate baseline cause-specific hazard functions
+# =========================================================
 
 
 baseHaz <- function(Y, strats, score, weights = NULL){

@@ -1,6 +1,5 @@
 ## Modification of Therneau T (2015). _A Package for Survival Analysis in S_. version 2.38, <URL: https://CRAN.R-project.org/package=survival>.*/
 
-
 #' Augmented inverse probability weighted Cox proportional hazard model for competing risks data
 #'
 #' Fitting an augmented inverse probability weighted Cox proportional hazard model for competing risks data with partially missing markers, in which marker variables define the subyptes of outcome.
@@ -17,7 +16,7 @@
 #' @param second_cont_rr a logical value: if \code{TRUE}, the second order contrasts are included in modeling cause-specific relative risks based on log-linear representation. Otherwise the first contrasts are only included.
 #' @param constvar a vector of character strings specifying constrained varaibles of which the effects on the outcome are to be the same across subtypes of outcome. The variables which are not specified in \code{constvar} are considered as unconstrained variabales of which the associations with the outcome may be different across the outcome subtypes.
 #' @param init a vector of initial values of the iteration. Default value is zero for all variables.
-#' @param control an object of class \code{\link[survival]{coxph.control}} in \code{survival} packages. The default value of \code{iter.max} is 1000 and that of \code{eps} is 1e-12. See \code{\link[survival]{coxph.control}} for other values.
+#' @param control an object of class \code{\link[survival]{coxph.control}} in \code{survival} packages.The default value of \code{iter.max} is 2000 and that of \code{eps} is 1e-12. See \code{\link[survival]{coxph.control}} for other values.
 
 #' @details The Cox proportional hazard model is used to model cause-specific hazard functions. To examine the association between exposures and the specific subtypes of disease, the log-linear is used for reparameterization. Logistic regression models \code{\link[stats]{glm}} are used for the missiness models and a conditional logistic regression model \code{\link[survival]{clogit}} is used for the marker model.
 #' The data duplication method is used so that the returned value \code{x} and \code{y} are duplicated the number of subtypes of outcome. Special terms including \code{+strata()} and \code{+offset()} can be used. \code{+cluster()} should be avoided since we automatically include it in the formula. Breslow method is used for handling tied event times.
@@ -66,10 +65,34 @@
 #'
 #' @export
 AIPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE, two_stage = FALSE, tstage_name = NULL,
-     marker_name, second_cont_bl = FALSE, second_cont_rr = FALSE, constvar = NULL, init, control, x = FALSE, y = TRUE, model = FALSE, ...) {
+     marker_name, second_cont_bl = FALSE, second_cont_rr = FALSE, constvar = NULL, init, control = list(), x = FALSE, y = TRUE, model = FALSE, ...) {
 
 
     Call <- match.call()
+
+    if(missing(id)) stop("id must be specified")
+    if(missing(marker_name)) stop("marker_name must be specified")
+    if(missing(missing_model)) stop("missing_model must be specified")
+
+    extraArgs <- list(...)
+    if (length(extraArgs)) {
+      controlargs <- names(formals(coxph.control))  #legal arg names
+      indx <- pmatch(names(extraArgs), controlargs, nomatch = 0L)
+      if (any(indx == 0L))
+        stop(gettextf("Argument %s not matched", names(extraArgs)[indx == 0L]), domain = NA)
+    }
+
+    if (missing(control)) {
+      control = coxph.control(...)
+      control$eps = 1e-12
+      control$iter.max = 2000
+      control$toler.inf = sqrt(control$eps)
+    }
+
+
+    if (missing(init))
+      init <- NULL
+
     rx <- x
     ry <- y
     rmodel <- model
@@ -118,6 +141,8 @@ AIPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE,
     }
     total_R <- as.matrix(total_R)
 
+    if(length(missing_model) != nvecR) stop("the length of missing model does not match with a vector of missing indicators")
+
     # possible marker combination
 
     level_y = list()
@@ -129,7 +154,7 @@ AIPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE,
         tmpy[[k]] <- as.vector(level_y[[k]])
     }
     total_subtype <- as.data.frame(expand.grid(tmpy))
-
+    names(total_subtype) <- marker_name
     ## marker|R
     if (two_stage == T) {
         marker_r <- replicate(nR - 1, total_subtype, simplify = F)
@@ -433,23 +458,6 @@ AIPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE,
     special <- c("strata", "cluster")
     Terms <- terms(newformula, special)
 
-    extraArgs <- list(...)
-    if (length(extraArgs)) {
-        controlargs <- names(formals(coxph.control))  #legal arg names
-        indx <- pmatch(names(extraArgs), controlargs, nomatch = 0L)
-        if (any(indx == 0L))
-            stop(gettextf("Argument %s not matched", names(extraArgs)[indx == 0L]), domain = NA)
-    }
-
-    if (missing(control)) {
-        control = coxph.control()
-        control$eps = 1e-12
-        control$iter.max = 1000
-        control$toler.inf = sqrt(control$eps)
-    }
-
-    if (missing(init))
-        init <- NULL
 
     Y <- model.extract(mf, "response")
     if (!inherits(Y, "Surv"))
@@ -545,19 +553,15 @@ AIPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE,
             stop("offsets must be finite")
     }
 
+
+    # new marker|R by model matrix
+
     newmarker <- model.matrix.lm(as.formula(paste("~", paste(term_marker, collapse = "+"))), data = marker,
         na.action = na.pass)[, -1]
 
 
-    # new marker|R by model matrix
-    nc_marker <- ncol(newmarker)
-    tmpy <- list()
-    for (k in 1:nc_marker) {
-        tmpy[[k]] <- as.vector(c(1, 0))
-    }
-
-    ntotal_subtype = as.data.frame(expand.grid(tmpy))
-
+    ntotal_subtype <- model.matrix.lm(as.formula(paste("~", paste(term_marker, collapse = "+"))), data = total_subtype,
+                                 na.action = na.pass)[, -1]
 
     tmp <- list()
     for (i in 1:n_marker) {
