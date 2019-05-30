@@ -63,7 +63,7 @@ cif <- function(fit, newdata, individual, id, na.action = na.pass){
   dnewdata <- lapply(1:n, function(i) newdata[rep(i, each = fit$subtype$n_subtype), ])
   dnewdata <- lapply(dnewdata, lf)
   dnewdata <- as.data.frame(rbindlist(dnewdata))
-  dnewdata[, marker_name] <- data.frame(fit$subtype$total_subtype[dnewdata$cause, ])
+  dnewdata[, fit$subtype$marker_name] <- data.frame(fit$subtype$total_subtype[dnewdata$cause, ])
 
   Terms <- fit$terms
   has.strata <- !is.null(fit$strata)
