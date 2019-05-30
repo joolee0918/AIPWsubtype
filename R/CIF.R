@@ -2,6 +2,11 @@
 #' @export
 CIF <- function(fit, newdata, na.action = na.pass){
 
+  if (is.null(fit)){
+    cat("object must be either AIPWsubtype, IPWsubtype or subtype.")
+    return(NULL)
+  }
+
   n_marker <- length(fit$subtype$marker_name)
   cumhaz <- lapply(1:length(fit$basehaz), function(i) cbind(fit$basehaz[[i]][,1], cumsum(fit$basehaz[[i]][,2])))
 
@@ -11,7 +16,7 @@ CIF <- function(fit, newdata, na.action = na.pass){
   total_subtype <- fit$subtype$total_subtype
 
   if(missing(newdata)){
-    newdata <- data.frame(rep(0, fit$subtype$nX + fit$subtype$nW))   #create a dummy newdata
+    newdata <- data.frame(t(rep(0, fit$subtype$nX + fit$subtype$nW))) #create a dummy newdata
     names(newdata) <- names(fit$coefficients[1:(fit$subtype$nX + fit$subtype$nW)])
     found.strata <- FALSE
     marker <- data.frame(t(rep(1, n_marker)))
@@ -132,13 +137,12 @@ CIF <- function(fit, newdata, na.action = na.pass){
     temp1 <- cumhaz[[whichstr[i]]]
     temp2 <- fit$basehaz[[whichstr[i]]]
     newcumhaz <- outer(temp1[,2], newrisk[[i]], '*')
-    newhaz1 <- temp2[,2]*newrisk[[i]][1]
-    newhaz2 <- temp2[,2]*newrisk[[i]][2]
-    newhaz3 <- temp2[,2]*newrisk[[i]][3]
-    newhaz4 <- temp2[,2]*newrisk[[i]][4]
+    newhaz <- temp2[,2]*newrisk[[i]][1]
     surv <- exp(-drop(rowSums(newcumhaz)))
     pt[[i]] <- cbind(temp1[,1], cumsum(newhaz*surv))
+    names(pt[[i]]) <- c("time", "CIF")
   }
+
 
   class(pt) <- "CIF"
   return(pt)
