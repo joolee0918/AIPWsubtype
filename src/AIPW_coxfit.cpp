@@ -230,10 +230,7 @@ Rcpp::List AIPW_coxfit_cpp(int maxiter, NumericVector time, IntegerVector status
           tmp_numw[j] += tmp_w[j] * exp(zgamma);
         }
 
-        /*   Rcout<<tmp_denom<<"\n";
-        for(i=0;i<nvar;i++)
-        Rcout<<tmp_num[i]<<"\n"; */
-      }
+       }
       for (i = 0; i < ngamma; i++) {
         EZ[(tmp_r - 1) * ngamma * nevent + i * nevent + pid] = tmp_num[i] / tmp_denom;
         for (j = 0; j < ngamma; j++) {

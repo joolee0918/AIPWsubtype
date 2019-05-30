@@ -2,15 +2,27 @@
 % Please edit documentation in R/CIF.R
 \name{cif}
 \alias{cif}
-\title{predicting the cumulative incidence function}
+\title{Predicting the cumulative incidence function}
 \usage{
-cif(fit, newdata, individual, id, na.action = na.pass)
+cif(fit, newdata, individual = FALSE, id, na.action = na.pass)
 }
 \arguments{
 \item{fit}{\code{subtype}, \code{IPWsubtype} or \code{AIPWsubtype} object.}
 
-\item{newdata}{a data.frame which has variables in formula and markers.}
+\item{newdata}{a data.frame which has variables in formula and markers. This value must be specified.}
+
+\item{individual}{a logical value: if \code{FALSE}, each row of newdata is considered as a different subject. If \code{TRUE}, \code{id} must be specified indicating a variable name of subjects and multiple rows represent different time points for one subject.}
+
+\item{id}{a variable name identifying subject id.}
+
+\item{na.action}{na.action to be passed}
+}
+\value{
+An object of class \code{cif} representing the fit. A list of time and cumulative incidence functions for distinct subjects.
 }
 \description{
-predicting the cumulative incidence function for IPWsubtype and AIPWsubtype models.
+Predicting the cumulative incidence function for \code{subtype}, \code{IPWsubtype}, and \code{AIPWsubtype} models.
+}
+\details{
+The cumulative incidence function with a subtype defined by marker values in \code{newdata}. If a fitted object has strata, strata variable must be included in \code{newdata}.
 }

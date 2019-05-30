@@ -19,6 +19,7 @@ baseHaz <- function(Y, strats, score, weights = NULL){
     enter <- Y[strats == Strata[j], 1]
     exit <- Y[strats == Strata[j], 2]
     event <- Y[strats == Strata[j], 3] != 0
+    wt <- weights[strats == Strata[j]]
     sco <- score[strats == Strata[j]]
     time <- sort(unique(exit[event]))
     haz <- matrix(0, ncol = 2, nrow = length(time))
@@ -28,7 +29,7 @@ baseHaz <- function(Y, strats, score, weights = NULL){
       if(is.null(weights)) {
         haz[i, 2] <- sum(event[exit == time[i]]) /sum(sco[rs])
       } else{
-        haz[i, 2] <- sum(weights[exit==time[i]]*event[exit == time[i]]) /sum(sco[rs])
+        haz[i, 2] <- sum(wt[exit == time[i]]*event[exit == time[i]]) /sum(sco[rs])
       }
     }
     out[[j]] <- haz
