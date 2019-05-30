@@ -614,7 +614,7 @@ AIPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE,
 
     fit <- fitter(x = X, y = Y, eventid = eventid, id = newid, strata = strats, offset = offset, whereX = whichX,
         whereW = whichW, init = init, control = control, marker = newmarker, gamma = gamma, pR = pR, R = R,
-        dpR = dpR, total_R = ntotal_R, marker_r = nmarker_r, two_stage = two_stage, n_marker = nc_marker, second_cont_rr = second_cont_rr,
+        dpR = dpR, nR = nR, total_R = ntotal_R, marker_r = nmarker_r, two_stage = two_stage, n_marker = nc_marker, second_cont_rr = second_cont_rr,
         second_cont_bl = second_cont_bl, rownames = row.names(mf), collapse = cluster)
 
     if (is.character(fit)) {

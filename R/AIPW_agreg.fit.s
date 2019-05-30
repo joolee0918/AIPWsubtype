@@ -5,7 +5,7 @@
 # =========================================================
 
 
-AIPW_agreg.fit <- function(x, y, eventid, id, strata, offset, whereX, whereW, init, control, marker, gamma,pR, R, dpR, total_R, marker_r, two_stage, n_marker, second_cont_bl, second_cont_rr,  rownames, collapse)
+AIPW_agreg.fit <- function(x, y, eventid, id, strata, offset, whereX, whereW, init, control, marker, gamma,pR, R, dpR, nR, total_R, marker_r, two_stage, n_marker, second_cont_bl, second_cont_rr,  rownames, collapse)
 {
     n <-  nrow(y)
     event <- y[,3]
@@ -17,11 +17,6 @@ AIPW_agreg.fit <- function(x, y, eventid, id, strata, offset, whereX, whereW, in
         if (length(x)==0) {nvar <-0
         } else { nvar <-1
         }
-    }
-    if(two_stage==T) {
-        nR = 2^n_marker + 1
-    } else {
-        nR = 2^n_marker
     }
 
     ngamma = as.integer(length(gamma))

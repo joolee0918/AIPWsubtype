@@ -5,7 +5,7 @@
 # =========================================================
 
 
-AIPW_coxph.fit <- function(x, y, eventid, id, strata, offset, whereX, whereW, init, control, marker, gamma,  pR, R, dpR, total_R, marker_r, two_stage, n_marker, second_cont_bl, second_cont_rr,  rownames, collapse)
+AIPW_coxph.fit <- function(x, y, eventid, id, strata, offset, whereX, whereW, init, control, marker, gamma,  pR, R, dpR, nR, total_R, marker_r, two_stage, n_marker, second_cont_bl, second_cont_rr,  rownames, collapse)
 {
 
     n <-  nrow(y)
@@ -16,12 +16,8 @@ AIPW_coxph.fit <- function(x, y, eventid, id, strata, offset, whereX, whereW, in
         } else { nvar <-1
         }
     }
-    if(two_stage==T) {
-        nR = 2^n_marker + 1
-    } else {
-        nR = 2^n_marker
-    }
-    ny <- ncol(y)
+
+      ny <- ncol(y)
     ngamma = as.integer(length(gamma))
     nalp = as.integer(dim(dpR[[1]])[2])
 
