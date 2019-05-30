@@ -28,7 +28,7 @@
 
 #' @export
 subtype <- function(formula, data, id,  marker_name,
-                    second_cont_bl = FALSE, second_cont_rr = FALSE, constvar = NULL, init, control,  x = FALSE, y = TRUE, model = FALSE, ...) {
+                    second_cont_bl = FALSE, second_cont_rr = FALSE, constvar = NULL, init, control,  x = FALSE, y = TRUE, model = FALSE) {
 
 
   Call <- match.call()
@@ -36,7 +36,7 @@ subtype <- function(formula, data, id,  marker_name,
   rmodel <- model
 
   if (missing(control)) {
-    control = coxph.control(...)
+    control = coxph.control()
      }
 
 

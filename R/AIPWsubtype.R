@@ -65,7 +65,7 @@
 #'
 #' @export
 AIPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE, two_stage = FALSE, tstage_name = NULL,
-     marker_name, second_cont_bl = FALSE, second_cont_rr = FALSE, constvar = NULL, init, control = list(), x = FALSE, y = TRUE, model = FALSE, ...) {
+     marker_name, second_cont_bl = FALSE, second_cont_rr = FALSE, constvar = NULL, init, control = list(), x = FALSE, y = TRUE, model = FALSE) {
 
 
     Call <- match.call()
@@ -74,16 +74,8 @@ AIPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE,
     if(missing(marker_name)) stop("marker_name must be specified")
     if(missing(missing_model)) stop("missing_model must be specified")
 
-    extraArgs <- list(...)
-    if (length(extraArgs)) {
-      controlargs <- names(formals(coxph.control))  #legal arg names
-      indx <- pmatch(names(extraArgs), controlargs, nomatch = 0L)
-      if (any(indx == 0L))
-        stop(gettextf("Argument %s not matched", names(extraArgs)[indx == 0L]), domain = NA)
-    }
-
     if (missing(control)) {
-      control = coxph.control(...)
+      control = coxph.control()
       control$eps = 1e-12
       control$iter.max = 2000
       control$toler.inf = sqrt(control$eps)
@@ -558,10 +550,11 @@ AIPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE,
 
     newmarker <- model.matrix.lm(as.formula(paste("~", paste(term_marker, collapse = "+"))), data = marker,
         na.action = na.pass)[, -1]
-
+    nc_marker <- ncol(newmarker)
 
     ntotal_subtype <- model.matrix.lm(as.formula(paste("~", paste(term_marker, collapse = "+"))), data = total_subtype,
                                  na.action = na.pass)[, -1]
+
 
     tmp <- list()
     for (i in 1:n_marker) {

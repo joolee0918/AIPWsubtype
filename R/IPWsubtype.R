@@ -59,7 +59,7 @@
 
 #' @export
 IPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE, two_stage = FALSE, tstage_name = NULL,  marker_name,
-    second_cont_bl = FALSE, second_cont_rr = FALSE, constvar = NULL, init, control,  x = FALSE, y = TRUE, model = FALSE, ...) {
+    second_cont_bl = FALSE, second_cont_rr = FALSE, constvar = NULL, init, control,  x = FALSE, y = TRUE, model = FALSE) {
 
 
     Call <- match.call()
@@ -68,16 +68,8 @@ IPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE, 
     if(missing(marker_name)) stop("marker_name must be specified")
     if(missing(missing_model)) stop("missing_model must be specified")
 
-    extraArgs <- list(...)
-    if (length(extraArgs)) {
-      controlargs <- names(formals(coxph.control))  #legal arg names
-      indx <- pmatch(names(extraArgs), controlargs, nomatch = 0L)
-      if (any(indx == 0L))
-        stop(gettextf("Argument %s not matched", names(extraArgs)[indx == 0L]), domain = NA)
-    }
-
     if (missing(control)) {
-      control = coxph.control(...)
+      control = coxph.control()
       control$eps = 1e-12
       control$iter.max = 2000
       control$toler.inf = sqrt(control$eps)
