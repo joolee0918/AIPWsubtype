@@ -17,7 +17,10 @@
 #'
 #' For marker variables, 0 indicates censored events.
 #'
-#' @return A returned object is an object of class \code{\link[survival]{coxph}}. See \code{\link[survival]{coxph.object}} for details.
+#' @return A returned object is an object of class \code{\link[survival]{coxph}}. See \code{\link[survival]{coxph.object}} for details. The additional returned values include the following:
+#' \item{basehaz}{estimated baseline cause-specific hazard functions the reference disease subtype corresponding to marker variables equal to 1.}
+#' \item{subtype}{a list of values related to subtypes including the number of subtypes, character strings of marker names, etc.}
+#'
 
 #' @examples
 #' m1 <- subtype(Surv(start, time, status)~ X + W,  data = data, id = "id", marker_name = c("y1", "y2"), second_cont_bl = FALSE, second_cont_rr = FALSE, constvar = "W")
@@ -107,6 +110,8 @@ subtype <- function(formula, data, id,  marker_name,
   }
 
   unconstvar <- Xattr[!(Xattr %in% constvar)]
+  whichX <- which(dimnames(attr(Tf, "factors"))[[2]] %in% c(unconstvar))
+  whichW <- which(dimnames(attr(Tf, "factors"))[[2]] %in% c(constvar))
 
   nuvar <- length(unconstvar)
   order_rr <- NULL
@@ -150,9 +155,24 @@ subtype <- function(formula, data, id,  marker_name,
   }
 
   newformula <- update.formula(formula, paste("~.+", order_bl, order_rr, "+", "cluster", "(", id, ")"))
-  fit <- coxph(formula = newformula, data = newdata, robust = T, method = "breslow", model = rmodel, x = rx)
+  fit <- coxph(formula = newformula, data = newdata, robust = T, method = "breslow", model = rmodel, x = TRUE)
+
+  if(is.null(fit$strata)) {
+    stratum <- rep(1, nrow(fit$y))
+  }else {
+    stratum <- fit$strata
+  }
+  lp <- fit$linear.predictors + sum(fit$coefficients * fit$means)
+  s0 <- exp(lp)
+  basehaz <- baseHaz(fit$y, stratum, s0)
+
   fit$n <- n
+  fit$subtype = list(n_subtype = n_subtype, marker_name = marker_name, total_subtype = total_subtype, nX = length(whichX), nW = length(whichW))
+  fit$basehaz <- basehaz
   fit$call <- Call
+
+  if(!rx) fit$x <- NULL
+
   return(fit)
 
 }

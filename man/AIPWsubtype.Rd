@@ -41,17 +41,25 @@ An object of class \code{AIPWsubtype} representing the fit.
 \item{coefficients}{the estimated regressoin coefficients.}
 \item{naive.var}{the inverse of estimated Information matrix.}
 \item{var}{the robust sandwich variance estimate.}
+\item{linear.predictors}{a vector of linear predictors. This is not centered.}
 \item{loglik}{a vector of length 2 containing the log-likelihood with the initial values and with the estimated coefficients.}
+\item{score}{a value of the score test at the initial value of the coefficients.}
+\item{rscore}{a value of the robust log-rank statistic.}
+\item{wald.test}{a value of the Wald test statistics for whether the estimated coefficients are different from the initial value of the coefficients.}
 \item{score.residual}{the score residuals for each subject.}
 \item{iter}{a number of iterations used.}
 \item{conv}{an integer code for the convergence. 0 indicates successful convergence, 1 indicates a failure to convergence, and 2 indicates it reaches the maximum number of iterations.}
+\item{basehaz}{estimated baseline cause-specific hazard functions the reference disease subtype corresponding to marker variables equal to 1.}
 \item{Ithealp}{a matrix of the partial derivative of the score functions with respect to the parameters from the missingness models.}
 \item{Ithegam}{a matrix of the partial derivative of the score functions with respect to the parameters from the marker model.}
 \item{model_missing}{a list of an object of class \code{glm} fitting the missingness models.}
 \item{model_subtype}{an object of class \code{clogit} fitting the marker model.}
 \item{n}{the number of observations.}
 \item{nevent}{the number of events.}
-The object will also contain the following: call, terms, y, optionally x, and model.
+\item{subtype}{a list of values related to subtypes including the number of subtypes, character strings of marker names, etc.}
+
+
+The object will also contain the following: strata, formula, call, terms, y, xlevels, offset, optionally x, and model.
 }
 \description{
 Fitting an augmented inverse probability weighted Cox proportional hazard model for competing risks data with partially missing markers, in which marker variables define the subyptes of outcome.
@@ -61,6 +69,7 @@ The Cox proportional hazard model is used to model cause-specific hazard functio
 The data duplication method is used so that the returned value \code{x} and \code{y} are duplicated the number of subtypes of outcome. Special terms including \code{+strata()} and \code{+offset()} can be used. \code{+cluster()} should be avoided since we automatically include it in the formula. Breslow method is used for handling tied event times.
 
 For marker variables, 0 indicates censored events or missing values.
+formula = formula, call = Call, terms = Terms, assign = assign, method = "AIPW"
 }
 \examples{
 m1 <- AIPWsubtype(Surv(start, time, status)~ X + W,  data = data, id = "id", missing_model = list(~time + X, ~time + X),

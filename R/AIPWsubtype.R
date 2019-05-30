@@ -23,22 +23,31 @@
 #' The data duplication method is used so that the returned value \code{x} and \code{y} are duplicated the number of subtypes of outcome. Special terms including \code{+strata()} and \code{+offset()} can be used. \code{+cluster()} should be avoided since we automatically include it in the formula. Breslow method is used for handling tied event times.
 #'
 #' For marker variables, 0 indicates censored events or missing values.
-#'
+#'formula = formula, call = Call, terms = Terms, assign = assign, method = "AIPW"
+
 #' @return An object of class \code{AIPWsubtype} representing the fit.
 #' \item{coefficients}{the estimated regressoin coefficients.}
 #' \item{naive.var}{the inverse of estimated Information matrix.}
 #' \item{var}{the robust sandwich variance estimate.}
+#' \item{linear.predictors}{a vector of linear predictors. This is not centered.}
 #' \item{loglik}{a vector of length 2 containing the log-likelihood with the initial values and with the estimated coefficients.}
+#' \item{score}{a value of the score test at the initial value of the coefficients.}
+#' \item{rscore}{a value of the robust log-rank statistic.}
+#' \item{wald.test}{a value of the Wald test statistics for whether the estimated coefficients are different from the initial value of the coefficients.}
 #' \item{score.residual}{the score residuals for each subject.}
 #' \item{iter}{a number of iterations used.}
 #' \item{conv}{an integer code for the convergence. 0 indicates successful convergence, 1 indicates a failure to convergence, and 2 indicates it reaches the maximum number of iterations.}
+#' \item{basehaz}{estimated baseline cause-specific hazard functions the reference disease subtype corresponding to marker variables equal to 1.}
 #' \item{Ithealp}{a matrix of the partial derivative of the score functions with respect to the parameters from the missingness models.}
 #' \item{Ithegam}{a matrix of the partial derivative of the score functions with respect to the parameters from the marker model.}
 #' \item{model_missing}{a list of an object of class \code{glm} fitting the missingness models.}
 #' \item{model_subtype}{an object of class \code{clogit} fitting the marker model.}
 #' \item{n}{the number of observations.}
 #' \item{nevent}{the number of events.}
-#' The object will also contain the following: call, terms, y, optionally x, and model.
+#' \item{subtype}{a list of values related to subtypes including the number of subtypes, character strings of marker names, etc.}
+#'
+#'
+#' The object will also contain the following: strata, formula, call, terms, y, xlevels, offset, optionally x, and model.
 
 #' @importFrom stats model.frame model.extract model.matrix model.offset aggregate update.formula printCoefmat rexp qlnorm rnorm pchisq pnorm predict glm
 #' @import survival
@@ -760,9 +769,10 @@ AIPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE,
         basehaz <- baseHaz(Y, stratum, s0)
 
         afit <- list(coefficients = fit$coef, naive.var = fit$naive.var, var = var, linear.predictors = fit$linear.predictors,
-                     score = fit$sctest, loglik = fit$loglik, rscore = rscore, wald.test = wald.test, score.residual = resid, iter = fit$iter, conv = fit$conv, basehaz = basehaz,
+                     score = fit$sctest, loglik = fit$loglik, rscore = rscore, wald.test = wald.test, score.residual = fit$resid, iter = fit$iter, conv = fit$conv, basehaz = basehaz,
                      Ithealp = fit$Ithealp, Ithegam = fit$Ithegam, model.missing = model_missing, model.subtype = model_subtype,
-                     n = n, nevent = nevent, subtype = list(n_subtype = n_subtype, marker_name = marker_name, total_subtype = total_subtype, nX = length(whichX), nW = length(whichW)), formula = formula, call = Call, terms = Terms, assign = assign, method = "AIPW")
+                     n = n, nevent = nevent, subtype = list(n_subtype = n_subtype, marker_name = marker_name, total_subtype = total_subtype, nX = length(whichX), nW = length(whichW)),
+                     formula = formula, call = Call, terms = Terms, assign = assign, method = "AIPW")
 
 
         if(rmodel){afit$model <- mf}
@@ -774,7 +784,8 @@ AIPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE,
         }
         if (ry)  afit$y <- Y
 
-
+        if (length(xlevels) >0) fit$xlevels <- xlevels
+        if (any(offset !=0)) fit$offset <- offset
         class(afit) <- "AIPWcprisk"
     }
 

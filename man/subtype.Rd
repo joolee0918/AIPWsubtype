@@ -28,7 +28,9 @@ subtype(formula, data, id, marker_name, second_cont_bl = FALSE,
 \item{control}{an object of class \code{\link[survival]{coxph.control}} in \code{survival} packages.}
 }
 \value{
-A returned object is an object of class \code{\link[survival]{coxph}}. See \code{\link[survival]{coxph.object}} for details.
+A returned object is an object of class \code{\link[survival]{coxph}}. See \code{\link[survival]{coxph.object}} for details. The additional returned values include the following:
+\item{basehaz}{estimated baseline cause-specific hazard functions the reference disease subtype corresponding to marker variables equal to 1.}
+\item{subtype}{a list of values related to subtypes including the number of subtypes, character strings of marker names, etc.}
 }
 \description{
 Fitting a Cox proportional hazard model for competing risks data, in which marker variables define the subyptes of outcome.

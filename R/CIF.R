@@ -1,11 +1,32 @@
-
+#' predicting the cumulative incidence function
+#'
+#' predicting the cumulative incidence function for IPWsubtype and AIPWsubtype models.
+#'
+#' @param fit \code{subtype}, \code{IPWsubtype} or \code{AIPWsubtype} object.
+#' @param newdata a data.frame which has variables in formula and markers.
+#
+#'
+#'
 #' @export
-CIF <- function(fit, newdata, na.action = na.pass){
+cif <- function(fit, newdata, individual, id, na.action = na.pass){
+
+  Call <- match.call()
 
   if (is.null(fit)){
     cat("object must be either AIPWsubtype, IPWsubtype or subtype.")
     return(NULL)
   }
+
+  if(is.null(newdata)){
+    stop("newdata must be specified.")
+  }
+
+  missid <- missing(id) # I need this later, and setting id below makes
+  # "missing(id)" always false
+  if (!missid) individual <- TRUE
+  else if (missid && individual) id <- rep(0,nrow(y))  #dummy value
+  else id <- NULL
+
 
   n_marker <- length(fit$subtype$marker_name)
   cumhaz <- lapply(1:length(fit$basehaz), function(i) cbind(fit$basehaz[[i]][,1], cumsum(fit$basehaz[[i]][,2])))
@@ -15,17 +36,9 @@ CIF <- function(fit, newdata, na.action = na.pass){
   n_subtype <- fit$subtype$n_subtype
   total_subtype <- fit$subtype$total_subtype
 
-  if(missing(newdata)){
-    newdata <- data.frame(t(rep(0, fit$subtype$nX + fit$subtype$nW))) #create a dummy newdata
-    names(newdata) <- names(fit$coefficients[1:(fit$subtype$nX + fit$subtype$nW)])
-    found.strata <- FALSE
-    marker <- data.frame(t(rep(1, n_marker)))
-    names(marker) <- fit$subtype$marker_name
-    newdata <- cbind(newdata, marker)
-  } else{
-    marker <- newdata[, fit$subtype$marker_name]
-    if(any(marker==0)) stop("Newdata should not have misisng markers")
-  }
+  marker <- newdata[, fit$subtype$marker_name]
+  if(any(marker==0)) stop("Newdata should not have misisng markers")
+
 
   n <- nrow(newdata)
   cause <- rep(0, n)
@@ -46,7 +59,7 @@ CIF <- function(fit, newdata, na.action = na.pass){
     x
   }
 
-  newdata$id <- seq(1, n)
+  if(!individual) newdata$id <- seq(1, n)
   dnewdata <- lapply(1:n, function(i) newdata[rep(i, each = fit$subtype$n_subtype), ])
   dnewdata <- lapply(dnewdata, lf)
   dnewdata <- as.data.frame(rbindlist(dnewdata))
@@ -79,12 +92,13 @@ CIF <- function(fit, newdata, na.action = na.pass){
     Terms <- subterms(Terms, -temp$terms)
 
   Terms2 <- Terms
-  Terms2 <- delete.response(Terms)
+  if (!individual)  Terms2 <- delete.response(Terms)
 
   if (is.null(names(newdata))) {
     stop("Newdata argument must be a data frame")
   }
 
+  if(missid){
   if(has.strata){
     found.strata <- TRUE
     tempenv <- new.env(, parent=emptyenv())
@@ -102,7 +116,19 @@ CIF <- function(fit, newdata, na.action = na.pass){
     if (found.strata) mf2 <- stats::model.frame(Terms2, data=newdata,
                                             na.action=na.action, xlev=fit$xlevels)
   }else{
+    mf2 <- stats::model.frame(Terms2, data=newdata, na.action=na.action,
+                              xlev=object$xlevels)
     found.strata <- has.strata
+  }
+  }else{
+    tcall <- Call[c(1, match(c('id', "na.action"),
+                             names(Call), nomatch=0))]
+    tcall$data <- newdata
+    tcall$formula <- Terms2
+    tcall$xlev <- object$xlevels
+    tcall[[1L]] <- quote(stats::model.frame)
+    mf2 <- eval(tcall)
+    found.strata <- has.strata # would have failed otherwise
   }
 
   if (has.strata && found.strata) { #pull them off
@@ -120,16 +146,93 @@ CIF <- function(fit, newdata, na.action = na.pass){
 
   Strata <- levels(strata2)
   ns <- length(Strata)
-  ntarget <- length(strata2)
-  whichstr <- match(strata2, Strata)
 
-  mf2 <- stats::model.frame(Terms2, data=dnewdata, na.action=na.action, xlev=fit$xlevels)
+  if(missid){
+    mf2 <- stats::model.frame(Terms2, data=dnewdata, na.action=na.action, xlev=fit$xlevels)
+  }else{
+    tcall <- Call[c(1, match(c('id', "na.action"),
+                             names(Call), nomatch=0))]
+    tcall$data <- dnewdata
+    tcall$formula <- Terms2
+    tcall$xlev <- object$xlevels
+    tcall[[1L]] <- quote(stats::model.frame)
+    mf2 <- eval(tcall)
+  }
+
+
+  if (individual) {
+   if (!missid) {  #grab the id variable
+      id <- model.extract(mf2, "id")
+      if (is.null(id)) stop("id=NULL is an invalid argument")
+    }
+    else id <- rep(1, nrow(mf2))
+
+    x2 <- model.matrix(Terms2, mf2)[,-1, drop=FALSE]  #no intercept
+    if (length(x2)==0) stop("Individual survival but no variables")
+
+    offset2 <- model.offset(mf2)
+    if (length(offset2) == 0) offset2 <- 0
+
+    y2 <- model.extract(mf2, 'response')
+    if (attr(y2,'type') != type)
+      stop("Survival type of newdata does not match the fitted model")
+    if (attr(y2, "type") != "counting")
+      stop("Individual=TRUE is only valid for counting process data")
+    y2 <- y2[,1:2, drop=F]  #throw away status, it's never used
+
+    risk <- exp(c(x2 %*% fit$coefficients) + offset2)
+
+    onecurve <- function(basehaz, cumhaz, x2, y2, strata2,  newrisk) {
+    ntarget <- nrow(x2)/fit$subtype$n_subtype
+    surv <- newcumhaz <- time <- vector('list', target)
+    whichstr <- match(strata2, Strata)
+    timeforward <- 0
+    i=1
+    while(i <nrow(x2)){
+      tt <- cumhaz[[whichstr[i]]][,1]
+      indx <- which(tt > y2[i,1] & tt <= y2[i,2])
+      if (length(indx)==0) {
+        timeforward <- timeforward + y2[i,2] - y2[i,1]
+        # No deaths or censors in user interval.  Possible
+        # user error, but not uncommon at the tail of the curve.
+      }
+      else {
+        time[[i]] <- diff(c(y2[i,1], cumhaz[[whichstr[i]]][indx,1])) #time increments
+        time[[i]][1] <- time[[i]][1] + timeforward
+        timeforward <- y2[i,2] - max(cumhaz[[whichstr[i]]][indx,1])
+        newcumhaz[[i]] <- outer(cumhaz[[whichstr[i]]][indx,2], newrisk[i:(i+n_subtype-1)], '*')
+        newhaz[[i]] <- fit$basehaz[[whichstr[i]]][indx,2]*newrisk[[i]][i]
+        surv[[i]] <- exp(-drop(rowSums(newcumhaz[[i]])))
+      }
+      i = i + fit$subtype$n_subtype
+    }
+    res <- list(time = cumsum(unlist(time)), cif = cumsum(unlist(newhaz)*unlist(surv)))
+    }
+    if (all(id ==id[1])) {
+      result <- list(onecurve(basehaz, cumhaz, x2, y2, strata2, newrisk))
+    }
+    else {
+      uid <- unique(id)
+      result <- vector('list', length=length(uid))
+      for (i in 1:length(uid)) {
+        indx <- which(id==uid[i])
+        result[[i]] <- onecurve(basehaz, cumhaz,x2[indx,,drop=FALSE],
+                                y2[indx,,drop=FALSE],
+                                strata2[indx],  newrisk[indx])
+      }
+      names(result) <- uid
+    }
+
+
+  }else{
+    ntarget <- length(strata2)
+    whichstr <- match(strata2, Strata)
 
   offset2 <- model.offset(mf2)
   if (length(offset2) == 0)  offset2 <- 0
   x2 <- model.matrix(Terms2, mf2)[,-1, drop=FALSE]  #no intercept
-
   risk <- exp(c(x2 %*% fit$coefficients) + offset2)
+
   newrisk <- split(risk, newdata$id)
 
   pt <- list()
@@ -140,11 +243,14 @@ CIF <- function(fit, newdata, na.action = na.pass){
     newhaz <- temp2[,2]*newrisk[[i]][1]
     surv <- exp(-drop(rowSums(newcumhaz)))
     tmp <- cbind(temp1[,1], cumsum(newhaz*surv))
-    colnames(tmp) <- c("time", "CIF")
-    pt[[i]] <- tmp
+    pt[[i]]$time <- temp1[,1]
+    pt[[i]]$cif <- cumsum(newhaz*surv)
   }
 
-  class(pt) <- "CIF"
+  }
+
+
+  class(pt) <- "cif"
   return(pt)
 
   }

@@ -1,5 +1,6 @@
 ## Modify getHaz in eha packages
 
+
 baseHaz <- function(Y, strats, score, weights = NULL){
   if (NCOL(Y) == 2) {
     Y <- cbind(rep(0, NROW(Y)), Y)

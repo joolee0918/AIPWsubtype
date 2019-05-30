@@ -25,17 +25,23 @@
 #' \item{coefficients}{the estimated regressoin coefficients.}
 #' \item{naive.var}{the inverse of estimated Information matrix.}
 #' \item{var}{the robust sandwich variance estimate.}
+#' \item{linear.predictors}{a vector of linear predictors. This is not centered.}
 #' \item{loglik}{a vector of length 2 containing the log-likelihood with the initial values and with the estimated coefficients.}
+#' \item{score}{a value of the score test at the initial value of the coefficients.}
+#' \item{rscore}{a value of the robust log-rank statistic.}
 #' \item{score.residual}{the score residuals for each subject. For incomplece cases, the value is 0.}
 #' \item{iter}{a number of iterations used.}
 #' \item{weights}{a vector of weights used, which is the inverse of the probability of complete case given the event occurs.}
+#' \item{basehaz}{estimated baseline cause-specific hazard functions the reference disease subtype corresponding to marker variables equal to 1.}
 #' \item{Ithealp}{a matrix of the partial derivative of the score functions with respect to the parameters from the missingness models.}
 #' \item{model_missing}{a list of an object of class \code{glm} fitting the missingness models.}
 #' \item{n}{the number of observations.}
 #' \item{nc}{the number of complete-case observations.}
 #' \item{nevent}{the number of events.}
 #' \item{ncevent}{the number of complete-case events.}
-#' The object will also contain the following: call, terms, y, optionally x, and model.
+#' \item{subtype}{a list of values related to subtypes including the number of subtypes, character strings of marker names, etc.}
+
+#' The object will also contain the following: strata, formula, call, terms, y, offset, xlevels, optionally x, and model.
 
 #' @importFrom stats model.frame model.extract model.matrix model.offset aggregate update.formula printCoefmat rexp qlnorm rnorm pchisq pnorm predict glm
 #' @import survival
@@ -489,7 +495,7 @@ IPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE, 
         basehaz <- baseHaz(fit$y, stratum, s0, weights = weights)
 
         afit <- list(coefficients = fit$coefficients, naive.var = fit$naive.var, var = var,  linear.predictors = lp, loglik = fit$loglik, score = fit$score,
-                     rscore = rscore, wald.test = wald.test, score.residual = resid, iter = fit$iter,
+                     rscore = rscore, wald.test = wald.test, score.residual =  as.matrix(Stheta), iter = fit$iter,
                      weights = fit$weights, basehaz = basehaz, Ithealp = Ithealp, model_missing = model_missing, n = n, nevent = nevent,
                      nc = ndata, ncevent = nnevent, subtype = list(n_subtype = n_subtype, marker_name = marker_name, total_subtype = total_subtype, nX = length(whichX), nW = length(whichW)), formula = formula, call = Call, terms = fit$terms, assign = fit$assign, method = "IPW")
 
@@ -501,6 +507,8 @@ IPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE, 
           afit$strata <- strata
         }
         if (ry)  afit$y <- fit$y
+        afit$xlevels <- fit$xlevels
+        afit$offset <- fit$offset
 
         class(afit) <- "IPWcprisk"
     }
