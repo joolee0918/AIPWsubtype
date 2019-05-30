@@ -7,7 +7,7 @@
 AIPWsubtype(formula, data, id, missing_model, missing_indep = FALSE,
   two_stage = FALSE, tstage_name = NULL, marker_name,
   second_cont_bl = FALSE, second_cont_rr = FALSE, constvar = NULL,
-  init, control, x = FALSE, y = TRUE, model = FALSE, ...)
+  init, control = list(), x = FALSE, y = TRUE, model = FALSE, ...)
 }
 \arguments{
 \item{formula}{a formula object with an obect of the type \code{Surv} on the left side and the terms on the right side. It should not include marker variables.}
@@ -34,7 +34,7 @@ AIPWsubtype(formula, data, id, missing_model, missing_indep = FALSE,
 
 \item{init}{a vector of initial values of the iteration. Default value is zero for all variables.}
 
-\item{control}{an object of class \code{\link[survival]{coxph.control}} in \code{survival} packages. The default value of \code{iter.max} is 1000 and that of \code{eps} is 1e-12. See \code{\link[survival]{coxph.control}} for other values.}
+\item{control}{an object of class \code{\link[survival]{coxph.control}} in \code{survival} packages.The default value of \code{iter.max} is 2000 and that of \code{eps} is 1e-12. See \code{\link[survival]{coxph.control}} for other values.}
 }
 \value{
 An object of class \code{AIPWsubtype} representing the fit.

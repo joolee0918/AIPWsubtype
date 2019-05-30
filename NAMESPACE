@@ -34,3 +34,4 @@ importFrom(stats,rnorm)
 importFrom(stats,update.formula)
 useDynLib('AIPWsubtype', .registration = TRUE)
 importFrom('Rcpp', 'evalCpp')
+

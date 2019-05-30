@@ -11,7 +11,7 @@ cif(fit, newdata, individual = FALSE, id, na.action = na.pass)
 
 \item{newdata}{a data.frame which has variables in formula and markers. This value must be specified.}
 
-\item{individual}{a logical value: if \code{FALSE}, each row of newdata is considered as a different subject. If \code{TRUE}, \code{id} must be specified indicating a variable name of subjects and multiple rows represent different time points for one subject.}
+\item{individual}{a logical value: if \code{FALSE}, each row of newdata is considered as a different subject. If \code{TRUE}, \code{id} must be specified indicating variable name of subjects and time interval must be included in \code{newdata} (start, stop, status). Multiple rows represent different time points for one subject.}
 
 \item{id}{a variable name identifying subject id.}
 

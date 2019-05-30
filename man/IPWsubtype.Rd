@@ -34,7 +34,7 @@ IPWsubtype(formula, data, id, missing_model, missing_indep = FALSE,
 
 \item{init}{a vector of initial values of the iteration. Default value is zero for all variables.}
 
-\item{control}{an object of class \code{\link[survival]{coxph.control}} in \code{survival} packages. The default value of \code{iter.max} is 1000 and that of \code{eps} is 1e-12. See \code{\link[survival]{coxph.control}} for other values.}
+\item{control}{an object of class \code{\link[survival]{coxph.control}} in \code{survival} packages. The default value of \code{iter.max} is 2000 and that of \code{eps} is 1e-12. See \code{\link[survival]{coxph.control}} for other values.}
 }
 \value{
 An object of class \code{IPWsubtype} representing the fit.
