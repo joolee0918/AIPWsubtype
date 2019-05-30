@@ -19,13 +19,13 @@ plot.CIF <- function(x, xlab ="TIME", ylab ="CUMULATIVE INCIDENCE FUNCTION",
     col <-  grDevices::rainbow(length(n))
 
   if(n == 1){
-    graphics::matplot(x = x[[1]][,1], y = x[[1]][,2], type = type, lty = lty,  lwd = lwd, col = col, xlab = xlab, ylab = ylab, ...)
+    graphics::matplot(x = x[[1]][,1], y = x[[1]][,2], type = type, lty = lty,  lwd = lwd, col = col, xlab = xlab, ylab = ylab)
 
   }else{
-    graphics::matplot(x = x[[1]][,1], y = x[[1]][,2], type = type, lty = lty,  lwd = lwd, col = col[1], xlab = xlab, ylab = ylab, ...)
+    graphics::matplot(x = x[[1]][,1], y = x[[1]][,2], type = type, lty = lty,  lwd = lwd, col = col[1], xlab = xlab, ylab = ylab)
 
     for(i in 2:n){
-      graphics::matlines(x = x[[i]][,1], y = x[[i]][,2], type = type, lty = lty,  lwd = lwd, col = col[i],...)
+      graphics::matlines(x = x[[i]][,1], y = x[[i]][,2], type = type, lty = lty,  lwd = lwd, col = col[i])
 
     }
 

@@ -143,7 +143,6 @@ CIF <- function(fit, newdata, na.action = na.pass){
     names(pt[[i]]) <- c("time", "CIF")
   }
 
-
   class(pt) <- "CIF"
   return(pt)
 
