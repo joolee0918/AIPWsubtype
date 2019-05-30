@@ -552,8 +552,8 @@ AIPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE,
         na.action = na.pass)[, -1]
     nc_marker <- ncol(newmarker)
 
-    ntotal_subtype <- model.matrix.lm(as.formula(paste("~", paste(term_marker, collapse = "+"))), data = total_subtype,
-                                 na.action = na.pass)[, -1]
+    ntotal_subtype <- as.matrix(model.matrix.lm(as.formula(paste("~", paste(term_marker, collapse = "+"))), data = total_subtype,
+                                 na.action = na.pass)[, -1])
 
 
     tmp <- list()
@@ -561,7 +561,7 @@ AIPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE,
         tmp[[i]] <- total_R[, rep(i, length(level_y[[i]]) - 1)]
     }
 
-    ntotal_R <- do.call(cbind, tmp)
+    ntotal_R <- as.matrix(do.call(cbind, tmp))
 
 
     if (two_stage == T) {
