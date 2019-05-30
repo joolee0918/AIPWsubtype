@@ -65,7 +65,7 @@
 #'
 #' @export
 AIPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE, two_stage = FALSE, tstage_name = NULL,
-     marker_name, second_cont_bl = FALSE, second_cont_rr = FALSE, constvar = NULL, init, control = list(), x = FALSE, y = TRUE, model = FALSE) {
+     marker_name, second_cont_bl = FALSE, second_cont_rr = FALSE, constvar = NULL, init, control, x = FALSE, y = TRUE, model = FALSE) {
 
 
     Call <- match.call()
@@ -601,11 +601,6 @@ AIPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE,
         fitter <- get("agreg.fit")
     }
 
-
-#    miss <- !newdata[, id] %in% dropid
-#    m_c <- fitter(X[miss, ], Y[miss, ], strats[miss], offset[miss], init = init, control, weights = NULL, method = "breslow",
-#        row.names(mf)[miss])
-#    init = m_c$coefficients
     if (missing(init)) init <- NULL
 
     ## Fitting model
