@@ -395,6 +395,7 @@ AIPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE,
 
     nuvar <- length(unconstvar)
     order_rr <- NULL
+    order_bl <- NULL
 
     if(first_cont_rr == TRUE){
       if (nuvar == 0) {
@@ -422,7 +423,6 @@ AIPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE,
         }
     }
 
-    order_bl <- NULL
     if (second_cont_bl == TRUE & second_cont_rr == FALSE) {
         for (i in 1:ncol(pairm)) {
             tmp_bl <- paste(term_marker[pairm[1, i]], term_marker[pairm[2, i]], sep = ":")
