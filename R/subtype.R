@@ -105,6 +105,12 @@ subtype <- function(formula, data, id,  marker_name,
   term_marker <- rep(0, n_marker)
 
   for (i in 1:n_marker) term_marker[i] <- paste("factor(", marker_name[i], ")", sep = "")
+  if(is.null(marker_rr)) {
+    term_marker_rr <- term_marker
+  }else{
+    term_marker_rr <- term_marker[marker_rr]
+  }
+
 
   special <- c("strata", "cluster")
   Tf <- terms(formula, special)
@@ -116,21 +122,29 @@ subtype <- function(formula, data, id,  marker_name,
     Xattr <- attr(Tf, "term.labels")
   }
 
+  if(is.null(constvar)) unconstvar <- Xattr
+  else{
+    constvar <- Xattr[c(grep(constvar, Xattr))]
+    unconstvar <- Xattr[-c(grep(constvar, Xattr))] # Xattr[!(Xattr %in% constvar)]
+  }
   unconstvar <- Xattr[!(Xattr %in% constvar)]
-  whichX <- which(dimnames(attr(Tf, "factors"))[[2]] %in% c(unconstvar))
-  whichW <- which(dimnames(attr(Tf, "factors"))[[2]] %in% c(constvar))
 
   nuvar <- length(unconstvar)
   order_rr <- NULL
-
-  if (nuvar == 0) {
-    order_rr <- paste(term_marker, collapse = "+")
-  } else {
-    for (i in 1:nuvar) {
-      tmp_rr <- paste(term_marker, "*", unconstvar[i], collapse = "+")
-      order_rr <- paste(order_rr, tmp_rr, sep = "+")
+  order_bl <- NULL
+  if(first_cont_rr == TRUE){
+    if (nuvar == 0) {
+      order_rr <- paste(term_marker_rr, collapse = "+")
+    } else {
+      for (i in 1:nuvar) {
+        tmp_rr <- paste(term_marker_rr, "*", unconstvar[i], collapse = "+")
+        order_rr <- paste(order_rr, tmp_rr, sep = "+")
+      }
     }
   }
+
+  order_bl <- paste(term_marker, collapse= "+")
+
 
 
   if(n_marker > 1) pairm <- combn(n_marker, 2)
@@ -138,13 +152,13 @@ subtype <- function(formula, data, id,  marker_name,
   if (second_cont_rr == TRUE) {
     order_rr <- NULL
     for (i in 1:nuvar) {
-      tmp_rr <- paste(attr(terms(as.formula(paste("~", unconstvar[i], "*", "(", paste(term_marker, collapse = "+"),
+      tmp_rr <- paste(attr(terms(as.formula(paste("~", unconstvar[i], "*", "(", paste(term_marker_rr, collapse = "+"),
                                                   ")", "^", 2))), "term.labels"), collapse = "+")
       order_rr <- paste(order_rr, tmp_rr, sep = "+")
     }
   }
 
-  order_bl <- NULL
+
   if (second_cont_bl == TRUE & second_cont_rr == FALSE) {
     for (i in 1:ncol(pairm)) {
       tmp_bl <- paste(term_marker[pairm[1, i]], term_marker[pairm[2, i]], sep = ":")
@@ -161,6 +175,7 @@ subtype <- function(formula, data, id,  marker_name,
     order_bl <- paste("-", paste(drop_bl, collapse = "-"))
   }
 
+
   newformula <- update.formula(formula, paste("~.+", order_bl, order_rr, "+", "cluster", "(", id, ")"))
   fit <- coxph(formula = newformula, data = newdata, control = control, robust = T, method = "breslow", model = rmodel, x = TRUE)
 
@@ -174,7 +189,7 @@ subtype <- function(formula, data, id,  marker_name,
   basehaz <- baseHaz(fit$y, stratum, s0)
 
   fit$n <- n
-  fit$subtype = list(n_subtype = n_subtype, marker_name = marker_name, total_subtype = total_subtype, nX = length(whichX), nW = length(whichW))
+  fit$subtype = list(n_subtype = n_subtype, marker_name = marker_name, total_subtype = total_subtype, marker_rr = marker_rr)
   fit$basehaz <- basehaz
   fit$call <- Call
 
