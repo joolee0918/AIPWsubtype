@@ -13,8 +13,7 @@ print.hetero.test <- function(object){
   cat("--------------------------------------------")
   cat("\n")
 
-  object$pvalue <- format.pval(object$pvalue, digits=pdig)
-
-  print(object)
+  print(object[[1]], row.names = F)
+  cat("\n")
   invisible()
 }
