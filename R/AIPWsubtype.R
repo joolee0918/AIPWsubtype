@@ -93,7 +93,7 @@ AIPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE,
     n <- nrow(data)
     uniqid <- unique(data[, id])
     n_marker <- length(marker_name)
-    marker <- data[, marker_name]
+    marker <- as.data.frame(data[, marker_name])
     marker[marker == 0] <- NA
 
 
