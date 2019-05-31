@@ -1,8 +1,8 @@
 
-#' @export
 #' @method print hetero.test
 #' @keywords internal
 
+#' @export
 print.hetero.test <- function(object){
 
   n <- length(object)
@@ -11,7 +11,7 @@ print.hetero.test <- function(object){
   for(i in 1:n){
     cat("---------------------------------------------")
     cat("\n")
-    print(object[[i]], row.names = FALSE)
+    data.table::print(object[[i]], row.names = FALSE)
 
   }
 }

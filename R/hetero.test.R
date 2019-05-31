@@ -1,6 +1,7 @@
 
+
+#' @importFrom data.table data.table
 #' @export
-#'
 hetero.test <- function(object, data){
 
   Call <- object$call
