@@ -5,7 +5,6 @@
 #' @export
 print.hetero.test <- function(object){
 
-  n <- length(object)
   pdig <- max(1, getOption("digits")-4)
 
   cat("\n")
@@ -13,9 +12,9 @@ print.hetero.test <- function(object){
   cat("\n")
   cat("--------------------------------------------")
   cat("\n")
-  object <- rbindlist(object)
+
   object$pvalue <- format.pval(object$pvalue, digits=pdig)
-  print(object, row.names = F)
+  print(object)
 
   cat("\n")
 }

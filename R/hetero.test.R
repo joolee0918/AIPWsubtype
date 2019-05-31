@@ -24,11 +24,16 @@ hetero.test <- function(fit1, fit2 = NULL, data = NULL){
       df <- Mdf2 - Mdf1
     }
     pvalue = pchisq(logtest, df, lower.tail=FALSE)
-    if(is.null(fit1$subtype$marker_mm)) who1 <- fit1$subtype$marker_name
-    else who1 <- fit1$subtype$marker_name[fit1$subtype$marker_rr]
-
-    if(is.null(fit2$subtype$marker_mm)) who2 <- fit2$subtype$marker_name
-    else who2 <- fit2$subtype$marker_name[fit2$subtype$marker_rr]
+    if(is.null(fit1$subtype$marker_rr)){
+      who1 <- fit1$subtype$marker_name
+    }else{
+      who1 <- fit1$subtype$marker_name[fit1$subtype$marker_rr]
+    }
+    if(is.null(fit2$subtype$marker_rr)){
+      who2 <- fit2$subtype$marker_name
+    }else{
+      who2 <- fit2$subtype$marker_name[fit2$subtype$marker_rr]
+    }
 
     label <- paste(setdiff(who1, who2), collapse = " ")
     mf <-  data.frame(label = label, test = logtest, df = df, pvalue = pvalue)
@@ -43,8 +48,11 @@ hetero.test <- function(fit1, fit2 = NULL, data = NULL){
     tcall$second_cont_rr <- FALSE
     tcall[[1L]] <- quote(AIPWsubtype)
     mm <- eval(tcall)
-    if(is.null(fit1$subtype$marker_mm)) who <- fit1$subtype$marker_name
-    else who <- fit1$subtype$marker_name[fit1$subtype$marker_rr]
+    if(is.null(fit1$subtype$marker_rr)){
+      who <- fit1$subtype$marker_name
+    }else{
+      who <- fit1$subtype$marker_name[fit1$subtype$marker_rr]
+    }
     logtest <- -2 * (mm$loglik[2] - Mloglik1)
     beta <- mm$coefficients
     nabeta <- !(is.na(beta))  #non-missing coefs
@@ -55,7 +63,7 @@ hetero.test <- function(fit1, fit2 = NULL, data = NULL){
     mf <-  data.frame(label = who, test = logtest, df = df, pvalue = pvalue)
 
   }
-  class(mf) <- "hetero.test"
+  #class(mf) <- "hetero.test"
 
   return(mf)
 }
