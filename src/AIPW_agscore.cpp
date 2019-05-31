@@ -103,11 +103,20 @@ Rcpp::NumericMatrix AIPW_agscore_cpp(NumericVector start, NumericVector stop, In
 
           if(first_cont_rr == TRUE){
             for (j = 0; j < nX; j++) {
-              for (k = 0; k < ny_rr; k++) {
-                tmp_w[ny + ny_rr * j + k] = covar(person, whereX[j] - 1) * tmp_yr[k];
+              for (k = 0; k < n_marker; k++) {
+                tmp_w[ny + n_marker * j + k] = covar(person, whereX[j] - 1) * tmp_yr[k];
               }
             }
           }
+
+          if(second_cont_rr == TRUE){
+            for (j = 0; j < nX; j++) {
+              for (k = 0; k < two_y; k++) {
+                tmp_w[ny + n_marker * nX + two_y*j + k] = covar(person, whereX[j] - 1) * tmp_yr[n_marker + k];
+              }
+            }
+          }
+
 
           zgamma = 0;
           for (l = 0; l < ngamma; l++) {
@@ -172,11 +181,20 @@ Rcpp::NumericMatrix AIPW_agscore_cpp(NumericVector start, NumericVector stop, In
 
         if(first_cont_rr == TRUE){
           for (j = 0; j < nX; j++) {
-            for (k = 0; k < ny_rr; k++) {
-              tmp_w[ny + ny_rr * j + k] = covar(person, whereX[j] - 1) * tmp_yr[k];
+            for (k = 0; k < n_marker; k++) {
+              tmp_w[ny + n_marker * j + k] = covar(person, whereX[j] - 1) * tmp_yr[k];
             }
           }
         }
+
+        if(second_cont_rr == TRUE){
+          for (j = 0; j < nX; j++) {
+            for (k = 0; k < two_y; k++) {
+              tmp_w[ny + n_marker * nX + two_y*j + k] = covar(person, whereX[j] - 1) * tmp_yr[n_marker + k];
+            }
+          }
+        }
+
 
         zgamma = 0;
         for (l = 0; l < ngamma; l++) {
