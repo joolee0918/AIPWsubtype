@@ -302,7 +302,7 @@ IPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE, 
     nuvar <- length(unconstvar)
     order_rr <- NULL
 
-    if(first_cont_rr){
+    if(first_cont_rr == TRUE){
       if (nuvar == 0) {
         order_rr <- paste(term_marker, collapse = "+")
      } else {
@@ -311,6 +311,8 @@ IPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE, 
             order_rr <- paste(order_rr, tmp_rr, sep = "+")
         }
       }
+    }else{
+      order_bl <- paste(term_marker, collapse= "+")
     }
 
 
