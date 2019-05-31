@@ -3,7 +3,7 @@
 #' @keywords internal
 
 #' @export
-print.hetero.test <- function(object){
+print.loglik.test <- function(object){
 
   n <- length(object)
   pdig <- max(1, getOption("digits")-4)

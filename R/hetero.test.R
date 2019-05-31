@@ -1,8 +1,7 @@
 
-
 #' @importFrom data.table data.table
 #' @export
-loglik.test <- function(fit1, fit2 = NULL, data = NULL){
+hetero.test <- function(fit1, fit2 = NULL, data = NULL){
 
   Mloglik1 <- fit1$loglik[2]
   beta <- fit1$coefficients
