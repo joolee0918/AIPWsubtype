@@ -211,7 +211,8 @@ IPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE, 
     newedata <- newdata[newdata[, event] == 1, ]
     nnevent <- nrow(newedata)
     nuniqid <- unique(newdata[, id])
-    newmarker <- marker[R == 1, ]
+    newmarker <- as.data.frame(marker[R == 1, ])
+    names(newmarker) <- marker_name
 
 
     nalp = 0
