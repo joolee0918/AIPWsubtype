@@ -290,10 +290,7 @@ Rcpp::List AIPW_coxfit_cpp(int maxiter, NumericVector time, IntegerVector status
             break;
           }
         }
-        /*	      Rcout<<id[person]<<"\n";
-        Rcout<<eventid[pid]<<"\n";
-        Rcout<<pR(pid,0) <<" "<<pR(pid,1) <<" "<< pR(pid,1) << " "<< pR(pid,2) <<"\n";
-        */
+
         ndead++;
         deadwt += 1;
         denom2 += risk;
@@ -515,9 +512,7 @@ Rcpp::List AIPW_coxfit_cpp(int maxiter, NumericVector time, IntegerVector status
       }
     } /* end  of accumulation loop  */
 
-    Rcout<<"iter: "<<iter<<"\n";
-    Rcout<<"beta"" "<<beta<<"\n";
-    /* am I done?
+              /* am I done?
      **   update the betas and test for convergence
      */
      if (fabs(1 - (loglik[1] / newlk)) <= eps && halving == 0) {
