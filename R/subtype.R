@@ -27,8 +27,8 @@
 #'
 
 #' @export
-subtype <- function(formula, data, id,  marker_name,
-                    second_cont_bl = FALSE, second_cont_rr = FALSE, constvar = NULL, init, control,  x = FALSE, y = TRUE, model = FALSE) {
+subtype <- function(formula, data, id,  marker_name, marker_rr = NULL,
+                    first_cont_rr = TRUE, second_cont_bl = FALSE, second_cont_rr = FALSE, constvar = NULL, init, control,  x = FALSE, y = TRUE, model = FALSE) {
 
 
   Call <- match.call()
