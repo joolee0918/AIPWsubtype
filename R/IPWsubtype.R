@@ -61,7 +61,7 @@
 
 #' @export
 IPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE, two_stage = FALSE, tstage_name = NULL,  marker_name,
-                       marekr_rr = NULL, first_cont_rr = TRUE, second_cont_bl = FALSE, second_cont_rr = FALSE, constvar = NULL, init, control,  x = FALSE, y = TRUE, model = FALSE) {
+                       marker_rr = NULL, first_cont_rr = TRUE, second_cont_bl = FALSE, second_cont_rr = FALSE, constvar = NULL, init, control,  x = FALSE, y = TRUE, model = FALSE) {
 
 
     Call <- match.call()
