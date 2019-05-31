@@ -779,7 +779,7 @@ AIPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE,
         afit <- list(coefficients = fit$coef, naive.var = fit$naive.var, var = var, linear.predictors = fit$linear.predictors,
                      score = fit$sctest, loglik = fit$loglik, rscore = rscore, wald.test = wald.test, score.residual = fit$resid, iter = fit$iter, conv = fit$conv, basehaz = basehaz,
                      Ithealp = fit$Ithealp, Ithegam = fit$Ithegam, model.missing = model_missing, model.subtype = model_subtype,
-                     n = n, nevent = nevent, subtype = list(n_subtype = n_subtype, marker_name = marker_name, total_subtype = total_subtype,
+                     n = n, nevent = nevent, subtype = list(n_subtype = n_subtype, marker_name = marker_name, total_subtype = total_subtype),
                      formula = formula, call = Call, terms = Terms, assign = assign, method = "AIPW")
 
 
