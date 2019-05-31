@@ -10,6 +10,8 @@
 #' @param two_stage  a logical value: if \code{TRUE}, a two-stage missingness model is used. Default is \code{FALSE}.
 #' @param tstage_name a charhacter string specifying the first-stage missingness variable if \code{two_stage} is \code{TRUE}.
 #' @param marker_name a vector of charhacter strings specifying markers defining cause of failures.
+#' @param marker_rr a vector of logical value. Dafault is NULL, in which a model includes all markers named in \code{marker_name} in modeling heterogeneity effects. Otherwise, a vector of logical value can spcify whether each marker's heterogeneity effect will be examined or not. A length of this should be equal to that of \code{marker_name}.
+#' @param first_cont_rr a logical value: if \code{TRUE}, the first order contrasts are included in modeling cause-specific relative risks based on log-linear representation. Otherwise the first contrasts are only included.
 #' @param second_cont_bl a logical value: if \code{TRUE}, the second order contrasts are included in modeling cause-specific baseline functions based on log-linear representation. Otherwise the first contrasts are only included.
 #' @param second_cont_rr a logical value: if \code{TRUE}, the second order contrasts are included in modeling cause-specific relative risks based on log-linear representation. Otherwise the first contrasts are only included.
 #' @param constvar a vector of character strings specifying constrained varaibles of which the effects on the outcome are to be the same across subtypes of outcome. The variables which are not specified in \code{constvar} are considered as unconstrained variabales of which the associations with the outcome may be different across the outcome subtypes.
@@ -59,7 +61,7 @@
 
 #' @export
 IPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE, two_stage = FALSE, tstage_name = NULL,  marker_name,
-    second_cont_bl = FALSE, first_cont_rr = TRUE, second_cont_rr = FALSE, constvar = NULL, init, control,  x = FALSE, y = TRUE, model = FALSE) {
+                       marekr_rr = NULL, first_cont_rr = TRUE, second_cont_bl = FALSE, second_cont_rr = FALSE, constvar = NULL, init, control,  x = FALSE, y = TRUE, model = FALSE) {
 
 
     Call <- match.call()
@@ -282,6 +284,12 @@ IPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE, 
     term_marker <- rep(0, n_marker)
 
     for (i in 1:n_marker) term_marker[i] <- paste("factor(", marker_name[i], ")", sep = "")
+    if(is.null(marker_rr)) {
+      term_marker_rr <- term_marker
+    }else{
+      term_marker_rr <- term_marker[marker_rr]
+    }
+
 
     special <- c("strata", "cluster")
     Tf <- terms(formula, special)
@@ -310,10 +318,10 @@ IPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE, 
     order_bl <- NULL
     if(first_cont_rr == TRUE){
       if (nuvar == 0) {
-        order_rr <- paste(term_marker, collapse = "+")
+        order_rr <- paste(term_marker_rr, collapse = "+")
      } else {
           for (i in 1:nuvar) {
-            tmp_rr <- paste(term_marker, "*", unconstvar[i], collapse = "+")
+            tmp_rr <- paste(term_marker_rr, "*", unconstvar[i], collapse = "+")
             order_rr <- paste(order_rr, tmp_rr, sep = "+")
         }
      }
@@ -328,7 +336,7 @@ IPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE, 
     if (second_cont_rr == TRUE) {
         order_rr <- NULL
         for (i in 1:nuvar) {
-            tmp_rr <- paste(attr(terms(as.formula(paste("~", unconstvar[i], "*", "(", paste(term_marker, collapse = "+"),
+            tmp_rr <- paste(attr(terms(as.formula(paste("~", unconstvar[i], "*", "(", paste(term_marker_rr, collapse = "+"),
                 ")", "^", 2))), "term.labels"), collapse = "+")
             order_rr <- paste(order_rr, tmp_rr, sep = "+")
         }

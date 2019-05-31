@@ -6,7 +6,7 @@
 \usage{
 AIPWsubtype(formula, data, id, missing_model, missing_indep = FALSE,
   two_stage = FALSE, tstage_name = NULL, marker_name,
-  second_cont_bl = FALSE, marker_rr = NULL, first_cont_rr = TRUE,
+  marker_rr = NULL, first_cont_rr = TRUE, second_cont_bl = FALSE,
   second_cont_rr = FALSE, constvar = NULL, init, control, x = FALSE,
   y = TRUE, model = FALSE)
 }
@@ -26,6 +26,10 @@ AIPWsubtype(formula, data, id, missing_model, missing_indep = FALSE,
 \item{tstage_name}{a charhacter string specifying the first-stage missingness variable if \code{two_stage} is \code{TRUE}.}
 
 \item{marker_name}{a vector of charhacter strings specifying markers defining cause of failures.}
+
+\item{marker_rr}{a vector of logical value. Dafault is NULL, in which a model includes all markers named in \code{marker_name} in modeling heterogeneity effects. Otherwise, a vector of logical value can spcify whether each marker's heterogeneity effect will be examined or not. A length of this should be equal to that of \code{marker_name}.}
+
+\item{first_cont_rr}{a logical value: if \code{TRUE}, the first order contrasts are included in modeling cause-specific relative risks based on log-linear representation. Otherwise the first contrasts are only included.}
 
 \item{second_cont_bl}{a logical value: if \code{TRUE}, the second order contrasts are included in modeling cause-specific baseline functions based on log-linear representation. Otherwise the first contrasts are only included.}
 
@@ -67,7 +71,7 @@ Fitting an augmented inverse probability weighted Cox proportional hazard model 
 }
 \details{
 The Cox proportional hazard model is used to model cause-specific hazard functions. To examine the association between exposures and the specific subtypes of disease, the log-linear is used for reparameterization. Logistic regression models \code{\link[stats]{glm}} are used for the missiness models and a conditional logistic regression model \code{\link[survival]{clogit}} is used for the marker model.
-The data duplication method is used so that the returned value \code{x} and \code{y} are duplicated the number of subtypes of outcome. Special terms including \code{+strata()} and \code{+offset()} can be used. \code{+cluster()} should be avoided since we automatically include it in the formula. Breslow method is used for handling tied event times.
+The data duplication method is used so that the returned value \code{x} and \code{y} are duplicated the number of subtypes of outcome. Special terms including \code{+strata()} and \code{+offset()} can be used. \code{+cluster()} should be avoided since we automatically include it in the formula. Breslow method is used for handling tied event times. The first order contrasts are included as default in modeling cause-specific baseline functions based on log-linear representation.
 
 For marker variables, 0 indicates censored events or missing values.
 formula = formula, call = Call, terms = Terms, assign = assign, method = "AIPW"

@@ -12,6 +12,8 @@
 #' @param two_stage  a logical value: if \code{TRUE}, a two-stage missingness model is used. Default is \code{FALSE}.
 #' @param tstage_name a charhacter string specifying the first-stage missingness variable if \code{two_stage} is \code{TRUE}.
 #' @param marker_name a vector of charhacter strings specifying markers defining cause of failures.
+#' @param marker_rr a vector of logical value. Dafault is NULL, in which a model includes all markers named in \code{marker_name} in modeling heterogeneity effects. Otherwise, a vector of logical value can spcify whether each marker's heterogeneity effect will be examined or not. A length of this should be equal to that of \code{marker_name}.
+#' @param first_cont_rr a logical value: if \code{TRUE}, the first order contrasts are included in modeling cause-specific relative risks based on log-linear representation. Otherwise the first contrasts are only included.
 #' @param second_cont_bl a logical value: if \code{TRUE}, the second order contrasts are included in modeling cause-specific baseline functions based on log-linear representation. Otherwise the first contrasts are only included.
 #' @param second_cont_rr a logical value: if \code{TRUE}, the second order contrasts are included in modeling cause-specific relative risks based on log-linear representation. Otherwise the first contrasts are only included.
 #' @param constvar a vector of character strings specifying constrained varaibles of which the effects on the outcome are to be the same across subtypes of outcome. The variables which are not specified in \code{constvar} are considered as unconstrained variabales of which the associations with the outcome may be different across the outcome subtypes.
@@ -19,7 +21,7 @@
 #' @param control an object of class \code{\link[survival]{coxph.control}} in \code{survival} packages.The default value of \code{iter.max} is 2000 and that of \code{eps} is 1e-12. See \code{\link[survival]{coxph.control}} for other values.
 
 #' @details The Cox proportional hazard model is used to model cause-specific hazard functions. To examine the association between exposures and the specific subtypes of disease, the log-linear is used for reparameterization. Logistic regression models \code{\link[stats]{glm}} are used for the missiness models and a conditional logistic regression model \code{\link[survival]{clogit}} is used for the marker model.
-#' The data duplication method is used so that the returned value \code{x} and \code{y} are duplicated the number of subtypes of outcome. Special terms including \code{+strata()} and \code{+offset()} can be used. \code{+cluster()} should be avoided since we automatically include it in the formula. Breslow method is used for handling tied event times.
+#' The data duplication method is used so that the returned value \code{x} and \code{y} are duplicated the number of subtypes of outcome. Special terms including \code{+strata()} and \code{+offset()} can be used. \code{+cluster()} should be avoided since we automatically include it in the formula. Breslow method is used for handling tied event times. The first order contrasts are included as default in modeling cause-specific baseline functions based on log-linear representation.
 #'
 #' For marker variables, 0 indicates censored events or missing values.
 #'formula = formula, call = Call, terms = Terms, assign = assign, method = "AIPW"
@@ -65,7 +67,7 @@
 #'
 #' @export
 AIPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE, two_stage = FALSE, tstage_name = NULL,
-     marker_name, second_cont_bl = FALSE, marker_rr = NULL, first_cont_rr = TRUE, second_cont_rr = FALSE, constvar = NULL, init, control, x = FALSE, y = TRUE, model = FALSE) {
+     marker_name, marker_rr = NULL, first_cont_rr = TRUE, second_cont_bl = FALSE,  second_cont_rr = FALSE, constvar = NULL, init, control, x = FALSE, y = TRUE, model = FALSE) {
 
 
     Call <- match.call()
@@ -782,7 +784,7 @@ AIPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE,
         afit <- list(coefficients = fit$coef, naive.var = fit$naive.var, var = var, linear.predictors = fit$linear.predictors,
                      score = fit$sctest, loglik = fit$loglik, rscore = rscore, wald.test = wald.test, score.residual = fit$resid, iter = fit$iter, conv = fit$conv, basehaz = basehaz,
                      Ithealp = fit$Ithealp, Ithegam = fit$Ithegam, model.missing = model_missing, model.subtype = model_subtype,
-                     n = n, nevent = nevent, subtype = list(n_subtype = n_subtype, marker_name = marker_name, total_subtype = total_subtype, marker_rr),
+                     n = n, nevent = nevent, subtype = list(n_subtype = n_subtype, marker_name = marker_name, total_subtype = total_subtype, marker_rr = marker_rr),
                      formula = formula, call = Call, terms = Terms, assign = assign, method = "AIPW")
 
 
