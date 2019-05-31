@@ -398,7 +398,8 @@ AIPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE,
     }
 
 
-    pairm <- combn(n_marker, 2)
+
+   if(n_marker >1) pairm <- combn(n_marker, 2)
 
     if (second_cont_rr == TRUE) {
         order_rr <- NULL
@@ -416,6 +417,8 @@ AIPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE,
             order_bl <- paste(order_bl, tmp_bl, sep = "+")
         }
     }
+
+
 
     Xformula <- as.formula(paste("~", order_bl, order_rr))
 

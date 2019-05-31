@@ -17,7 +17,7 @@ AIPW_coxph.fit <- function(x, y, eventid, id, strata, offset, whereX, whereW, in
         }
     }
 
-      ny <- ncol(y)
+    ny <- ncol(y)
     ngamma = as.integer(length(gamma))
     nalp = as.integer(dim(dpR[[1]])[2])
 
@@ -66,7 +66,8 @@ AIPW_coxph.fit <- function(x, y, eventid, id, strata, offset, whereX, whereW, in
 
     storage.mode(init) <- "double"
 
-    comb_y = combn(n_marker,2)
+    if(n_marker >1) comb_y <- combn(n_marker,2)
+    else comb_y <- 0
     smarker[is.na(smarker)] <- -999
 
 

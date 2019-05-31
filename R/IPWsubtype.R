@@ -82,7 +82,7 @@ IPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE, 
     data <- data[order(data[, id]), ]
     n <- nrow(data)
     n_marker <- length(marker_name)
-    marker <- data[, marker_name]
+    marker <- as.data.frame(data[, marker_name])
     marker[marker == 0] <- NA
 
 
@@ -309,7 +309,7 @@ IPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE, 
     }
 
 
-    pairm <- combn(n_marker, 2)
+    if(n_marker > 1) pairm <- combn(n_marker, 2)
 
     if (second_cont_rr == TRUE) {
         order_rr <- NULL
