@@ -43,13 +43,15 @@ subtype <- function(formula, data, id,  marker_name,
   data <- data[order(data[, id]), ]
   n <- nrow(data)
   n_marker <- length(marker_name)
-  marker <- data[, marker_name]
+  marker <- as.data.frame(data[, marker_name])
+  names(marker) <- marker_name
   marker[marker == 0] <- NA
 
 
   for (i in 1:n_marker) {
     marker[, i] <- factor(marker[, i])
   }
+  marker <- as.data.frame(marker)
   data[, marker_name] <- marker
 
   n_subtype = 1
@@ -131,7 +133,7 @@ subtype <- function(formula, data, id,  marker_name,
   }
 
 
-  pairm <- combn(n_marker, 2)
+  if(n_marker > 1) pairm <- combn(n_marker, 2)
 
   if (second_cont_rr == TRUE) {
     order_rr <- NULL

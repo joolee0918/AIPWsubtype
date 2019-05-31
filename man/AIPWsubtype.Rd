@@ -7,7 +7,7 @@
 AIPWsubtype(formula, data, id, missing_model, missing_indep = FALSE,
   two_stage = FALSE, tstage_name = NULL, marker_name,
   second_cont_bl = FALSE, second_cont_rr = FALSE, constvar = NULL,
-  init, control = list(), x = FALSE, y = TRUE, model = FALSE, ...)
+  init, control, x = FALSE, y = TRUE, model = FALSE)
 }
 \arguments{
 \item{formula}{a formula object with an obect of the type \code{Surv} on the left side and the terms on the right side. It should not include marker variables.}

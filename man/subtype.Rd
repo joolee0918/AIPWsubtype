@@ -6,7 +6,7 @@
 \usage{
 subtype(formula, data, id, marker_name, second_cont_bl = FALSE,
   second_cont_rr = FALSE, constvar = NULL, init, control, x = FALSE,
-  y = TRUE, model = FALSE, ...)
+  y = TRUE, model = FALSE)
 }
 \arguments{
 \item{formula}{a formula object with an obect of the type \code{Surv} on the left side and the terms on the right side. It should not include marker variables.}
