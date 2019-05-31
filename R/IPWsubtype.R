@@ -296,11 +296,11 @@ IPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE, 
     unconstvar <- Xattr[-c(grep(constvar, Xattr))] # Xattr[!(Xattr %in% constvar)]
     constvar <- Xattr[c(grep(constvar, Xattr))]
 
-    whichX <- which(dimnames(attr(Tf, "factors"))[[2]] %in% c(unconstvar))
-    whereX <- which(Xattr$assign == whichX)
+    #whichX <- which(dimnames(attr(Tf, "factors"))[[2]] %in% c(unconstvar))
+    #whereX <- which(Xattr$assign == whichX)
     # where is the main effect for uonstrained variables in X matrix
-    whichW <- which(dimnames(attr(Tf, "factors"))[[2]] %in% c(constvar))
-    whereW <- which(Xattr$assign == whichW)
+    #whichW <- which(dimnames(attr(Tf, "factors"))[[2]] %in% c(constvar))
+    #whereW <- which(Xattr$assign == whichW)
 
     nuvar <- length(unconstvar)
     order_rr <- NULL
@@ -516,7 +516,7 @@ IPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE, 
         afit <- list(coefficients = fit$coefficients, naive.var = fit$naive.var, var = var,  linear.predictors = lp, loglik = fit$loglik, score = fit$score,
                      rscore = rscore, wald.test = wald.test, score.residual =  as.matrix(Stheta), iter = fit$iter,
                      weights = fit$weights, basehaz = basehaz, Ithealp = Ithealp, model_missing = model_missing, n = n, nevent = nevent,
-                     nc = ndata, ncevent = nnevent, subtype = list(n_subtype = n_subtype, marker_name = marker_name, total_subtype = total_subtype, nX = length(whereX), nW = length(whereW)), formula = formula, call = Call, terms = fit$terms, assign = fit$assign, method = "IPW")
+                     nc = ndata, ncevent = nnevent, subtype = list(n_subtype = n_subtype, marker_name = marker_name, total_subtype = total_subtype, formula = formula, call = Call, terms = fit$terms, assign = fit$assign, method = "IPW")
 
         if(rmodel){afit$model <- mf}
         if (rx)  {
