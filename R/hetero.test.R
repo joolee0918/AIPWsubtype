@@ -36,7 +36,6 @@ hetero.test <- function(object, data){
         tcall[[1L]] <- quote(AIPWsubtype)
         mm <- eval(tcall)
         who[i] <- paste(marker_name[c(comb[, i])], collapse=" ")
-        print(mm$loglik)
         logtest[i] <- -2 * (mm$loglik[2] - Mloglik)
         beta <- mm$coefficients
         nabeta <- !(is.na(beta))  #non-missing coefs

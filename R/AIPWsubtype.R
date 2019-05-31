@@ -391,8 +391,11 @@ AIPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE,
         Xattr <- attr(Tf, "term.labels")
     }
 
-    unconstvar <- Xattr[-c(grep(constvar, Xattr))] # Xattr[!(Xattr %in% constvar)]
-    constvar <- Xattr[c(grep(constvar, Xattr))]
+    if(is.null(constvar)) unconstvar <- Xattr
+    else{
+      constvar <- Xattr[c(grep(constvar, Xattr))]
+      unconstvar <- Xattr[-c(grep(constvar, Xattr))] # Xattr[!(Xattr %in% constvar)]
+    }
 
     nuvar <- length(unconstvar)
     order_rr <- NULL
