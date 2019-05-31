@@ -63,7 +63,7 @@ hetero.test <- function(fit1, fit2 = NULL, data = NULL){
     mf <-  data.frame(label = who, test = logtest, df = df, pvalue = pvalue)
 
   }
-  class(mf) <- "hetero.test"
+  class(mf) <- c("hetero.test", "data.frame")
 
   return(mf)
 }

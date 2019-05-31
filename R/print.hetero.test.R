@@ -14,7 +14,7 @@ print.hetero.test <- function(object){
   cat("\n")
 
   object$pvalue <- format.pval(object$pvalue, digits=pdig)
-  print(object)
 
-  cat("\n")
+  print(object)
+  invisible()
 }
