@@ -391,7 +391,8 @@ AIPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE,
         Xattr <- attr(Tf, "term.labels")
     }
 
-    unconstvar <- Xattr[!(Xattr %in% constvar)]
+    unconstvar <- Xattr[-c(grep(constvar, Xattr))] # Xattr[!(Xattr %in% constvar)]
+    constvar <- Xattr[c(grep(constvar, Xattr))]
 
     nuvar <- length(unconstvar)
     order_rr <- NULL
@@ -439,11 +440,11 @@ AIPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE,
 
     drop_bl <- NULL
     if (second_cont_bl == FALSE & second_cont_rr == TRUE) {
-        drop_bl <- rep(0, ncol(pairm))
-        for (i in 1:ncol(pairm)) {
-            drop_bl[i] <- paste(term_marker[pairm[1, i]], term_marker[pairm[2, i]], sep = ":")
-        }
-        order_bl <- paste("-", paste(drop_bl, collapse = "-"))
+      drop_bl <- rep(0, ncol(pairm))
+      for (i in 1:ncol(pairm)) {
+        drop_bl[i] <- paste(term_marker[pairm[1, i]], term_marker[pairm[2, i]], sep = ":")
+      }
+      order_bl <- paste("-", paste(drop_bl, collapse = "-"))
     }
 
     whichdrop <- which(dimnames(attr(Xterms, "factors"))[[2]] %in% c(unconstvar, drop_bl))
@@ -451,7 +452,6 @@ AIPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE,
     s_X <- s_X[, !xdrop, drop = FALSE]
     s_y <- subset_data[, event]
     s_uid <- subset_data[, id]
-
 
     model_subtype <- clogit(s_y ~ s_X + strata(s_uid))
     subset_data$lp <- predict(model_subtype, type = "lp")
@@ -529,15 +529,16 @@ AIPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE,
             temp + 1 * (shift[2] <= temp)
         attr(X, "assign") <- temp
     } else {
-        X <- model.matrix(Terms, mf, contrasts = contrast.arg)
+        Terms2 <- Terms
+        X <- model.matrix(Terms2, mf, contrasts = contrast.arg)
     }
 
 
     # drop intercept and drop baseline part if necessary
     Xattr <- attributes(X)
-    whichdrop <- which(dimnames(attr(Terms, "factors"))[[2]] %in% c(drop_bl))
+    whichdrop <- which(dimnames(attr(Terms2, "factors"))[[2]] %in% c(drop_bl))
     if (hasinteractions) {
-        xdrop <- Xattr$assign %in% c(0, whichdrop, untangle.specials(Terms, "strata")$terms)
+        xdrop <- Xattr$assign %in% c(0, whichdrop, untangle.specials(Terms2, "strata")$terms)
     } else {
         xdrop <- Xattr$assign %in% c(0, whichdrop)
 
@@ -546,10 +547,11 @@ AIPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE,
     attr(X, "assign") <- Xattr$assign[!xdrop]
 
     # where is the main effect for unconstrained variables in X matrix
-    whichX <- which(dimnames(attr(Terms, "factors"))[[2]] %in% c(unconstvar))
-
+    whichX <- which(dimnames(attr(Terms2, "factors"))[[2]] %in% c(unconstvar))
+    whereX <- which(Xattr$assign == whichX)
     # where is the main effect for uonstrained variables in X matrix
-    whichW <- which(dimnames(attr(Terms, "factors"))[[2]] %in% c(constvar))
+    whichW <- which(dimnames(attr(Terms2, "factors"))[[2]] %in% c(constvar))
+    whereW <- which(Xattr$assign == whichW)
 
     offset <- model.offset(mf)
     if (is.null(offset) | all(offset == 0)) {
@@ -626,8 +628,8 @@ AIPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE,
     }
 
 
-    fit <- fitter(x = X, y = Y, eventid = eventid, id = newid, strata = strats, offset = offset, whereX = whichX,
-        whereW = whichW, init = init, control = control, marker = newmarker, gamma = gamma, pR = pR, R = R,
+    fit <- fitter(x = X, y = Y, eventid = eventid, id = newid, strata = strats, offset = offset, whereX = whereX,
+        whereW = whereW, init = init, control = control, marker = newmarker, gamma = gamma, pR = pR, R = R,
         dpR = dpR, nR = nR, total_R = ntotal_R, marker_r = nmarker_r, two_stage = two_stage, n_marker = nc_marker, first_cont_rr = first_cont_rr, second_cont_rr = second_cont_rr,
         second_cont_bl = second_cont_bl, rownames = row.names(mf), collapse = cluster)
 
@@ -777,7 +779,7 @@ AIPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE,
         afit <- list(coefficients = fit$coef, naive.var = fit$naive.var, var = var, linear.predictors = fit$linear.predictors,
                      score = fit$sctest, loglik = fit$loglik, rscore = rscore, wald.test = wald.test, score.residual = fit$resid, iter = fit$iter, conv = fit$conv, basehaz = basehaz,
                      Ithealp = fit$Ithealp, Ithegam = fit$Ithegam, model.missing = model_missing, model.subtype = model_subtype,
-                     n = n, nevent = nevent, subtype = list(n_subtype = n_subtype, marker_name = marker_name, total_subtype = total_subtype, nX = length(whichX), nW = length(whichW)),
+                     n = n, nevent = nevent, subtype = list(n_subtype = n_subtype, marker_name = marker_name, total_subtype = total_subtype, nX = length(whereX), nW = length(whereW)),
                      formula = formula, call = Call, terms = Terms, assign = assign, method = "AIPW")
 
 
