@@ -101,6 +101,7 @@ AIPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE,
     for (i in 1:n_marker) {
         marker[, i] <- factor(marker[, i])
     }
+    marker <- as.data.frame(marker)
     data[, marker_name] <- marker
 
     n_subtype = 1
@@ -367,7 +368,8 @@ AIPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE,
 
     ## Do not duplicate: pr, dpr,
 
-    marker <- marker[rep(seq_len(nrow(marker)), each = n_subtype), ]
+    marker <- as.data.frame(marker[rep(seq_len(nrow(marker)), each = n_subtype), ])
+    names(marker) <- marker_name
     R <- R[rep(seq_len(length(R)), each = n_subtype)]
 
     term_marker <- rep(0, n_marker)

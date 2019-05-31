@@ -83,12 +83,14 @@ IPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE, 
     n <- nrow(data)
     n_marker <- length(marker_name)
     marker <- as.data.frame(data[, marker_name])
+    names(marker) <- marker_name
     marker[marker == 0] <- NA
 
 
     for (i in 1:n_marker) {
         marker[, i] <- factor(marker[, i])
     }
+    marker <- as.data.frame(marker)
     data[, marker_name] <- marker
 
     n_subtype = 1
