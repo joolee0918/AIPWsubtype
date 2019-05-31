@@ -11,7 +11,7 @@ print.hetero.test <- function(object){
   for(i in 1:n){
     cat("---------------------------------------------")
     cat("\n")
-    print(object[[i]], row.names = FALSE)
+    print(object[[i]], row.names = F)
 
   }
 }

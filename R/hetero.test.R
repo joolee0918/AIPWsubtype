@@ -52,7 +52,7 @@ hetero.test <- function(object, data){
   df <-  Mdf - length(beta2)
   pvalue = pchisq(logtest, df, lower.tail=FALSE)
 
-  mf[[n_marker]] <-  data.table(label = paste(marker_name, collapse = "+"), test = logtest, df = df, pvalue = pvalue)
+  mf[[n_marker]] <-  data.frame(label = paste(marker_name, collapse = "+"), test = logtest, df = df, pvalue = pvalue)
 
   class(mf) <- "hetero.test"
 
