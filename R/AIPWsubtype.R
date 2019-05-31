@@ -554,8 +554,8 @@ AIPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE,
 
     # new marker|R by model matrix
 
-    newmarker <- model.matrix.lm(as.formula(paste("~", paste(term_marker, collapse = "+"))), data = marker,
-        na.action = na.pass)[, -1]
+    newmarker <- as.matrix(model.matrix.lm(as.formula(paste("~", paste(term_marker, collapse = "+"))), data = marker,
+        na.action = na.pass)[, -1])
     nc_marker <- ncol(newmarker)
 
     ntotal_subtype <- as.matrix(model.matrix.lm(as.formula(paste("~", paste(term_marker, collapse = "+"))), data = total_subtype,
