@@ -2,68 +2,55 @@
 
 #' @importFrom data.table data.table
 #' @export
-hetero.test <- function(object, data){
+loglik.test <- function(fit1, fit2 = NULL, data = NULL){
 
-  Call <- object$call
-
-  Mloglik <- object$loglik[2]
-  beta <- object$coefficients
+  Mloglik1 <- fit1$loglik[2]
+  beta <- fit1$coefficients
   nabeta <- !(is.na(beta))  #non-missing coefs
   beta2 <- beta[nabeta]
-  Mdf <- length(beta2)
+  Mdf1 <- length(beta2)
 
-  nullmodel <- coxph(object$formula, data, method="breslow")
+  if(!is.null(fit2)){
+    Mloglik2 <- fit2$loglik[2]
+    beta <- fit2$coefficients
+    nabeta <- !(is.na(beta))  #non-missing coefs
+    beta2 <- beta[nabeta]
+    Mdf2 <- length(beta2)
 
-  marker_name <- object$subtype$marker_name
-  missing_model <- eval(Call[c(match(c('missing_model'), names(Call), nomatch=0))][[1]])
-  n_marker <- length(marker_name)
-  marker_rr <- object$subtype$marker_rr
-  if(is.null(marker_rr)) marker_rr <- rep(TRUE, n_marker)
+    if(Mdf1 > Mdf2) {
+      logtest <- -2 * (Mloglik2 - Mloglik1)
+      df <- Mdf1 - Mdf2
+    }else {
+      logtest <- -2 * (Mloglik1 - Mloglik2)
+      df <- Mdf2 - Mdf1
+    }
+    pvalue = pchisq(logtest, df, lower.tail=FALSE)
+    who1 <- fit1$subtype$marker_name[fit1$subtype$marker_rr]
+    who2 <- fit2$subtype$marker_name[fit2$subtype$marker_rr]
+    label <- paste(setdiff(who1, who2), collapse = " ")
+    mf <-  data.frame(label = label, test = logtest, df = df, pvalue = pvalue)
+  } else{
+    if(!is.null(data)) stop("data should be included")
 
-  mf <- vector('list', n_marker)
-  for(k in 1:(n_marker-1)){
-    comb <- combn(n_marker, k)
-    J <- ncol(comb)
-    who <- logtest <- df <- pvalue <- rep(0, J)
-      for(i in 1:J){
-        tcall <- Call[c(1, match(c('formula', 'id', 'missing_model', 'missing_indep', 'two_stage', 'tstage_name', 'marker_name', 'second_cont_bl', 'first_cont_rr', 'second_cont_rr', 'constvar',
+    tcall <- Call[c(1, match(c('formula', 'id', 'missing_model', 'missing_indep', 'two_stage', 'tstage_name', 'marker_name', 'second_cont_bl', 'constvar',
                              'init', 'control'), names(Call), nomatch=0))]
 
-        tmp <- marker_rr
-        tmp[c(comb[, i])] <- FALSE
-        tcall$marker_rr <- tmp
-        tcall$data <- data
-        tcall[[1L]] <- quote(AIPWsubtype)
-        mm <- eval(tcall)
-        who[i] <- paste(marker_name[c(comb[, i])], collapse=" ")
-        logtest[i] <- -2 * (mm$loglik[2] - Mloglik)
-        beta <- mm$coefficients
-        nabeta <- !(is.na(beta))  #non-missing coefs
-        beta2 <- beta[nabeta]
-        df[i] <-  Mdf - length(beta2)
-        pvalue[i] = pchisq(logtest[i], df[i], lower.tail=FALSE)
-      }
-    mf[[k]] <- data.frame(label = who, test = logtest, df = df, pvalue = pvalue)
+    tcall$data <- data
+    tcall$first_cont_rr <- FALSE
+    tcall$second_cont_rr <- FALSE
+    tcall[[1L]] <- quote(AIPWsubtype)
+    mm <- eval(tcall)
+    who <-  paste(marker_name, collapse = "+")
+    logtest <- -2 * (mm$loglik[2] - Mloglik1)
+    beta <- mm$coefficients
+    nabeta <- !(is.na(beta))  #non-missing coefs
+    beta2 <- beta[nabeta]
+    df <-  Mdf1 - length(beta2)
+    pvalue = pchisq(logtest, df, lower.tail=FALSE)
+
+    mf <-  data.frame(label = who, test = logtest, df = df, pvalue = pvalue)
+
   }
-
-
-  tcall <- Call[c(1, match(c('formula', 'id', 'missing_model', 'missing_indep', 'two_stage', 'tstage_name', 'marker_name', 'second_cont_bl', 'second_cont_rr', 'constvar',
-                             'init', 'control'), names(Call), nomatch=0))]
-
-  tcall$data <- data
-  tcall$first_cont_rr <- FALSE
-  tcall[[1L]] <- quote(AIPWsubtype)
-  mm <- eval(tcall)
-  who <-  paste(marker_name, collapse = "+")
-  logtest <- -2 * (mm$loglik[2] - Mloglik)
-  beta <- mm$coefficients
-  nabeta <- !(is.na(beta))  #non-missing coefs
-  beta2 <- beta[nabeta]
-  df <-  Mdf - length(beta2)
-  pvalue = pchisq(logtest, df, lower.tail=FALSE)
-
-  mf[[n_marker]] <-  data.frame(label = who, test = logtest, df = df, pvalue = pvalue)
-
   class(mf) <- "hetero.test"
 
   return(mf)
