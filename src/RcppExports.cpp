@@ -7,8 +7,8 @@
 using namespace Rcpp;
 
 // AIPW_agreg_cpp
-Rcpp::List AIPW_agreg_cpp(int maxiter, NumericVector start, NumericVector tstop, IntegerVector event, NumericMatrix covar, IntegerVector eventid, IntegerVector id, NumericVector offset, IntegerVector strata, IntegerVector sort1, IntegerVector sort2, IntegerMatrix marker, IntegerVector R, NumericMatrix pR, List dpR, IntegerMatrix total_R, List marker_r, IntegerVector whereX, IntegerVector whereW, NumericVector gamma, NumericMatrix comb_y, int nvar, int n_marker, int nR, int ngamma, int nalp, double eps, bool second_cont_bl, bool second_cont_rr, NumericVector init_beta);
-RcppExport SEXP _AIPWsubtype_AIPW_agreg_cpp(SEXP maxiterSEXP, SEXP startSEXP, SEXP tstopSEXP, SEXP eventSEXP, SEXP covarSEXP, SEXP eventidSEXP, SEXP idSEXP, SEXP offsetSEXP, SEXP strataSEXP, SEXP sort1SEXP, SEXP sort2SEXP, SEXP markerSEXP, SEXP RSEXP, SEXP pRSEXP, SEXP dpRSEXP, SEXP total_RSEXP, SEXP marker_rSEXP, SEXP whereXSEXP, SEXP whereWSEXP, SEXP gammaSEXP, SEXP comb_ySEXP, SEXP nvarSEXP, SEXP n_markerSEXP, SEXP nRSEXP, SEXP ngammaSEXP, SEXP nalpSEXP, SEXP epsSEXP, SEXP second_cont_blSEXP, SEXP second_cont_rrSEXP, SEXP init_betaSEXP) {
+Rcpp::List AIPW_agreg_cpp(int maxiter, NumericVector start, NumericVector tstop, IntegerVector event, NumericMatrix covar, IntegerVector eventid, IntegerVector id, NumericVector offset, IntegerVector strata, IntegerVector sort1, IntegerVector sort2, IntegerMatrix marker, IntegerVector R, NumericMatrix pR, List dpR, IntegerMatrix total_R, List marker_r, IntegerVector whereX, IntegerVector whereW, NumericVector gamma, NumericMatrix comb_y, int nvar, int n_marker, int nR, int ngamma, int nalp, double eps, bool first_cont_rr, bool second_cont_bl, bool second_cont_rr, NumericVector init_beta);
+RcppExport SEXP _AIPWsubtype_AIPW_agreg_cpp(SEXP maxiterSEXP, SEXP startSEXP, SEXP tstopSEXP, SEXP eventSEXP, SEXP covarSEXP, SEXP eventidSEXP, SEXP idSEXP, SEXP offsetSEXP, SEXP strataSEXP, SEXP sort1SEXP, SEXP sort2SEXP, SEXP markerSEXP, SEXP RSEXP, SEXP pRSEXP, SEXP dpRSEXP, SEXP total_RSEXP, SEXP marker_rSEXP, SEXP whereXSEXP, SEXP whereWSEXP, SEXP gammaSEXP, SEXP comb_ySEXP, SEXP nvarSEXP, SEXP n_markerSEXP, SEXP nRSEXP, SEXP ngammaSEXP, SEXP nalpSEXP, SEXP epsSEXP, SEXP first_cont_rrSEXP, SEXP second_cont_blSEXP, SEXP second_cont_rrSEXP, SEXP init_betaSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -39,16 +39,17 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type ngamma(ngammaSEXP);
     Rcpp::traits::input_parameter< int >::type nalp(nalpSEXP);
     Rcpp::traits::input_parameter< double >::type eps(epsSEXP);
+    Rcpp::traits::input_parameter< bool >::type first_cont_rr(first_cont_rrSEXP);
     Rcpp::traits::input_parameter< bool >::type second_cont_bl(second_cont_blSEXP);
     Rcpp::traits::input_parameter< bool >::type second_cont_rr(second_cont_rrSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type init_beta(init_betaSEXP);
-    rcpp_result_gen = Rcpp::wrap(AIPW_agreg_cpp(maxiter, start, tstop, event, covar, eventid, id, offset, strata, sort1, sort2, marker, R, pR, dpR, total_R, marker_r, whereX, whereW, gamma, comb_y, nvar, n_marker, nR, ngamma, nalp, eps, second_cont_bl, second_cont_rr, init_beta));
+    rcpp_result_gen = Rcpp::wrap(AIPW_agreg_cpp(maxiter, start, tstop, event, covar, eventid, id, offset, strata, sort1, sort2, marker, R, pR, dpR, total_R, marker_r, whereX, whereW, gamma, comb_y, nvar, n_marker, nR, ngamma, nalp, eps, first_cont_rr, second_cont_bl, second_cont_rr, init_beta));
     return rcpp_result_gen;
 END_RCPP
 }
 // AIPW_agscore_cpp
-Rcpp::NumericMatrix AIPW_agscore_cpp(NumericVector start, NumericVector stop, IntegerVector event, NumericMatrix covar, IntegerVector eventid, IntegerVector id, NumericVector score, IntegerVector strata, IntegerMatrix marker, IntegerVector R, NumericMatrix pR, IntegerMatrix total_R, List marker_r, IntegerVector whereX, IntegerVector whereW, NumericVector gamma, NumericMatrix comb_y, int nvar, int n_marker, int nR, int ngamma, int nalp, bool second_cont_bl, bool second_cont_rr);
-RcppExport SEXP _AIPWsubtype_AIPW_agscore_cpp(SEXP startSEXP, SEXP stopSEXP, SEXP eventSEXP, SEXP covarSEXP, SEXP eventidSEXP, SEXP idSEXP, SEXP scoreSEXP, SEXP strataSEXP, SEXP markerSEXP, SEXP RSEXP, SEXP pRSEXP, SEXP total_RSEXP, SEXP marker_rSEXP, SEXP whereXSEXP, SEXP whereWSEXP, SEXP gammaSEXP, SEXP comb_ySEXP, SEXP nvarSEXP, SEXP n_markerSEXP, SEXP nRSEXP, SEXP ngammaSEXP, SEXP nalpSEXP, SEXP second_cont_blSEXP, SEXP second_cont_rrSEXP) {
+Rcpp::NumericMatrix AIPW_agscore_cpp(NumericVector start, NumericVector stop, IntegerVector event, NumericMatrix covar, IntegerVector eventid, IntegerVector id, NumericVector score, IntegerVector strata, IntegerMatrix marker, IntegerVector R, NumericMatrix pR, IntegerMatrix total_R, List marker_r, IntegerVector whereX, IntegerVector whereW, NumericVector gamma, NumericMatrix comb_y, int nvar, int n_marker, int nR, int ngamma, int nalp, bool first_cont_rr, bool second_cont_bl, bool second_cont_rr);
+RcppExport SEXP _AIPWsubtype_AIPW_agscore_cpp(SEXP startSEXP, SEXP stopSEXP, SEXP eventSEXP, SEXP covarSEXP, SEXP eventidSEXP, SEXP idSEXP, SEXP scoreSEXP, SEXP strataSEXP, SEXP markerSEXP, SEXP RSEXP, SEXP pRSEXP, SEXP total_RSEXP, SEXP marker_rSEXP, SEXP whereXSEXP, SEXP whereWSEXP, SEXP gammaSEXP, SEXP comb_ySEXP, SEXP nvarSEXP, SEXP n_markerSEXP, SEXP nRSEXP, SEXP ngammaSEXP, SEXP nalpSEXP, SEXP first_cont_rrSEXP, SEXP second_cont_blSEXP, SEXP second_cont_rrSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -74,15 +75,16 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type nR(nRSEXP);
     Rcpp::traits::input_parameter< int >::type ngamma(ngammaSEXP);
     Rcpp::traits::input_parameter< int >::type nalp(nalpSEXP);
+    Rcpp::traits::input_parameter< bool >::type first_cont_rr(first_cont_rrSEXP);
     Rcpp::traits::input_parameter< bool >::type second_cont_bl(second_cont_blSEXP);
     Rcpp::traits::input_parameter< bool >::type second_cont_rr(second_cont_rrSEXP);
-    rcpp_result_gen = Rcpp::wrap(AIPW_agscore_cpp(start, stop, event, covar, eventid, id, score, strata, marker, R, pR, total_R, marker_r, whereX, whereW, gamma, comb_y, nvar, n_marker, nR, ngamma, nalp, second_cont_bl, second_cont_rr));
+    rcpp_result_gen = Rcpp::wrap(AIPW_agscore_cpp(start, stop, event, covar, eventid, id, score, strata, marker, R, pR, total_R, marker_r, whereX, whereW, gamma, comb_y, nvar, n_marker, nR, ngamma, nalp, first_cont_rr, second_cont_bl, second_cont_rr));
     return rcpp_result_gen;
 END_RCPP
 }
 // AIPW_coxfit_cpp
-Rcpp::List AIPW_coxfit_cpp(int maxiter, NumericVector time, IntegerVector status, NumericMatrix covar, IntegerVector eventid, IntegerVector id, NumericVector offset, IntegerVector strata, IntegerMatrix marker, IntegerVector R, NumericMatrix pR, List dpR, IntegerMatrix total_R, List marker_r, IntegerVector whereX, IntegerVector whereW, NumericVector gamma, NumericMatrix comb_y, int nvar, int n_marker, int nR, int ngamma, int nalp, double eps, bool second_cont_bl, bool second_cont_rr, NumericVector init_beta);
-RcppExport SEXP _AIPWsubtype_AIPW_coxfit_cpp(SEXP maxiterSEXP, SEXP timeSEXP, SEXP statusSEXP, SEXP covarSEXP, SEXP eventidSEXP, SEXP idSEXP, SEXP offsetSEXP, SEXP strataSEXP, SEXP markerSEXP, SEXP RSEXP, SEXP pRSEXP, SEXP dpRSEXP, SEXP total_RSEXP, SEXP marker_rSEXP, SEXP whereXSEXP, SEXP whereWSEXP, SEXP gammaSEXP, SEXP comb_ySEXP, SEXP nvarSEXP, SEXP n_markerSEXP, SEXP nRSEXP, SEXP ngammaSEXP, SEXP nalpSEXP, SEXP epsSEXP, SEXP second_cont_blSEXP, SEXP second_cont_rrSEXP, SEXP init_betaSEXP) {
+Rcpp::List AIPW_coxfit_cpp(int maxiter, NumericVector time, IntegerVector status, NumericMatrix covar, IntegerVector eventid, IntegerVector id, NumericVector offset, IntegerVector strata, IntegerMatrix marker, IntegerVector R, NumericMatrix pR, List dpR, IntegerMatrix total_R, List marker_r, IntegerVector whereX, IntegerVector whereW, NumericVector gamma, NumericMatrix comb_y, int nvar, int n_marker, int nR, int ngamma, int nalp, double eps, bool first_cont_rr, bool second_cont_bl, bool second_cont_rr, NumericVector init_beta);
+RcppExport SEXP _AIPWsubtype_AIPW_coxfit_cpp(SEXP maxiterSEXP, SEXP timeSEXP, SEXP statusSEXP, SEXP covarSEXP, SEXP eventidSEXP, SEXP idSEXP, SEXP offsetSEXP, SEXP strataSEXP, SEXP markerSEXP, SEXP RSEXP, SEXP pRSEXP, SEXP dpRSEXP, SEXP total_RSEXP, SEXP marker_rSEXP, SEXP whereXSEXP, SEXP whereWSEXP, SEXP gammaSEXP, SEXP comb_ySEXP, SEXP nvarSEXP, SEXP n_markerSEXP, SEXP nRSEXP, SEXP ngammaSEXP, SEXP nalpSEXP, SEXP epsSEXP, SEXP first_cont_rrSEXP, SEXP second_cont_blSEXP, SEXP second_cont_rrSEXP, SEXP init_betaSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -110,16 +112,17 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type ngamma(ngammaSEXP);
     Rcpp::traits::input_parameter< int >::type nalp(nalpSEXP);
     Rcpp::traits::input_parameter< double >::type eps(epsSEXP);
+    Rcpp::traits::input_parameter< bool >::type first_cont_rr(first_cont_rrSEXP);
     Rcpp::traits::input_parameter< bool >::type second_cont_bl(second_cont_blSEXP);
     Rcpp::traits::input_parameter< bool >::type second_cont_rr(second_cont_rrSEXP);
     Rcpp::traits::input_parameter< NumericVector >::type init_beta(init_betaSEXP);
-    rcpp_result_gen = Rcpp::wrap(AIPW_coxfit_cpp(maxiter, time, status, covar, eventid, id, offset, strata, marker, R, pR, dpR, total_R, marker_r, whereX, whereW, gamma, comb_y, nvar, n_marker, nR, ngamma, nalp, eps, second_cont_bl, second_cont_rr, init_beta));
+    rcpp_result_gen = Rcpp::wrap(AIPW_coxfit_cpp(maxiter, time, status, covar, eventid, id, offset, strata, marker, R, pR, dpR, total_R, marker_r, whereX, whereW, gamma, comb_y, nvar, n_marker, nR, ngamma, nalp, eps, first_cont_rr, second_cont_bl, second_cont_rr, init_beta));
     return rcpp_result_gen;
 END_RCPP
 }
 // AIPW_coxscore_cpp
-Rcpp::NumericMatrix AIPW_coxscore_cpp(NumericVector time, NumericVector status, NumericMatrix covar, IntegerVector eventid, IntegerVector id, NumericVector score, IntegerVector strata, IntegerMatrix marker, IntegerVector R, NumericMatrix pR, IntegerMatrix total_R, List marker_r, IntegerVector whereX, IntegerVector whereW, NumericVector gamma, NumericMatrix comb_y, int nvar, int n_marker, int nR, int ngamma, int nalp, bool second_cont_bl, bool second_cont_rr);
-RcppExport SEXP _AIPWsubtype_AIPW_coxscore_cpp(SEXP timeSEXP, SEXP statusSEXP, SEXP covarSEXP, SEXP eventidSEXP, SEXP idSEXP, SEXP scoreSEXP, SEXP strataSEXP, SEXP markerSEXP, SEXP RSEXP, SEXP pRSEXP, SEXP total_RSEXP, SEXP marker_rSEXP, SEXP whereXSEXP, SEXP whereWSEXP, SEXP gammaSEXP, SEXP comb_ySEXP, SEXP nvarSEXP, SEXP n_markerSEXP, SEXP nRSEXP, SEXP ngammaSEXP, SEXP nalpSEXP, SEXP second_cont_blSEXP, SEXP second_cont_rrSEXP) {
+Rcpp::NumericMatrix AIPW_coxscore_cpp(NumericVector time, NumericVector status, NumericMatrix covar, IntegerVector eventid, IntegerVector id, NumericVector score, IntegerVector strata, IntegerMatrix marker, IntegerVector R, NumericMatrix pR, IntegerMatrix total_R, List marker_r, IntegerVector whereX, IntegerVector whereW, NumericVector gamma, NumericMatrix comb_y, int nvar, int n_marker, int nR, int ngamma, int nalp, bool first_cont_rr, bool second_cont_bl, bool second_cont_rr);
+RcppExport SEXP _AIPWsubtype_AIPW_coxscore_cpp(SEXP timeSEXP, SEXP statusSEXP, SEXP covarSEXP, SEXP eventidSEXP, SEXP idSEXP, SEXP scoreSEXP, SEXP strataSEXP, SEXP markerSEXP, SEXP RSEXP, SEXP pRSEXP, SEXP total_RSEXP, SEXP marker_rSEXP, SEXP whereXSEXP, SEXP whereWSEXP, SEXP gammaSEXP, SEXP comb_ySEXP, SEXP nvarSEXP, SEXP n_markerSEXP, SEXP nRSEXP, SEXP ngammaSEXP, SEXP nalpSEXP, SEXP first_cont_rrSEXP, SEXP second_cont_blSEXP, SEXP second_cont_rrSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -144,9 +147,10 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type nR(nRSEXP);
     Rcpp::traits::input_parameter< int >::type ngamma(ngammaSEXP);
     Rcpp::traits::input_parameter< int >::type nalp(nalpSEXP);
+    Rcpp::traits::input_parameter< bool >::type first_cont_rr(first_cont_rrSEXP);
     Rcpp::traits::input_parameter< bool >::type second_cont_bl(second_cont_blSEXP);
     Rcpp::traits::input_parameter< bool >::type second_cont_rr(second_cont_rrSEXP);
-    rcpp_result_gen = Rcpp::wrap(AIPW_coxscore_cpp(time, status, covar, eventid, id, score, strata, marker, R, pR, total_R, marker_r, whereX, whereW, gamma, comb_y, nvar, n_marker, nR, ngamma, nalp, second_cont_bl, second_cont_rr));
+    rcpp_result_gen = Rcpp::wrap(AIPW_coxscore_cpp(time, status, covar, eventid, id, score, strata, marker, R, pR, total_R, marker_r, whereX, whereW, gamma, comb_y, nvar, n_marker, nR, ngamma, nalp, first_cont_rr, second_cont_bl, second_cont_rr));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -195,10 +199,10 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_AIPWsubtype_AIPW_agreg_cpp", (DL_FUNC) &_AIPWsubtype_AIPW_agreg_cpp, 30},
-    {"_AIPWsubtype_AIPW_agscore_cpp", (DL_FUNC) &_AIPWsubtype_AIPW_agscore_cpp, 24},
-    {"_AIPWsubtype_AIPW_coxfit_cpp", (DL_FUNC) &_AIPWsubtype_AIPW_coxfit_cpp, 27},
-    {"_AIPWsubtype_AIPW_coxscore_cpp", (DL_FUNC) &_AIPWsubtype_AIPW_coxscore_cpp, 23},
+    {"_AIPWsubtype_AIPW_agreg_cpp", (DL_FUNC) &_AIPWsubtype_AIPW_agreg_cpp, 31},
+    {"_AIPWsubtype_AIPW_agscore_cpp", (DL_FUNC) &_AIPWsubtype_AIPW_agscore_cpp, 25},
+    {"_AIPWsubtype_AIPW_coxfit_cpp", (DL_FUNC) &_AIPWsubtype_AIPW_coxfit_cpp, 28},
+    {"_AIPWsubtype_AIPW_coxscore_cpp", (DL_FUNC) &_AIPWsubtype_AIPW_coxscore_cpp, 24},
     {"_AIPWsubtype_IPW_ithealp_ag", (DL_FUNC) &_AIPWsubtype_IPW_ithealp_ag, 13},
     {"_AIPWsubtype_IPW_ithealp_cox", (DL_FUNC) &_AIPWsubtype_IPW_ithealp_cox, 10},
     {NULL, NULL, 0}

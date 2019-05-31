@@ -65,7 +65,7 @@
 #'
 #' @export
 AIPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE, two_stage = FALSE, tstage_name = NULL,
-     marker_name, second_cont_bl = FALSE, second_cont_rr = FALSE, constvar = NULL, init, control, x = FALSE, y = TRUE, model = FALSE) {
+     marker_name, second_cont_bl = FALSE, marker_rr = NULL, first_cont_rr = TRUE, second_cont_rr = FALSE, constvar = NULL, init, control, x = FALSE, y = TRUE, model = FALSE) {
 
 
     Call <- match.call()
@@ -375,6 +375,11 @@ AIPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE,
     term_marker <- rep(0, n_marker)
 
     for (i in 1:n_marker) term_marker[i] <- paste("factor(", marker_name[i], ")", sep = "")
+    if(is.null(marker_rr)) {
+      term_marker_rr <- term_marker
+    }else{
+      term_marker_rr <- term_marker[marker_rr]
+    }
 
     special <- c("strata", "cluster")
     Tf <- terms(formula, special)
@@ -391,13 +396,15 @@ AIPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE,
     nuvar <- length(unconstvar)
     order_rr <- NULL
 
-    if (nuvar == 0) {
-        order_rr <- paste(term_marker, collapse = "+")
-    } else {
-        for (i in 1:nuvar) {
-            tmp_rr <- paste(term_marker, "*", unconstvar[i], collapse = "+")
-            order_rr <- paste(order_rr, tmp_rr, sep = "+")
-        }
+    if(first_cont_rr == TRUE){
+      if (nuvar == 0) {
+        order_rr <- paste(term_marker_rr, collapse = "+")
+      } else {
+          for (i in 1:nuvar) {
+              tmp_rr <- paste(term_marker_rr, "*", unconstvar[i], collapse = "+")
+              order_rr <- paste(order_rr, tmp_rr, sep = "+")
+          }
+      }
     }
 
 
@@ -407,7 +414,7 @@ AIPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE,
     if (second_cont_rr == TRUE) {
         order_rr <- NULL
         for (i in 1:nuvar) {
-            tmp_rr <- paste(attr(terms(as.formula(paste("~", unconstvar[i], "*", "(", paste(term_marker, collapse = "+"),
+            tmp_rr <- paste(attr(terms(as.formula(paste("~", unconstvar[i], "*", "(", paste(term_marker_rr, collapse = "+"),
                 ")", "^", 2))), "term.labels"), collapse = "+")
             order_rr <- paste(order_rr, tmp_rr, sep = "+")
         }
@@ -620,7 +627,7 @@ AIPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE,
 
     fit <- fitter(x = X, y = Y, eventid = eventid, id = newid, strata = strats, offset = offset, whereX = whichX,
         whereW = whichW, init = init, control = control, marker = newmarker, gamma = gamma, pR = pR, R = R,
-        dpR = dpR, nR = nR, total_R = ntotal_R, marker_r = nmarker_r, two_stage = two_stage, n_marker = nc_marker, second_cont_rr = second_cont_rr,
+        dpR = dpR, nR = nR, total_R = ntotal_R, marker_r = nmarker_r, two_stage = two_stage, n_marker = nc_marker, first_cont_rr = first_cont_rr, second_cont_rr = second_cont_rr,
         second_cont_bl = second_cont_bl, rownames = row.names(mf), collapse = cluster)
 
     if (is.character(fit)) {

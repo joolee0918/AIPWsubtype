@@ -5,7 +5,7 @@
 # =========================================================
 
 
-AIPW_coxph.fit <- function(x, y, eventid, id, strata, offset, whereX, whereW, init, control, marker, gamma,  pR, R, dpR, nR, total_R, marker_r, two_stage, n_marker, second_cont_bl, second_cont_rr,  rownames, collapse)
+AIPW_coxph.fit <- function(x, y, eventid, id, strata, offset, whereX, whereW, init, control, marker, gamma,  pR, R, dpR, nR, total_R, marker_r, two_stage, n_marker, second_cont_bl, first_cont_rr, second_cont_rr,  rownames, collapse)
 {
 
     n <-  nrow(y)
@@ -95,6 +95,7 @@ AIPW_fit <- AIPW_coxfit_cpp(control$iter.max,
         ngamma,
         nalp,
         control$eps,
+        first_cont_rr,
         second_cont_bl,
         second_cont_rr,
         init)
@@ -154,6 +155,7 @@ AIPW_fit <- AIPW_coxfit_cpp(control$iter.max,
 	        nR,
 	        ngamma,
 	        nalp,
+		      first_cont_rr,
 	        second_cont_bl,
 	        second_cont_rr)
 
@@ -186,6 +188,7 @@ AIPW_fit <- AIPW_coxfit_cpp(control$iter.max,
 		  nR,
 		  ngamma,
 		  nalp,
+		  first_cont_rr,
 		  second_cont_bl,
 		  second_cont_rr)
 

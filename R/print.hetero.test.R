@@ -6,13 +6,16 @@
 print.hetero.test <- function(object){
 
   n <- length(object)
+  pdig <- max(1, getOption("digits")-4)
+
   cat("\n")
   cat("Heterogeneity Tests (Likelihood ratio test) ")
   cat("\n")
-  for(i in 1:n){
-    cat("---------------------------------------------")
-    cat("\n")
-    print(object[[i]], row.names = F)
-  }
+  cat("--------------------------------------------")
+  cat("\n")
+  object <- rbindlist(object)
+  object$pvalue <- format.pval(object$pvalue, digits=pdig)
+  print(object, row.names = F)
+
   cat("\n")
 }

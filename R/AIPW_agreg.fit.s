@@ -5,7 +5,7 @@
 # =========================================================
 
 
-AIPW_agreg.fit <- function(x, y, eventid, id, strata, offset, whereX, whereW, init, control, marker, gamma,pR, R, dpR, nR, total_R, marker_r, two_stage, n_marker, second_cont_bl, second_cont_rr,  rownames, collapse)
+AIPW_agreg.fit <- function(x, y, eventid, id, strata, offset, whereX, whereW, init, control, marker, gamma,pR, R, dpR, nR, total_R, marker_r, two_stage, n_marker, second_cont_bl, first_cont_rr, second_cont_rr,  rownames, collapse)
 {
     n <-  nrow(y)
     event <- y[,3]
@@ -95,6 +95,7 @@ AIPW_fit <- AIPW_agreg_cpp(maxiter,
         ngamma,
         nalp,
         control$eps,
+        first_cont_rr,
         second_cont_bl,
         second_cont_rr,
         init)
@@ -152,6 +153,7 @@ AIPW_fit <- AIPW_agreg_cpp(maxiter,
 	        nR,
 	        ngamma,
 	        nalp,
+		      first_cont_rr,
 	        second_cont_bl,
 	        second_cont_rr)
 
@@ -184,6 +186,7 @@ AIPW_fit <- AIPW_agreg_cpp(maxiter,
 	                              nR,
 	                              ngamma,
 	                              nalp,
+	                              first_cont_rr,
 	                              second_cont_bl,
 	                              second_cont_rr)
 

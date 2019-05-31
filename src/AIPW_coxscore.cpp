@@ -18,7 +18,7 @@ Rcpp::NumericMatrix AIPW_coxscore_cpp(NumericVector time, NumericVector status,
   IntegerVector whereW,
   NumericVector gamma, NumericMatrix comb_y,
   int nvar, int n_marker, int nR, int ngamma, int nalp,
-  bool second_cont_bl, bool second_cont_rr) {
+  bool first_cont_rr, bool second_cont_bl, bool second_cont_rr) {
 
   int i, j, k, l, person, pid;
 
@@ -104,9 +104,11 @@ Rcpp::NumericMatrix AIPW_coxscore_cpp(NumericVector time, NumericVector status,
             tmp_w[k] = tmp_y[k];
           }
 
-          for (j = 0; j < nX; j++) {
-            for (k = 0; k < ny_rr; k++) {
-              tmp_w[ny + ny_rr * j + k] = covar(person, whereX[j] - 1) * tmp_yr[k];
+          if(first_cont_rr == TRUE){
+            for (j = 0; j < nX; j++) {
+              for (k = 0; k < ny_rr; k++) {
+                tmp_w[ny + ny_rr * j + k] = covar(person, whereX[j] - 1) * tmp_yr[k];
+              }
             }
           }
 
@@ -169,9 +171,11 @@ Rcpp::NumericMatrix AIPW_coxscore_cpp(NumericVector time, NumericVector status,
           tmp_w[k] = tmp_y[k];
         }
 
-        for (j = 0; j < nX; j++) {
-          for (k = 0; k < ny_rr; k++) {
-            tmp_w[ny + ny_rr * j + k] = covar(person, whereX[j] - 1) * tmp_yr[k];
+        if(first_cont_rr == TRUE){
+          for (j = 0; j < nX; j++) {
+            for (k = 0; k < ny_rr; k++) {
+              tmp_w[ny + ny_rr * j + k] = covar(person, whereX[j] - 1) * tmp_yr[k];
+            }
           }
         }
 

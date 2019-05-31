@@ -59,7 +59,7 @@
 
 #' @export
 IPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE, two_stage = FALSE, tstage_name = NULL,  marker_name,
-    second_cont_bl = FALSE, second_cont_rr = FALSE, constvar = NULL, init, control,  x = FALSE, y = TRUE, model = FALSE) {
+    second_cont_bl = FALSE, first_cont_rr = TRUE, second_cont_rr = FALSE, constvar = NULL, init, control,  x = FALSE, y = TRUE, model = FALSE) {
 
 
     Call <- match.call()
@@ -302,13 +302,15 @@ IPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE, 
     nuvar <- length(unconstvar)
     order_rr <- NULL
 
-    if (nuvar == 0) {
+    if(first_cont_rr){
+      if (nuvar == 0) {
         order_rr <- paste(term_marker, collapse = "+")
-    } else {
-        for (i in 1:nuvar) {
+     } else {
+          for (i in 1:nuvar) {
             tmp_rr <- paste(term_marker, "*", unconstvar[i], collapse = "+")
             order_rr <- paste(order_rr, tmp_rr, sep = "+")
         }
+      }
     }
 
 
