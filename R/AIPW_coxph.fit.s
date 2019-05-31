@@ -67,7 +67,7 @@ AIPW_coxph.fit <- function(x, y, eventid, id, strata, offset, whereX, whereW, in
     storage.mode(init) <- "double"
 
     if(n_marker >1) comb_y <- combn(n_marker,2)
-    else comb_y <- 0
+    else comb_y <- as.matrix(0)
     smarker[is.na(smarker)] <- -999
 
 

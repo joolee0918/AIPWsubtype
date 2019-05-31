@@ -65,7 +65,7 @@ AIPW_agreg.fit <- function(x, y, eventid, id, strata, offset, whereX, whereW, in
 
 
     if(n_marker >1) comb_y <- combn(n_marker,2)
-    else comb_y <- 0
+    else comb_y <- as.matrix(0)
     marker[is.na(marker)] <- -999
 
 AIPW_fit <- AIPW_agreg_cpp(maxiter,
