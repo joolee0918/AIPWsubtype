@@ -792,8 +792,8 @@ AIPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE,
         }
         if (ry)  afit$y <- Y
 
-        if (length(xlevels) >0) fit$xlevels <- xlevels
-        if (any(offset !=0)) fit$offset <- offset
+        if (length(xlevels) >0) afit$xlevels <- xlevels
+        if (any(offset !=0)) afit$offset <- offset
         class(afit) <- "AIPWcprisk"
     }
 
