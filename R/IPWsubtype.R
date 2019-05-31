@@ -311,9 +311,9 @@ IPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE, 
             order_rr <- paste(order_rr, tmp_rr, sep = "+")
         }
       }
-    }else{
-      order_bl <- paste(term_marker, collapse= "+")
-    }
+
+    order_bl <- paste(term_marker, collapse= "+")
+
 
 
     if(n_marker > 1) pairm <- combn(n_marker, 2)

@@ -29,13 +29,14 @@ hetero.test <- function(object, data){
         tcall <- Call[c(1, match(c('formula', 'id', 'missing_model', 'missing_indep', 'two_stage', 'tstage_name', 'marker_name', 'second_cont_bl', 'first_cont_rr', 'second_cont_rr', 'constvar',
                              'init', 'control'), names(Call), nomatch=0))]
 
-        tcall$data <- data
         tmp <- marker_rr
         tmp[c(comb[, i])] <- FALSE
         tcall$marker_rr <- tmp
         #print(tcall$marker_name)
+        tcall$data <- data
         tcall[[1L]] <- quote(AIPWsubtype)
         mm <- eval(tcall)
+        print(summary(mm))
         who[i] <- paste(marker_name[c(comb[, i])], collapse=" ")
         logtest[i] <- -2 * (Mloglik - mm$loglik[2])
         beta <- mm$coefficients
@@ -56,7 +57,7 @@ hetero.test <- function(object, data){
   #print(tcall$marker_name)
   tcall[[1L]] <- quote(AIPWsubtype)
   mm <- eval(tcall)
-  who <- label = paste(marker_name, collapse = "+")
+  who <-  paste(marker_name, collapse = "+")
   logtest <- -2 * (Mloglik - mm$loglik[2])
   beta <- mm$coefficients
   nabeta <- !(is.na(beta))  #non-missing coefs
