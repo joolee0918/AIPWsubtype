@@ -310,7 +310,8 @@ IPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE, 
             tmp_rr <- paste(term_marker, "*", unconstvar[i], collapse = "+")
             order_rr <- paste(order_rr, tmp_rr, sep = "+")
         }
-      }
+     }
+    }
 
     order_bl <- paste(term_marker, collapse= "+")
 
