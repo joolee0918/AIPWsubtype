@@ -6,6 +6,8 @@
 #' @param data a data.frame which has variables in formula and markers.
 #' @param id a charhacter string specifying subject IDs.
 #' @param marker_name a vector of charhacter strings specifying markers defining cause of failures.
+#' @param marker_rr a vector of logical value. Dafault is NULL, in which a model includes all markers named in \code{marker_name} in modeling heterogeneity effects. Otherwise, a vector of logical value can spcify whether each marker's heterogeneity effect will be examined or not. A length of this should be equal to that of \code{marker_name}.
+#' @param first_cont_rr a logical value: if \code{TRUE}, the first order contrasts are included in modeling cause-specific relative risks based on log-linear representation. Otherwise the first contrasts are only included.
 #' @param second_cont_bl a logical value: if \code{TRUE}, the second order contrasts are included in modeling cause-specific baseline functions based on log-linear representation. Otherwise the first contrasts are only included.
 #' @param second_cont_rr a logical value: if \code{TRUE}, the second order contrasts are included in modeling cause-specific relative risks based on log-linear representation. Otherwise the first contrasts are only included.
 #' @param constvar a vector of character strings specifying constrained varaibles of which the effects on the outcome are to be the same across subtypes of outcome. The variables which are not specified in \code{constvar} are considered as unconstrained variabales of which the associations with the outcome may be different across the outcome subtypes.
@@ -122,12 +124,13 @@ subtype <- function(formula, data, id,  marker_name, marker_rr = NULL,
     Xattr <- attr(Tf, "term.labels")
   }
 
-  if(is.null(constvar)) unconstvar <- Xattr
-  else{
-    constvar <- Xattr[c(grep(constvar, Xattr))]
-    unconstvar <- Xattr[-c(grep(constvar, Xattr))] # Xattr[!(Xattr %in% constvar)]
+  if(is.null(constvar)){
+    unconstvar <- Xattr
+  }else{
+    unconstvar <- Xattr[-c(grep(paste(constvar, collapse="|"), Xattr))] # Xattr[!(Xattr %in% constvar)]
+    constvar <- Xattr[!(Xattr %in% unconstvar)]
   }
-  unconstvar <- Xattr[!(Xattr %in% constvar)]
+
 
   nuvar <- length(unconstvar)
   order_rr <- NULL

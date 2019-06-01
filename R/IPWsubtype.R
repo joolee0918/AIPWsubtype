@@ -301,11 +301,13 @@ IPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE, 
         Xattr <- attr(Tf, "term.labels")
     }
 
-    if(is.null(constvar)) unconstvar <- Xattr
-    else{
-      constvar <- Xattr[c(grep(constvar, Xattr))]
-      unconstvar <- Xattr[-c(grep(constvar, Xattr))] # Xattr[!(Xattr %in% constvar)]
+    if(is.null(constvar)){
+      unconstvar <- Xattr
+    }else{
+      unconstvar <- Xattr[-c(grep(paste(constvar, collapse="|"), Xattr))] # Xattr[!(Xattr %in% constvar)]
+      constvar <- Xattr[!(Xattr %in% unconstvar)]
     }
+
 
     #whichX <- which(dimnames(attr(Tf, "factors"))[[2]] %in% c(unconstvar))
     #whereX <- which(Xattr$assign == whichX)
