@@ -1,4 +1,14 @@
+#' The heterogeneity test for the subtype-specific effet
 
+#' Testing whether the exposures are not associated with the specific subtypes of disease.
+
+#' @param fit an object of class \code{subtype}, \code{IPWsubtype}, or \code{AIPWsubtype}. If a single object \code{fit} was specified, it tests whether all unconstrained variables, so called, exposures are not associated with disease subtypes.
+#' @param fit2 an object of the same class as \code{fit} to compare the heterogeneity effect.
+#' @param data a data frame which was used in \code{fit}. It must be specified if a single object \code{fit} is specified.
+#'
+#' @details Log-likelihood tests are conducted to test whether the heterogeneity effects are significant. To test the heterogeneity effects, \code{marker_rr} can be used to drop out the marker-specific effects of exposures.
+
+#' @return a data frame: names of variables which are compared, test statistics, the degree of freedom, and p-value.
 #' @importFrom data.table data.table
 #' @export
 hetero.test <- function(fit, fit2 = NULL, data = NULL){

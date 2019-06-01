@@ -1,3 +1,4 @@
+#' Print heterogeneity test for the subtype-specific effet
 
 #' @method print hetero.test
 #' @keywords internal

@@ -552,12 +552,13 @@ AIPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE,
     X <- X[, !xdrop, drop = FALSE]
     attr(X, "assign") <- Xattr$assign[!xdrop]
 
+
     # where is the main effect for unconstrained variables in X matrix
     whichX <- which(dimnames(attr(Terms2, "factors"))[[2]] %in% c(unconstvar))
-    whereX <- which(Xattr$assign %in% whichX)
+    whereX <- which( attr(X, "assign")  %in% whichX)
     # where is the main effect for uonstrained variables in X matrix
     whichW <- which(dimnames(attr(Terms2, "factors"))[[2]] %in% c(constvar))
-    whereW <- which(Xattr$assign %in% whichW)
+    whereW <- which( attr(X, "assign")  %in% whichW)
 
     offset <- model.offset(mf)
     if (is.null(offset) | all(offset == 0)) {
