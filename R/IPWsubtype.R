@@ -232,7 +232,7 @@ IPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE, 
     for (k in 1:nvecR) {
         tmp <- predict(model_missing[[k]], newdata = newedata, type = "response")
         est_pi[, k] <- tmp
-        PI[newdata[, event] == 1, k] <- tmp
+        PI[ccdata[, event] == 1, k] <- tmp
     }
     missing_prob <- apply(PI, 1, prod)
 
@@ -244,7 +244,7 @@ IPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE, 
         tmp <- model.matrix(model_missing[[k]]$formula, newedata) * predict(model_missing[[k]], newdata = newedata,
             type = "response")/(1 + exp(predict(model_missing[[k]], newdata = newedata))) * apply(as.matrix(est_pi[,
             -k]), 1, prod)
-        dpR[newdata[, event] == 1, a:(a + b - 1)] <- tmp
+        dpR[ccdata[, event] == 1, a:(a + b - 1)] <- tmp
         a = a + b
     }
 
