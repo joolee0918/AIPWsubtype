@@ -275,9 +275,9 @@ IPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE, 
 
     newcause <- unlist(lapply(1:n, function(i) lf(cause[i])))
     ccdata$pi1 <- missing_prob
-    newdata <- ccdata[rep(1:n, each = n_subtype), ]
-    newdata[, event] <- rep(0, n*n_subtype)
-    newdata[seq(1, n*n_subtype, by=n_subtype), event] <- ccdata[, event]
+    newdata <- ccdata[rep(1:ndata, each = n_subtype), ]
+    newdata[, event] <- rep(0, ndata*n_subtype)
+    newdata[seq(1, ndata*n_subtype, by=n_subtype), event] <- ccdata[, event]
     newdata[, marker_name] <- data.frame(total_subtype[newcause, ])
     term_marker <- rep(0, n_marker)
 
