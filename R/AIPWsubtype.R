@@ -360,7 +360,7 @@ AIPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE,
     }
     newcause <- unlist(lapply(1:n, function(i) lf(cause[i])))
     newdata <- data[rep(1:n, each = n_subtype), ]
-    newdata[, event] <- rep(0, n*n_subtpye)
+    newdata[, event] <- rep(0, n*n_subtype)
     newdata[seq(1, n*n_subtype, by=n_subtype), event] <- data[, event]
     newdata[, marker_name] <- data.frame(total_subtype[newcause, ])
     newid <- newdata[, id]
