@@ -273,7 +273,7 @@ IPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE, 
       res
     }
 
-    newcause <- unlist(lapply(1:n, function(i) lf(cause[i])))
+    newcause <- unlist(lapply(1:ndata, function(i) lf(cause[i])))
     ccdata$pi1 <- missing_prob
     newdata <- ccdata[rep(1:ndata, each = n_subtype), ]
     newdata[, event] <- rep(0, ndata*n_subtype)
