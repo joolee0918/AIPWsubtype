@@ -87,24 +87,21 @@ subtype <- function(formula, data, id,  marker_name, marker_rr = NULL,
     }
   }
 
-  data$cause <- cause
   event <- tail(survival:::terms.inner(formula[1:2]), 1)
-  newdata <- lapply(1:n, function(i) data[rep(i, each = n_subtype), ])
   lf <- function(x) {
-    if (!is.na(x$cause[1])) {
-      x$cause <- c(x$cause[1], seq(1, n_subtype)[!(seq(1, n_subtype) %in% x$cause[1])])
+    if (!is.na(x)) {
+      res <- c(x, seq(1, n_subtype)[!(seq(1, n_subtype) %in% x)])
     } else {
-      x$cause <- seq(1, n_subtype)
+      res <- seq(1, n_subtype)
     }
-    x[, event] <- c(x[, event][1], rep(0, (n_subtype - 1)))
-    x
+    res
   }
-
-  newdata <- lapply(newdata, lf)
-  newdata <- as.data.frame(rbindlist(newdata))
-
-  newdata[, marker_name] <- data.frame(total_subtype[newdata$cause, ])
-  term_marker <- rep(0, n_marker)
+  newcause <- unlist(lapply(1:n, function(i) lf(cause[i])))
+  newdata <- data[rep(1:n, each = n_subtype), ]
+  newdata[, event] <- rep(0, n*n_subtype)
+  newdata[seq(1, n*n_subtype, by=n_subtype), event] <- data[, event]
+  newdata[, marker_name] <- data.frame(total_subtype[newcause, ])
+ term_marker <- rep(0, n_marker)
 
   for (i in 1:n_marker) term_marker[i] <- paste("factor(", marker_name[i], ")", sep = "")
   if(is.null(marker_rr)) {

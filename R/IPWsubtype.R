@@ -207,12 +207,12 @@ IPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE, 
 
     }
 
-    newdata <- data[R == 1, ]
-    ndata <- nrow(newdata)
+    ccdata <- data[R == 1, ]
+    ndata <- nrow(ccdata)
     missing_prob <- rep(1, ndata)
-    newedata <- newdata[newdata[, event] == 1, ]
+    newedata <- ccdata[ccdata[, event] == 1, ]
     nnevent <- nrow(newedata)
-    nuniqid <- unique(newdata[, id])
+    nuniqid <- unique(ccdata[, id])
     newmarker <- as.data.frame(marker[R == 1, ])
     names(newmarker) <- marker_name
 
@@ -264,23 +264,21 @@ IPWsubtype <- function(formula, data, id, missing_model, missing_indep = FALSE, 
         }
     }
 
-    newdata$cause <- cause
-    newdata$pi1 <- missing_prob
-    newdata <- lapply(1:ndata, function(i) newdata[rep(i, each = n_subtype), ])
     lf <- function(x) {
-        if (!is.na(x$cause[1])) {
-            x$cause <- c(x$cause[1], seq(1, n_subtype)[!(seq(1, n_subtype) %in% x$cause[1])])
-        } else {
-            x$cause <- seq(1, n_subtype)
-        }
-        x[, event] <- c(x[, event][1], rep(0, (n_subtype - 1)))
-        x
+      if (!is.na(x)) {
+        res <- c(x, seq(1, n_subtype)[!(seq(1, n_subtype) %in% x)])
+      } else {
+        res <- seq(1, n_subtype)
+      }
+      res
     }
 
-    newdata <- lapply(newdata, lf)
-    newdata <- as.data.frame(rbindlist(newdata))
-
-    newdata[, marker_name] <- data.frame(total_subtype[newdata$cause, ])
+    newcause <- unlist(lapply(1:n, function(i) lf(cause[i])))
+    ccdata$pi1 <- missing_prob
+    newdata <- ccdata[rep(1:n, each = n_subtype), ]
+    newdata[, event] <- rep(0, n*n_subtype)
+    newdata[seq(1, n*n_subtype, by=n_subtype), event] <- ccdata[, event]
+    newdata[, marker_name] <- data.frame(total_subtype[newcause, ])
     term_marker <- rep(0, n_marker)
 
     for (i in 1:n_marker) term_marker[i] <- paste("factor(", marker_name[i], ")", sep = "")
