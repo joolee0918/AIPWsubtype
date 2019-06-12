@@ -101,7 +101,7 @@ subtype <- function(formula, data, id,  marker_name, marker_rr = NULL,
   newdata[, event] <- rep(0, n*n_subtype)
   newdata[seq(1, n*n_subtype, by=n_subtype), event] <- data[, event]
   newdata[, marker_name] <- data.frame(total_subtype[newcause, ])
- term_marker <- rep(0, n_marker)
+  term_marker <- rep(0, n_marker)
 
   for (i in 1:n_marker) term_marker[i] <- paste("factor(", marker_name[i], ")", sep = "")
   if(is.null(marker_rr)) {
