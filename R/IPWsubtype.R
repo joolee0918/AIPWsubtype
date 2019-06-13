@@ -36,7 +36,7 @@
 #' \item{weights}{a vector of weights used, which is the inverse of the probability of complete case given the event occurs.}
 #' \item{basehaz}{estimated baseline cause-specific hazard functions the reference disease subtype corresponding to marker variables equal to 1.}
 #' \item{Ithealp}{a matrix of the partial derivative of the score functions with respect to the parameters from the missingness models.}
-#' \item{model_missing}{a list of an object of class \code{glm} fitting the missingness models.}
+#' \item{model.missing}{a list of an object of class \code{glm} fitting the missingness models.}
 #' \item{n}{the number of observations.}
 #' \item{nc}{the number of complete-case observations.}
 #' \item{nevent}{the number of events.}
