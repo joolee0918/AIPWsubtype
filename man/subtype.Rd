@@ -4,7 +4,8 @@
 \alias{subtype}
 \title{Cox proportional hazard model for competing risks data}
 \usage{
-subtype(formula, data, id, marker_name, second_cont_bl = FALSE,
+subtype(formula, data, id, marker_name, marker_rr = NULL,
+  first_cont_rr = TRUE, second_cont_bl = FALSE,
   second_cont_rr = FALSE, constvar = NULL, init, control, x = FALSE,
   y = TRUE, model = FALSE)
 }
@@ -16,6 +17,10 @@ subtype(formula, data, id, marker_name, second_cont_bl = FALSE,
 \item{id}{a charhacter string specifying subject IDs.}
 
 \item{marker_name}{a vector of charhacter strings specifying markers defining cause of failures.}
+
+\item{marker_rr}{a vector of logical value. Dafault is NULL, in which a model includes all markers named in \code{marker_name} in modeling heterogeneity effects. Otherwise, a vector of logical value can spcify whether each marker's heterogeneity effect will be examined or not. A length of this should be equal to that of \code{marker_name}.}
+
+\item{first_cont_rr}{a logical value: if \code{TRUE}, the first order contrasts are included in modeling cause-specific relative risks based on log-linear representation. Otherwise the first contrasts are only included.}
 
 \item{second_cont_bl}{a logical value: if \code{TRUE}, the second order contrasts are included in modeling cause-specific baseline functions based on log-linear representation. Otherwise the first contrasts are only included.}
 

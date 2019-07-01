@@ -6,7 +6,7 @@
 \usage{
 IPWsubtype(formula, data, id, missing_model, missing_indep = FALSE,
   two_stage = FALSE, tstage_name = NULL, marker_name,
-  marekr_rr = NULL, first_cont_rr = TRUE, second_cont_bl = FALSE,
+  marker_rr = NULL, first_cont_rr = TRUE, second_cont_bl = FALSE,
   second_cont_rr = FALSE, constvar = NULL, init, control, x = FALSE,
   y = TRUE, model = FALSE)
 }
@@ -27,6 +27,8 @@ IPWsubtype(formula, data, id, missing_model, missing_indep = FALSE,
 
 \item{marker_name}{a vector of charhacter strings specifying markers defining cause of failures.}
 
+\item{marker_rr}{a vector of logical value. Dafault is NULL, in which a model includes all markers named in \code{marker_name} in modeling heterogeneity effects. Otherwise, a vector of logical value can spcify whether each marker's heterogeneity effect will be examined or not. A length of this should be equal to that of \code{marker_name}.}
+
 \item{first_cont_rr}{a logical value: if \code{TRUE}, the first order contrasts are included in modeling cause-specific relative risks based on log-linear representation. Otherwise the first contrasts are only included.}
 
 \item{second_cont_bl}{a logical value: if \code{TRUE}, the second order contrasts are included in modeling cause-specific baseline functions based on log-linear representation. Otherwise the first contrasts are only included.}
@@ -38,8 +40,6 @@ IPWsubtype(formula, data, id, missing_model, missing_indep = FALSE,
 \item{init}{a vector of initial values of the iteration. Default value is zero for all variables.}
 
 \item{control}{an object of class \code{\link[survival]{coxph.control}} in \code{survival} packages. The default value of \code{iter.max} is 2000 and that of \code{eps} is 1e-12. See \code{\link[survival]{coxph.control}} for other values.}
-
-\item{marker_rr}{a vector of logical value. Dafault is NULL, in which a model includes all markers named in \code{marker_name} in modeling heterogeneity effects. Otherwise, a vector of logical value can spcify whether each marker's heterogeneity effect will be examined or not. A length of this should be equal to that of \code{marker_name}.}
 }
 \value{
 An object of class \code{IPWsubtype} representing the fit.
@@ -55,7 +55,7 @@ An object of class \code{IPWsubtype} representing the fit.
 \item{weights}{a vector of weights used, which is the inverse of the probability of complete case given the event occurs.}
 \item{basehaz}{estimated baseline cause-specific hazard functions the reference disease subtype corresponding to marker variables equal to 1.}
 \item{Ithealp}{a matrix of the partial derivative of the score functions with respect to the parameters from the missingness models.}
-\item{model_missing}{a list of an object of class \code{glm} fitting the missingness models.}
+\item{model.missing}{a list of an object of class \code{glm} fitting the missingness models.}
 \item{n}{the number of observations.}
 \item{nc}{the number of complete-case observations.}
 \item{nevent}{the number of events.}
