@@ -10,7 +10,7 @@ BugReports: http:://github.com/joolee0918/AIPWsubtype/issues
 Encoding: UTF-8
 LazyData: true
 LinkingTo: 
-    Rcpp, RcppArmadillo, survival
+    Rcpp, RcppArmadillo, survival, mlogit
 Imports: 
-    Rcpp, RcppArmadillo,  survival, Matrix, sandwich, data.table
+    Rcpp, RcppArmadillo,  survival, Matrix, sandwich, data.table, mlogit
 RoxygenNote: 6.1.1

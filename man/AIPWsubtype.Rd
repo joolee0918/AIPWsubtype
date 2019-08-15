@@ -4,7 +4,8 @@
 \alias{AIPWsubtype}
 \title{Augmented inverse probability weighted Cox proportional hazard model for competing risks data}
 \usage{
-AIPWsubtype(formula, data, id, missing_model, missing_indep = FALSE,
+AIPWsubtype(formula, data, id, missing_formula,
+  missing_model = c("condi", "multinom"), missing_indep = FALSE,
   two_stage = FALSE, tstage_name = NULL, marker_name,
   marker_rr = NULL, first_cont_rr = TRUE, second_cont_bl = FALSE,
   second_cont_rr = FALSE, constvar = NULL, init, control, x = FALSE,

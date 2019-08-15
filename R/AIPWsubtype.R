@@ -55,7 +55,7 @@
 #' @importFrom Matrix bdiag
 #' @importFrom data.table rbindlist
 #' @importFrom sandwich estfun
-#' @importFrom nnet multinom
+#' @importFrom mlogit mlogit mlogit.data mFormula
 #'
 #' @examples
 #' m1 <- AIPWsubtype(Surv(start, time, status)~ X + W,  data = data, id = "id", missing_model = list(~time + X, ~time + X),
@@ -277,13 +277,11 @@ AIPWsubtype <- function(formula, data, id, missing_formula, missing_model = c("c
 
     if(missing_model == "multinom"){
       if(two_stage == FALSE){
-      tmp_model <- as.formula(paste("R", paste(missing_formula, collapse = "")))
-      model_missing <- multinom(tmp_model, data = edata)
+        tmpedata <- mlogit.data(edata, shape="wide", choice="R")
+        mult_formula <- as.formula(paste("R", "~1|", paste(missing_formula[[1]][2], collapse = "")))
+        model_missing[[1]] <- mlogit(mult_formula, data=tmpedata, Hess=TRUE)
 
     } else{
-      model_missing <- list()
-      tmp_model <- as.formula(paste("R", paste(missing_formula[[1]], collapse = "")))
-      model_missing[[1]] <-  multinom(tmp_model, data = edata[edata[, tstage_name] == 1, ])
 
       tmpedata <- mlogit.data(edata[edata[, tstage_name] == 1, ], shape="wide", choice="R")
       mult_formula <- as.formula(paste("R", "~1|", paste(missing_formula[[1]][2], collapse = "")))
