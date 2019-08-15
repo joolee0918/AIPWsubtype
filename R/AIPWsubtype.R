@@ -767,7 +767,8 @@ AIPWsubtype <- function(formula, data, id, missing_formula, missing_model = c("c
 
 
         if(missing_model == "multinom"){
-          Ialp <- vcov(model_missing[[1]])
+          Ialp <- as.matrix(vcov(model_missing[[1]]))
+          class(Ialp) <- "matrix"
           Ualp <- estfun(model_missing[[1]])
 
           if(two_stage == TRUE){
