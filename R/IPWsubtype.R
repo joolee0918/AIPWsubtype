@@ -153,6 +153,9 @@ IPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom")
       R[data[, tstage_name] == 0] <- onR
     R <- findR(R, data[, event], fonR, Rmat, ototal_R[, 1:n_marker])
 
+    # observed R
+    oR <- sort(unique(R))
+
     ## Data frame for missing indicator
 
     # model missing
@@ -259,6 +262,7 @@ IPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom")
         p1[ccdata[, event] == 1] <- tmpp1
 
       }else {
+
         edata$RR <- ifelse(edata$R == max(oR), 1, edata$R)
         tmpdata <- mlogit.data(edata[edata[, tstage_name]==1,], shape="wide", choice="RR")
 
