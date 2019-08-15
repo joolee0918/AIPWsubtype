@@ -377,12 +377,14 @@ IPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom")
     }
 
     newcause <- unlist(lapply(1:ndata, function(i) lf(cause[i])))
-    ccdata$pi1 <- p1
     newdata <- ccdata[rep(1:ndata, each = on_subtype), ]
+    newdata$pi1 <-  rep(1, ndata*on_subtype)
+    newdata[seq(1, ndata*on_subtype, by=on_subtype), "pi1"] <- p1
     newdata[, event] <- rep(0, ndata*on_subtype)
     newdata[seq(1, ndata*on_subtype, by=on_subtype), event] <- ccdata[, event]
     newdata[, marker_name] <- data.frame(ototal_subtype[newcause, ])
-    dpR <- dpR[rep(seq_len(ndata), each = on_subtype), ]
+    dpR1 <- matrix(0, nrow=ndata*on_subtype, nalp)
+    dpR1[seq(1, ndata*on_subtype, by=on_subtype), ] <- dpR
 
     term_marker <- rep(0, n_marker)
 
@@ -525,12 +527,12 @@ IPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom")
             status2 <- status[ord]
             lp2 <- lp[ord]
             weights2 <- weights[ord]
-            dpR2 <- as.matrix(dpR[ord, ])
+            dpR2 <- as.matrix(dpR1[ord, ])
 
             Ithealp <- IPW_ithealp_cox(time2, status2, lp2, newstrat, x2, dpR2, weights2, nused, nvar, nalp)
         } else {
 
-            Ithealp <- IPW_ithealp_ag(start, stop, status, lp, newstrat, sort.start, sort.end, x, as.matrix(dpR),
+            Ithealp <- IPW_ithealp_ag(start, stop, status, lp, newstrat, sort.start, sort.end, x, as.matrix(dpR1),
                 weights, nused, nvar, nalp)
         }
 
@@ -647,7 +649,7 @@ IPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom")
         afit <- list(coefficients = fit$coefficients, naive.var = fit$naive.var, var = var,  linear.predictors = lp, loglik = fit$loglik, score = fit$score,
                      rscore = rscore, wald.test = wald.test, score.residual =  as.matrix(Stheta), iter = fit$iter,
                      weights = fit$weights, basehaz = basehaz, Ithealp = Ithealp, model.missing = model_missing, n = n, nevent = nevent,
-                     nc = ndata, ncevent = nnevent, subtype = list(n_subtype = n_subtype, marker_name = marker_name, total_subtype = total_subtype, marker_rr = marker_rr), formula = formula, call = Call, terms = fit$terms, assign = fit$assign, method = "IPW")
+                     nc = ndata, ncevent = nnevent, subtype = list(n_subtype = n_subtype, marker_name = marker_name, total_subtype = ototal_subtype, marker_rr = marker_rr), formula = formula, call = Call, terms = fit$terms, assign = fit$assign, method = "IPW")
 
         if(rmodel){afit$model <- mf}
         if (rx)  {
