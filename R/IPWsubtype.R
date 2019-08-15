@@ -385,6 +385,7 @@ IPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom")
     newdata[, marker_name] <- data.frame(ototal_subtype[newcause, ])
     dpR1 <- matrix(0, nrow=ndata*on_subtype, ncol=nalp)
     dpR1[seq(1, ndata*on_subtype, by=on_subtype), ] <- dpR
+    print(dim(dpR1))
 
     term_marker <- rep(0, n_marker)
 
@@ -520,6 +521,7 @@ IPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom")
             }
         }
 
+        print(length(ord))
         if (ny == 2) {
             time2 <- time[ord]
             status2 <- status[ord]
