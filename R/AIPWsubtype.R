@@ -762,10 +762,6 @@ AIPWsubtype <- function(formula, data, id, missing_formula, missing_model = c("c
         Salp = as.data.frame(uniqid)
         names(Salp) <- id
 
-        tmp_id = edata[, id]
-
-        print(missing_model)
-
         if(missing_model == "multinom"){
           Ialp <- as.matrix(vcov(model_missing[[1]]))
           class(Ialp) <- "matrix"
@@ -799,12 +795,12 @@ AIPWsubtype <- function(formula, data, id, missing_formula, missing_model = c("c
         }
 
         if (two_stage == FALSE) {
-          Ualp <- cbind(tmp_id, Ualp)
+          Ualp <- cbind(eventid, Ualp)
           colnames(Ualp)[1] <- id
         } else {
           Ualp <- cbind(edata[edata[, tstage_name] == 1, id], Ualp)
           colnames(Ualp)[1] <- id
-          Ualp_ts <- cbind(tmp_id, Ualp_ts)
+          Ualp_ts <- cbind(eventid, Ualp_ts)
           colnames(Ualp_ts)[1] <- id
           Ualp <- suppressWarnings(merge(Ualp, Ualp_ts, by = id, all = T))
           Ualp[is.na(Ualp)] <- 0
@@ -879,7 +875,7 @@ AIPWsubtype <- function(formula, data, id, missing_formula, missing_model = c("c
         afit <- list(coefficients = fit$coef, naive.var = fit$naive.var, var = var, linear.predictors = fit$linear.predictors,
                      score = fit$sctest, loglik = fit$loglik, rscore = rscore, wald.test = wald.test, score.residual = fit$resid, iter = fit$iter, conv = fit$conv, basehaz = basehaz,
                      Ithealp = fit$Ithealp, Ithegam = fit$Ithegam, model.missing = model_missing, model.subtype = model_subtype,
-                     n = n, nevent = nevent, subtype = list(n_subtype = n_subtype, marker_name = marker_name, total_subtype = total_subtype, marker_rr = marker_rr),
+                     n = n, nevent = nevent, subtype = list(n_subtype = on_subtype, marker_name = marker_name, total_subtype = ototal_subtype, marker_rr = marker_rr),
                      formula = formula, call = Call, terms = Terms, assign = assign, method = "AIPW")
 
 
