@@ -273,7 +273,7 @@ AIPWsubtype <- function(formula, data, id, missing_formula, missing_model = c("c
     ## Drop id for incomplete data
     dropid <- data[R != 1 & data[, event] == 1, id]
 
-
+    model_missing <- list()
 
     if(missing_model == "multinom"){
       if(two_stage == FALSE){
