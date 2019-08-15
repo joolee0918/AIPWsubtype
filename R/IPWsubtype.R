@@ -156,6 +156,47 @@ IPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom")
     # observed R
     oR <- sort(unique(R))
 
+    # possible marker combination
+
+    level_y = list()
+    for (k in 1:n_marker) {
+      level_y[[k]] <- seq(nlevels(factor(data[, marker_name[k]])), 1)
+    }
+    tmpy <- list()
+    for (k in 1:n_marker) {
+      tmpy[[k]] <- as.vector(level_y[[k]])
+    }
+    total_subtype <- as.data.frame(expand.grid(tmpy))
+    names(total_subtype) <- marker_name
+
+    ## Data frame for cause
+
+    umarker <- unique(na.omit(marker))
+    tmpmar <- rep(0, nrow(umarker))
+    for(i in 1:nrow(umarker)){
+      for (j in 1:n_subtype) {
+        if (all(umarker[i, ] == total_subtype[j, 1:n_marker]))
+          tmpmar[i] <- j
+      }
+    }
+
+    ototal_subtype <- total_subtype[sort(tmpmar),]
+    on_subtype <- nrow(ototal_subtype)
+
+    cause <- rep(NA, n)
+    cause <- findcause(R, cause, data[, event], as.matrix(marker), on_subtype, as.matrix(ototal_subtype))
+
+    # observed cause
+    ocause <- sort(unique(cause))
+
+    for (i in 1:n_marker) {
+      marker[, i] <- factor(marker[, i])
+    }
+    marker <- as.data.frame(marker)
+    data[, marker_name] <- marker
+
+
+
     ## Data frame for missing indicator
 
     # model missing
@@ -324,33 +365,8 @@ IPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom")
 
 
     }
-        ## Data frame for cause
 
-    umarker <- unique(na.omit(marker))
-    tmpmar <- rep(0, nrow(umarker))
-    for(i in 1:nrow(umarker)){
-      for (j in 1:n_subtype) {
-        if (all(umarker[i, ] == total_subtype[j, 1:n_marker]))
-          tmpmar[i] <- j
-      }
-    }
-
-    ototal_subtype <- total_subtype[sort(tmpmar),]
-    on_subtype <- nrow(ototal_subtype)
-
-    cause <- rep(NA, n)
-    cause <- findcause(R, cause, data[, event], as.matrix(marker), on_subtype, as.matrix(ototal_subtype))
-
-    # observed cause
-    ocause <- sort(unique(cause))
-
-    for (i in 1:n_marker) {
-      marker[, i] <- factor(marker[, i])
-    }
-    marker <- as.data.frame(marker)
-    data[, marker_name] <- marker
-
-
+    ## Data duplication
     lf <- function(x) {
       if (!is.na(x)) {
         res <- c(x, ocause[!(ocause %in% x)])
