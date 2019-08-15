@@ -383,9 +383,9 @@ IPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom")
     newdata[, event] <- rep(0, ndata*on_subtype)
     newdata[seq(1, ndata*on_subtype, by=on_subtype), event] <- ccdata[, event]
     newdata[, marker_name] <- data.frame(ototal_subtype[newcause, ])
+
     dpR1 <- matrix(0, nrow=ndata*on_subtype, ncol=nalp)
-    dpR1[seq(1, ndata*on_subtype, by=on_subtype), ] <- dpR
-    print(dim(dpR1))
+    dpR1[seq(1, ndata*on_subtype, by=on_subtype), ] <- as.matrix(dpR)
 
     term_marker <- rep(0, n_marker)
 
