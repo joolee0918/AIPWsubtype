@@ -830,34 +830,6 @@ AIPWsubtype <- function(formula, data, id, missing_formula, missing_model = c("c
         Sgam[is.na(Sgam)] <- 0
         Sgam <- as.matrix(Sgam[, -1])
 
-
-        Salp = as.data.frame(uniqid)
-        names(Salp) <- id
-        Ualp <- list()
-        tmp_id = edata[, id]
-        for (k in 1:n_marker) {
-          Ualp[[k]] <- estfun(model_missing[[k]])
-        }
-        if (two_stage == TRUE) {
-          Ualp_ts <- estfun(model_missing[[nvecR]])
-       }
-        Ualp <- do.call(cbind, Ualp)
-        if (two_stage == FALSE) {
-          Ualp <- cbind(tmp_id, Ualp)
-          colnames(Ualp)[1] <- id
-        } else {
-          Ualp <- cbind(edata[edata[, tstage_name] == 1, id], Ualp)
-          colnames(Ualp)[1] <- id
-          Ualp_ts <- cbind(tmp_id, Ualp_ts)
-          colnames(Ualp_ts)[1] <- id
-          Ualp <- suppressWarnings(merge(Ualp, Ualp_ts, by = id, all = T))
-          Ualp[is.na(Ualp)] <- 0
-        }
-
-        Salp <- suppressWarnings(merge(Salp, Ualp, by = id, all = T))
-        Salp[is.na(Salp)] <- 0
-        Salp <- as.matrix(Salp[, -1])
-
         Sgam <- as.data.frame(uniqid)
         names(Sgam) <- id
 
