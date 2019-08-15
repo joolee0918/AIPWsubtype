@@ -139,7 +139,6 @@ AIPWsubtype <- function(formula, data, id, missing_formula, missing_model = c("c
     }
     total_R <- as.matrix(total_R)
 
-    if(length(missing_model) != nvecR) stop("the length of missing model does not match with a vector of missing indicators")
 
     ### Marker
 
@@ -264,7 +263,8 @@ AIPWsubtype <- function(formula, data, id, missing_formula, missing_model = c("c
     }
     missing_data$R <- R
     missing_name <- names(missing_data)
-    data <- cbind(data, missing_data)
+
+    data$R <- R
     edata <- data[data[, event] == 1, ]
     eventid <- edata[, id]
     nevent <- nrow(edata)
@@ -273,8 +273,10 @@ AIPWsubtype <- function(formula, data, id, missing_formula, missing_model = c("c
     ## Drop id for incomplete data
     dropid <- data[R != 1 & data[, event] == 1, id]
 
+
+
     if(missing_model == "multinom"){
-      if(two_stage = FALSE){
+      if(two_stage == FALSE){
       tmp_model <- as.formula(paste("R", paste(missing_formula, collapse = "")))
       model_missing <- multinom(tmp_model, data = edata)
 
@@ -283,10 +285,17 @@ AIPWsubtype <- function(formula, data, id, missing_formula, missing_model = c("c
       tmp_model <- as.formula(paste("R", paste(missing_formula[[1]], collapse = "")))
       model_missing[[1]] <-  multinom(tmp_model, data = edata[edata[, tstage_name] == 1, ])
 
+      tmpedata <- mlogit.data(edata[edata[, tstage_name] == 1, ], shape="wide", choice="R")
+      mult_formula <- as.formula(paste("R", "~1|", paste(missing_formula[[1]][2], collapse = "")))
+      model_missing[[1]] <- mlogit(mult_formula, data=tmpedata, Hess=TRUE)
+
       tmp_model <- as.formula(paste(tstage_name, paste(missing_formula[[2]], collapse = "")))
       model_missing[[2]] <- glm(tmp_model, data = edata, family = binomial)
       }
     } else{
+
+      edata <- cbind(edata, missing_data[data[data, event]==1,])
+
     model_missing <- list()
     tmp_model <- as.formula(paste(missing_name[1], paste(missing_formula[[1]], collapse = "")))
 
@@ -325,14 +334,22 @@ AIPWsubtype <- function(formula, data, id, missing_formula, missing_model = c("c
 
     ## pi
 
-    NR_data <- data[data[, event] == 1, !(names(data) %in% missing_name)]
     pR <- matrix(rep(c(1, rep(0, onR - 1)), nevent), byrow = T, nrow = nevent, ncol = onR)
 
     if(missing_model == "multinom"){
-        pR <- predict(model_missing[[1]], type="probs", newdata=NR_data)
+        tmpf <- mFormula(mult_formula)
 
-        if(two_stage==TRUE){
-          pR <-  cbind(pR, as.vector(1 - predict(model_missing[[2]], newdata = NR_data, type = "response")))
+        if(two_stage == FALSE){
+
+          tmpdata <- mlogit.data(edata, shape="wide", choice="R")
+          pR <- predict(model_missing[[1]], type="probs", newdata=tmpdata)
+
+        }else {
+          edata$RR <- ifelse(edata$R == 6, 1, edata$R)
+          tmpdata <- mlogit.data(edata, shape="wide", choice="RR")
+          pR <- predict(model_missing[[1]], type="probs", newdata=tmpdata)
+
+          pR <-  cbind(pR, as.vector(1 - predict(model_missing[[2]], newdata = edata, type = "response")))
           pR[, 1:(onR-1)] <- pR[, 1:(onR-1)]*(1-pR[, onR])
         }
 
@@ -342,17 +359,16 @@ AIPWsubtype <- function(formula, data, id, missing_formula, missing_model = c("c
         if (two_stage == T)
           nalp0 = length(model_missing[[2]]$coefficients)
 
-        tmpX <-  model.matrix(missing_formula[[1]], NR_data)
-        dpR <- lapply(1:nrow(tmpX), function(i) dpR_multinom(tmpX[i,], coef(model_missing[[1]]), onR, two_stage, nalp0))
+        newX <- model.matrix(tmpf, tmpdata)
+        tmpX <-  model.matrix(missing_formula[[1]], edata)
+        scoreX <- matrix(exp(as.vector(newX%*%coef(model_missing[[1]]))), byrow=T, ncol=fonR)[,-1]
+
+        dpR <- lapply(1:nevent, function(i) dpR_multinom(tmpX[i,], scoreX[i,], onR, two_stage, ncol(scoreX), nalp, nalp0))
 
         if (two_stage == T) {
-          RR <- matrix(0, byrow = T, nrow = 1)
-          colnames(RR) <- colnames(total_R)[nvecR]
-          NR_data_tmp <- cbind(NR_data, RR)
+           tmp <- -model.matrix(model_missing[[2]]$formula, edata) *pR[,onR]/(1 + exp(predict(model_missing[[2]], newdata = edata)))
 
-          tmp <- -model.matrix(model_missing[[2]]$formula, NR_data_tmp) *pR[,onR]/(1 + exp(predict(model_missing[[2]], newdata = NR_data_tmp)))
-
-           for(i in 1:nrow(tmpX)) {
+           for(i in 1:nevent) {
             dpR[[i]][onR, (nalp - nalp0 + 1):(nalp)] <- tmp[i,]
             dpR[[i]][1:(onR-1),] <- dpR[[i]][1:(onR-1),]*(1-pR[i, onR])
             dpR[[i]][1:(onR-1), (nalp - nalp0 + 1):(nalp)] <- t(-tmp[i,] %o% pR[i, -onR]/(1-pR[i, onR]))
@@ -363,15 +379,15 @@ AIPWsubtype <- function(formula, data, id, missing_formula, missing_model = c("c
 
     est_pi = list()
 
-    for (r in 1:(onR - 1*(two_stage==T))) {
-        RR <- matrix(total_R[r, ], byrow = T, nrow = 1)
-        colnames(RR) <- colnames(total_R)
+    for (r in 1:fonR) {
+        RR <- matrix(ototal_R[r, ], byrow = T, nrow = 1)
+        colnames(RR) <- colnames(ototal_R)
         NR_data_tmp <- cbind(NR_data, RR)
         l <- ifelse(r == 1, 1, 0)
         PI <- matrix(l, nrow = nevent, ncol = nvecR)
         est_pi[[r]] <- matrix(0, nrow = nevent, ncol = nvecR)
         for (k in 1:nvecR) {
-            tmp <- ifelse(rep(total_R[r, k], nevent) == 1, predict(model_missing[[k]], newdata = NR_data_tmp,
+            tmp <- ifelse(rep(ototal_R[r, k], nevent) == 1, predict(model_missing[[k]], newdata = NR_data_tmp,
                 type = "response"), 1 - predict(model_missing[[k]], newdata = NR_data_tmp, type = "response"))
             est_pi[[r]][, k] <- tmp
             PI[, k] <- tmp
@@ -379,7 +395,7 @@ AIPWsubtype <- function(formula, data, id, missing_formula, missing_model = c("c
         pR[, r] <- apply(PI, 1, prod)
     }
     if (two_stage == T) {
-        RR <- matrix(total_R[nR, nvecR], byrow = T, nrow = 1)
+        RR <- matrix(0, byrow = T, nrow = 1)
         colnames(RR) <- colnames(total_R)[nvecR]
         NR_data_tmp <- cbind(NR_data, RR)
         est_pi[[nR]] <- 1 - predict(model_missing[[nvecR]], newdata = NR_data_tmp, type = "response")
@@ -398,11 +414,11 @@ AIPWsubtype <- function(formula, data, id, missing_formula, missing_model = c("c
 
     dpR <- replicate(nevent, matrix(0, nrow = nR, ncol = nalp), simplify = F)
 
-    for (r in 1:2^(n_marker)) {
+    for (r in 1:fonR) {
         a = 1
         tt <- matrix(0, nrow = nevent, ncol = nalp)
-        RR <- matrix(total_R[r, ], byrow = T, nrow = 1)
-        colnames(RR) <- colnames(total_R)
+        RR <- matrix(ototal_R[r, ], byrow = T, nrow = 1)
+        colnames(RR) <- colnames(tootal_R)
         NR_data_tmp <- cbind(NR_data, RR)
 
         for (k in 1:nvecR) {
@@ -410,7 +426,7 @@ AIPWsubtype <- function(formula, data, id, missing_formula, missing_model = c("c
             tmp <- model.matrix(model_missing[[k]]$formula, NR_data_tmp) * predict(model_missing[[k]], newdata = NR_data_tmp,
                 type = "response")/(1 + exp(predict(model_missing[[k]], newdata = NR_data_tmp))) * apply(as.matrix(est_pi[[r]][,
                 -k]), 1, prod)
-            if (total_R[r, k] == 0)
+            if (ototal_R[r, k] == 0)
                 tmp <- -tmp
 
             tt[, a:(a + b - 1)] <- tmp
@@ -741,28 +757,50 @@ AIPWsubtype <- function(formula, data, id, missing_formula, missing_model = c("c
 
 
         Igam <- vcov(model_subtype)
-        Ialp <- vcov(model_missing[[1]])
-        if (nvecR > 1) {
-          for (k in 2:nvecR) {
-            Ialp <- bdiag(Ialp, vcov(model_missing[[k]]))
-          }
-        }
-        Ialp <- as.matrix(Ialp)
 
         Salp = as.data.frame(data[, id])
         names(Salp) <- id
 
         Salp = as.data.frame(uniqid)
         names(Salp) <- id
-        Ualp <- list()
+
         tmp_id = edata[, id]
-        for (k in 1:n_marker) {
-          Ualp[[k]] <- estfun(model_missing[[k]])
+
+
+
+        if(missing_model == "multinom"){
+          Ialp <- vcov(model_missing[[1]])
+          Ualp <- estfun(model_missing[[1]])
+
+          if(two_stage == TRUE){
+            Ialp <- bdiag(Ialp, vcov(model_missing[[2]]))
+            Ialp <- as.matrix(Ialp)
+            Ualp_ts <- estfun(model_missing[[2]])
+          }
+
+
+        } else{
+
+          Ialp <- vcov(model_missing[[1]])
+          if (nvecR > 1) {
+            for (k in 2:nvecR) {
+              Ialp <- bdiag(Ialp, vcov(model_missing[[k]]))
+            }
+          }
+          Ialp <- as.matrix(Ialp)
+
+          Ualp <- list()
+
+          for (k in 1:n_marker) {
+            Ualp[[k]] <- estfun(model_missing[[k]])
+          }
+          if (two_stage == TRUE) {
+            Ualp_ts <- estfun(model_missing[[nvecR]])
+          }
+          Ualp <- do.call(cbind, Ualp)
+
         }
-        if (two_stage == TRUE) {
-          Ualp_ts <- estfun(model_missing[[nvecR]])
-        }
-        Ualp <- do.call(cbind, Ualp)
+
         if (two_stage == FALSE) {
           Ualp <- cbind(tmp_id, Ualp)
           colnames(Ualp)[1] <- id
@@ -778,7 +816,6 @@ AIPWsubtype <- function(formula, data, id, missing_formula, missing_model = c("c
         Salp <- suppressWarnings(merge(Salp, Ualp, by = id, all = T))
         Salp[is.na(Salp)] <- 0
         Salp <- as.matrix(Salp[, -1])
-
 
         Sgam <- as.data.frame(uniqid)
         names(Sgam) <- id
