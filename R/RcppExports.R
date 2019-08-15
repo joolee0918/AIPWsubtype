@@ -25,3 +25,7 @@ IPW_ithealp_cox <- function(time, status, lp, strata, covar, dpi, weights, nused
     .Call(`_AIPWsubtype_IPW_ithealp_cox`, time, status, lp, strata, covar, dpi, weights, nused, nvar, nalp)
 }
 
+dpR_multinom <- function(X, score, nR, twostage, nrp, nalp, nalp0) {
+    .Call(`_AIPWsubtype_dpR_multinom`, X, score, nR, twostage, nrp, nalp, nalp0)
+}
+

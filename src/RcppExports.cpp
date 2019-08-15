@@ -197,6 +197,23 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// dpR_multinom
+Rcpp::NumericMatrix dpR_multinom(NumericVector X, NumericVector score, int nR, bool twostage, int nrp, int nalp, int nalp0);
+RcppExport SEXP _AIPWsubtype_dpR_multinom(SEXP XSEXP, SEXP scoreSEXP, SEXP nRSEXP, SEXP twostageSEXP, SEXP nrpSEXP, SEXP nalpSEXP, SEXP nalp0SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type X(XSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type score(scoreSEXP);
+    Rcpp::traits::input_parameter< int >::type nR(nRSEXP);
+    Rcpp::traits::input_parameter< bool >::type twostage(twostageSEXP);
+    Rcpp::traits::input_parameter< int >::type nrp(nrpSEXP);
+    Rcpp::traits::input_parameter< int >::type nalp(nalpSEXP);
+    Rcpp::traits::input_parameter< int >::type nalp0(nalp0SEXP);
+    rcpp_result_gen = Rcpp::wrap(dpR_multinom(X, score, nR, twostage, nrp, nalp, nalp0));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_AIPWsubtype_AIPW_agreg_cpp", (DL_FUNC) &_AIPWsubtype_AIPW_agreg_cpp, 31},
@@ -205,6 +222,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_AIPWsubtype_AIPW_coxscore_cpp", (DL_FUNC) &_AIPWsubtype_AIPW_coxscore_cpp, 24},
     {"_AIPWsubtype_IPW_ithealp_ag", (DL_FUNC) &_AIPWsubtype_IPW_ithealp_ag, 13},
     {"_AIPWsubtype_IPW_ithealp_cox", (DL_FUNC) &_AIPWsubtype_IPW_ithealp_cox, 10},
+    {"_AIPWsubtype_dpR_multinom", (DL_FUNC) &_AIPWsubtype_dpR_multinom, 7},
     {NULL, NULL, 0}
 };
 
