@@ -305,7 +305,7 @@ AIPWsubtype <- function(formula, data, id, missing_formula, missing_model = c("c
                 break
             tmp_mname <- missing_name[1:i]
             if (missing_indep == FALSE)
-                missing_model[[i + 1]] <- paste(paste(missing_formula[[i + 1]], collapse = ""), paste(tmp_mname,
+                missing_formula[[i + 1]] <- paste(paste(missing_formula[[i + 1]], collapse = ""), paste(tmp_mname,
                   collapse = "+"), sep = "+")
             tmp_model <- as.formula(paste(missing_name[i + 1], paste(missing_formula[[i + 1]], collapse = "")))
         }
@@ -316,7 +316,7 @@ AIPWsubtype <- function(formula, data, id, missing_formula, missing_model = c("c
                 break
             tmp_mname <- c(missing_name[1:i])
             if (missing_indep == FALSE)
-                missing_model[[i + 1]] <- paste(paste(missing_formula[[i + 1]], collapse = ""), paste(tmp_mname,
+                missing_formula[[i + 1]] <- paste(paste(missing_formula[[i + 1]], collapse = ""), paste(tmp_mname,
                   collapse = "+"), sep = "+")
             tmp_model <- as.formula(paste(missing_name[i + 1], paste(missing_formula[[i + 1]], collapse = "")))
         }
@@ -764,7 +764,7 @@ AIPWsubtype <- function(formula, data, id, missing_formula, missing_model = c("c
 
         tmp_id = edata[, id]
 
-
+        print(missing_model)
 
         if(missing_model == "multinom"){
           Ialp <- as.matrix(vcov(model_missing[[1]]))
@@ -776,8 +776,6 @@ AIPWsubtype <- function(formula, data, id, missing_formula, missing_model = c("c
             Ialp <- as.matrix(Ialp)
             Ualp_ts <- estfun(model_missing[[2]])
           }
-
-
         } else{
 
           Ialp <- vcov(model_missing[[1]])
