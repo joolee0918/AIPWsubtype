@@ -7,7 +7,8 @@
 #' @param formula a formula object with an obect of the type \code{Surv} on the left side and the terms on the right side. It should not include marker variables.
 #' @param data a data.frame which has variables in formula and markers.
 #' @param id a charhacter string specifying subject IDs.
-#' @param missing_model a list of the missingness model for each marker. A right side of formula object including a ~ operator. If \code{two_stage} is \code{TRUE}, a model for the first-stage missingness model should be included at the last element of a list.
+#' @param missing_model a character string specifying the approach of the missingness model.\code{missing_model = "condi"} represents the conditional approach and \code{missing_model = "multinom"} uses a multinomial model.
+#' @param missing_formula a list of the missingness model formula for each marker. A right side of formula object including a ~ operator. If \code{two_stage} is \code{TRUE}, a model for the first-stage missingness model should be included at the last element of a list.
 #' @param missing_indep a logical value: if \code{TRUE}, markers are assumed to be independent.
 #' @param two_stage  a logical value: if \code{TRUE}, a two-stage missingness model is used. Default is \code{FALSE}.
 #' @param tstage_name a charhacter string specifying the first-stage missingness variable if \code{two_stage} is \code{TRUE}.
@@ -58,16 +59,16 @@
 #' @importFrom mlogit mlogit mlogit.data mFormula
 #'
 #' @examples
-#' m1 <- AIPWsubtype(Surv(start, time, status)~ X + W,  data = data, id = "id", missing_model = list(~time + X, ~time + X),
+#' m1 <- AIPWsubtype(Surv(start, time, status)~ X + W,  data = data, id = "id", missing_model = "multinom",  missing_formula = list(~time + X, ~time + X),
 #'  two_stage = FALSE, marker_name = c("y1", "y2"), second_cont_bl = FALSE, second_cont_rr = FALSE, constvar = "W")
 #'
 #' # Two-stage missingness model
-#' m2 <- AIPWsubtype(Surv(start, time, status)~ X + W,  data = data, id = "id", missing_model = list(~time + X, ~time + X, ~time + X + W),
+#' m2 <- AIPWsubtype(Surv(start, time, status)~ X + W,  data = data, id = "id", missing_model = "multinom", missing_formula = list(~time + X, ~time + X, ~time + X + W),
 #'  two_stage = TRUE, tstage_name = c("R0"), marker_name = c("y1", "y2"), second_cont_bl = FALSE, second_cont_rr = FALSE, constvar = "W")
 #'
 #'
 #' @export
-AIPWsubtype <- function(formula, data, id, missing_formula, missing_model = c("condi", "multinom"), missing_indep = FALSE, two_stage = FALSE, tstage_name = NULL,
+AIPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom"), missing_formula, missing_indep = FALSE, two_stage = FALSE, tstage_name = NULL,
      marker_name, marker_rr = NULL, first_cont_rr = TRUE, second_cont_bl = FALSE,  second_cont_rr = FALSE, constvar = NULL, init, control, x = FALSE, y = TRUE, model = FALSE) {
 
 
@@ -76,6 +77,8 @@ AIPWsubtype <- function(formula, data, id, missing_formula, missing_model = c("c
     if(missing(id)) stop("id must be specified")
     if(missing(marker_name)) stop("marker_name must be specified")
     if(missing(missing_model)) stop("missing_model must be specified")
+    if(missing(missing_formula)) stop("missing_formula must be specified")
+
 
     if (missing(control)) {
       control = coxph.control()
@@ -101,16 +104,9 @@ AIPWsubtype <- function(formula, data, id, missing_formula, missing_model = c("c
     names(marker) <- marker_name
     marker[marker == 0] <- NA
 
-
-    for (i in 1:n_marker) {
-        marker[, i] <- factor(marker[, i])
-    }
-    marker <- as.data.frame(marker)
-    data[, marker_name] <- marker
-
     n_subtype = 1
     for (i in 1:n_marker) {
-        n_subtype = n_subtype * (nlevels(factor(data[, marker_name[i]])))
+        n_subtype = n_subtype * (nlevels(factor(marker[, i])))
     }
 
 
@@ -166,14 +162,7 @@ AIPWsubtype <- function(formula, data, id, missing_formula, missing_model = c("c
     R = rep(1, n)
     if (two_stage == T)
       R[data[, tstage_name] == 0] <- onR
-    for (i in 1:n) {
-      if (R[i] == 1 & data[i, event]==1) {
-        for (j in 1:fonR) {
-          if (all(Rmat[i, ] == ototal_R[j, 1:n_marker]))
-            R[i] <- j
-        }
-      }
-    }
+    R <- findR(R, data[, event], fonR, Rmat, ototal_R[, 1:n_marker])
 
     # observed R
     oR <- sort(unique(R))
@@ -193,7 +182,6 @@ AIPWsubtype <- function(formula, data, id, missing_formula, missing_model = c("c
 
     ## Data frame for cause
 
-
     umarker <- unique(na.omit(marker))
     tmpmar <- rep(0, nrow(umarker))
     for(i in 1:nrow(umarker)){
@@ -207,51 +195,16 @@ AIPWsubtype <- function(formula, data, id, missing_formula, missing_model = c("c
     on_subtype <- nrow(ototal_subtype)
 
     cause <- rep(NA, n)
-    for (i in 1:n) {
-      if(data[i, event]==1){
-        if (anyNA(marker[i, ])) {
-          cause[i] <- NA
-        } else {
-          for (j in 1:on_subtype) {
-            if (all(marker[i, ] == ototal_subtype[j, 1:n_marker]))
-              cause[i] <- j
-          }
-        }
-      }
-    }
+    cause <- findcause(R, cause, data[, event], as.matrix(marker), on_subtype, as.matrix(ototal_subtype))
 
     # observed cause
     ocause <- sort(unique(cause))
 
-
-    ## marker|R
- #   if (two_stage == T) {
-#        marker_r <- replicate(onR - 1, ototal_subtype, simplify = F)
-#        for (i in 2:onR) {
-#            # exclude R=1; complete case
-#            for (k in 1:on_subtype) {
-#                marker_r[[i - 1]][k, ] <- as.vector(ototal_subtype[k, ]) * as.vector(1 - ototal_R[i, 1:n_marker])
-#            }
-#        }
-#        for (i in 2:onR) {
-#            # exclude R=1; complete case
-#            marker_r[[i - 1]] <- as.matrix(unique(marker_r[[i - 1]]))
-#        }
-#    } else {
-#        marker_r <- replicate(nR - 1, ototal_subtype, simplify = F)
-#        for (i in 2:onR) {
-#            # exclude R=1; complete case
-#            for (k in 1:on_subtype) {
-#                marker_r[[i - 1]][k, ] <- as.vector(ototal_subtype[k, ]) * as.vector(1 - ototal_R[i, 1:n_marker])
-#            }
-#        }
-#        for (i in 2:nR) {
-###            # exclude R=1; complete case
-#            marker_r[[i - 1]] <- as.matrix(unique(marker_r[[i - 1]]))
-#        }
-
-#    }
-
+    for (i in 1:n_marker) {
+      marker[, i] <- factor(marker[, i])
+    }
+    marker <- as.data.frame(marker)
+    data[, marker_name] <- marker
 
     ## Data frame for missing indicator
 
@@ -343,7 +296,7 @@ AIPWsubtype <- function(formula, data, id, missing_formula, missing_model = c("c
           pR <- predict(model_missing[[1]], type="probs", newdata=tmpdata)
 
         }else {
-          edata$RR <- ifelse(edata$R == 6, 1, edata$R)
+          edata$RR <- ifelse(edata$R == max(oR), 1, edata$R)
           tmpdata <- mlogit.data(edata, shape="wide", choice="RR")
           pR <- predict(model_missing[[1]], type="probs", newdata=tmpdata)
 
@@ -364,7 +317,7 @@ AIPWsubtype <- function(formula, data, id, missing_formula, missing_model = c("c
         dpR <- lapply(1:nevent, function(i) dpR_multinom(tmpX[i,], scoreX[i,], onR, two_stage, ncol(scoreX), nalp, nalp0))
 
         if (two_stage == T) {
-           tmp <- -model.matrix(model_missing[[2]]$formula, edata) *pR[,onR]/(1 + exp(predict(model_missing[[2]], newdata = edata)))
+           tmp <- -model.matrix(model_missing[[2]]$formula, edata) *(1-pR[,onR])/(1 + exp(predict(model_missing[[2]], newdata = edata)))
 
            for(i in 1:nevent) {
             dpR[[i]][onR, (nalp - nalp0 + 1):(nalp)] <- tmp[i,]
@@ -378,27 +331,20 @@ AIPWsubtype <- function(formula, data, id, missing_formula, missing_model = c("c
     est_pi = list()
 
     for (r in 1:fonR) {
-        RR <- matrix(ototal_R[r, ], byrow = T, nrow = 1)
-        colnames(RR) <- colnames(ototal_R)
-        NR_data_tmp <- cbind(NR_data, RR)
-        l <- ifelse(r == 1, 1, 0)
+       l <- ifelse(r == 1, 1, 0)
         PI <- matrix(l, nrow = nevent, ncol = nvecR)
         est_pi[[r]] <- matrix(0, nrow = nevent, ncol = nvecR)
         for (k in 1:nvecR) {
-            tmp <- ifelse(rep(ototal_R[r, k], nevent) == 1, predict(model_missing[[k]], newdata = NR_data_tmp,
-                type = "response"), 1 - predict(model_missing[[k]], newdata = NR_data_tmp, type = "response"))
+            tmp <- ifelse(rep(ototal_R[r, k], nevent) == 1, predict(model_missing[[k]], newdata = edata,
+                type = "response"), 1 - predict(model_missing[[k]], newdata = edata, type = "response"))
             est_pi[[r]][, k] <- tmp
             PI[, k] <- tmp
         }
         pR[, r] <- apply(PI, 1, prod)
     }
     if (two_stage == T) {
-        RR <- matrix(0, byrow = T, nrow = 1)
-        colnames(RR) <- colnames(total_R)[nvecR]
-        NR_data_tmp <- cbind(NR_data, RR)
-        est_pi[[nR]] <- 1 - predict(model_missing[[nvecR]], newdata = NR_data_tmp, type = "response")
+        est_pi[[nR]] <- 1 - predict(model_missing[[nvecR]], newdata = edata, type = "response")
         pR[, nR] <- est_pi[[nR]]
-        pR[, 1:(onR-1)] <- pR[, 1:(onR-1)]*(1-pR[, onR])
     }
 
 
@@ -414,15 +360,10 @@ AIPWsubtype <- function(formula, data, id, missing_formula, missing_model = c("c
 
     for (r in 1:fonR) {
         a = 1
-        tt <- matrix(0, nrow = nevent, ncol = nalp)
-        RR <- matrix(ototal_R[r, ], byrow = T, nrow = 1)
-        colnames(RR) <- colnames(tootal_R)
-        NR_data_tmp <- cbind(NR_data, RR)
-
         for (k in 1:nvecR) {
             b <- length(model_missing[[k]]$coefficients)
-            tmp <- model.matrix(model_missing[[k]]$formula, NR_data_tmp) * predict(model_missing[[k]], newdata = NR_data_tmp,
-                type = "response")/(1 + exp(predict(model_missing[[k]], newdata = NR_data_tmp))) * apply(as.matrix(est_pi[[r]][,
+            tmp <- model.matrix(model_missing[[k]]$formula, edata) * predict(model_missing[[k]], newdata = edata,
+                type = "response")/(1 + exp(predict(model_missing[[k]], newdata = edata))) * apply(as.matrix(est_pi[[r]][,
                 -k]), 1, prod)
             if (ototal_R[r, k] == 0)
                 tmp <- -tmp
@@ -435,12 +376,8 @@ AIPWsubtype <- function(formula, data, id, missing_formula, missing_model = c("c
     }
     if (two_stage == T) {
         tt <- matrix(0, nrow = nevent, ncol = length(model_missing[[nvecR]]$coefficients))
-        RR <- matrix(total_R[nR, nvecR], byrow = T, nrow = 1)
-        colnames(RR) <- colnames(total_R)[nvecR]
-        NR_data_tmp <- cbind(NR_data, RR)
-
-        tmp <- -model.matrix(model_missing[[nvecR]]$formula, NR_data_tmp) * predict(model_missing[[nvecR]], newdata = NR_data_tmp,
-            type = "response")/(1 + exp(predict(model_missing[[nvecR]], newdata = NR_data_tmp)))
+        tmp <- -model.matrix(model_missing[[nvecR]]$formula, edata) * predict(model_missing[[nvecR]], newdata = edata,
+            type = "response")/(1 + exp(predict(model_missing[[nvecR]], newdata = edata)))
         tt <- tmp
 
         for (i in 1:nevent) dpR[[i]][nR, (nalp - nalp0 + 1):(nalp)] <- tt[i, ]
@@ -755,9 +692,6 @@ AIPWsubtype <- function(formula, data, id, missing_formula, missing_model = c("c
 
 
         Igam <- vcov(model_subtype)
-
-        Salp = as.data.frame(data[, id])
-        names(Salp) <- id
 
         Salp = as.data.frame(uniqid)
         names(Salp) <- id

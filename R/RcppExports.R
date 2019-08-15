@@ -25,7 +25,19 @@ IPW_ithealp_cox <- function(time, status, lp, strata, covar, dpi, weights, nused
     .Call(`_AIPWsubtype_IPW_ithealp_cox`, time, status, lp, strata, covar, dpi, weights, nused, nvar, nalp)
 }
 
+findR <- function(R, event, fonR, Rmat, ototal_R) {
+    .Call(`_AIPWsubtype_findR`, R, event, fonR, Rmat, ototal_R)
+}
+
+findcause <- function(R, cause, event, marker, on_subtype, ototal_subtype) {
+    .Call(`_AIPWsubtype_findcause`, R, cause, event, marker, on_subtype, ototal_subtype)
+}
+
 dpR_multinom <- function(X, score, nR, twostage, nrp, nalp, nalp0) {
     .Call(`_AIPWsubtype_dpR_multinom`, X, score, nR, twostage, nrp, nalp, nalp0)
+}
+
+dpR1_multinom <- function(X, score, nR, twostage, nrp, nalp, nalp0) {
+    .Call(`_AIPWsubtype_dpR1_multinom`, X, score, nR, twostage, nrp, nalp, nalp0)
 }
 

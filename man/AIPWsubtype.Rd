@@ -4,10 +4,10 @@
 \alias{AIPWsubtype}
 \title{Augmented inverse probability weighted Cox proportional hazard model for competing risks data}
 \usage{
-AIPWsubtype(formula, data, id, missing_formula,
-  missing_model = c("condi", "multinom"), missing_indep = FALSE,
-  two_stage = FALSE, tstage_name = NULL, marker_name,
-  marker_rr = NULL, first_cont_rr = TRUE, second_cont_bl = FALSE,
+AIPWsubtype(formula, data, id, missing_model = c("condi", "multinom"),
+  missing_formula, missing_indep = FALSE, two_stage = FALSE,
+  tstage_name = NULL, marker_name, marker_rr = NULL,
+  first_cont_rr = TRUE, second_cont_bl = FALSE,
   second_cont_rr = FALSE, constvar = NULL, init, control, x = FALSE,
   y = TRUE, model = FALSE)
 }
@@ -18,7 +18,9 @@ AIPWsubtype(formula, data, id, missing_formula,
 
 \item{id}{a charhacter string specifying subject IDs.}
 
-\item{missing_model}{a list of the missingness model for each marker. A right side of formula object including a ~ operator. If \code{two_stage} is \code{TRUE}, a model for the first-stage missingness model should be included at the last element of a list.}
+\item{missing_model}{a character string specifying the approach of the missingness model.\code{missing_model = "condi"} represents the conditional approach and \code{missing_model = "multinom"} uses a multinomial model.}
+
+\item{missing_formula}{a list of the missingness model formula for each marker. A right side of formula object including a ~ operator. If \code{two_stage} is \code{TRUE}, a model for the first-stage missingness model should be included at the last element of a list.}
 
 \item{missing_indep}{a logical value: if \code{TRUE}, markers are assumed to be independent.}
 
@@ -78,11 +80,11 @@ For marker variables, 0 indicates censored events or missing values.
 formula = formula, call = Call, terms = Terms, assign = assign, method = "AIPW"
 }
 \examples{
-m1 <- AIPWsubtype(Surv(start, time, status)~ X + W,  data = data, id = "id", missing_model = list(~time + X, ~time + X),
+m1 <- AIPWsubtype(Surv(start, time, status)~ X + W,  data = data, id = "id", missing_model = "multinom",  missing_formula = list(~time + X, ~time + X),
  two_stage = FALSE, marker_name = c("y1", "y2"), second_cont_bl = FALSE, second_cont_rr = FALSE, constvar = "W")
 
 # Two-stage missingness model
-m2 <- AIPWsubtype(Surv(start, time, status)~ X + W,  data = data, id = "id", missing_model = list(~time + X, ~time + X, ~time + X + W),
+m2 <- AIPWsubtype(Surv(start, time, status)~ X + W,  data = data, id = "id", missing_model = "multinom", missing_formula = list(~time + X, ~time + X, ~time + X + W),
  two_stage = TRUE, tstage_name = c("R0"), marker_name = c("y1", "y2"), second_cont_bl = FALSE, second_cont_rr = FALSE, constvar = "W")
 
 

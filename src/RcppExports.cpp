@@ -197,6 +197,37 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// findR
+Rcpp::NumericVector findR(NumericVector R, NumericVector event, int fonR, NumericMatrix Rmat, NumericMatrix ototal_R);
+RcppExport SEXP _AIPWsubtype_findR(SEXP RSEXP, SEXP eventSEXP, SEXP fonRSEXP, SEXP RmatSEXP, SEXP ototal_RSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type R(RSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type event(eventSEXP);
+    Rcpp::traits::input_parameter< int >::type fonR(fonRSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type Rmat(RmatSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type ototal_R(ototal_RSEXP);
+    rcpp_result_gen = Rcpp::wrap(findR(R, event, fonR, Rmat, ototal_R));
+    return rcpp_result_gen;
+END_RCPP
+}
+// findcause
+Rcpp::NumericVector findcause(NumericVector R, NumericVector cause, NumericVector event, NumericMatrix marker, int on_subtype, NumericMatrix ototal_subtype);
+RcppExport SEXP _AIPWsubtype_findcause(SEXP RSEXP, SEXP causeSEXP, SEXP eventSEXP, SEXP markerSEXP, SEXP on_subtypeSEXP, SEXP ototal_subtypeSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type R(RSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type cause(causeSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type event(eventSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type marker(markerSEXP);
+    Rcpp::traits::input_parameter< int >::type on_subtype(on_subtypeSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type ototal_subtype(ototal_subtypeSEXP);
+    rcpp_result_gen = Rcpp::wrap(findcause(R, cause, event, marker, on_subtype, ototal_subtype));
+    return rcpp_result_gen;
+END_RCPP
+}
 // dpR_multinom
 Rcpp::NumericMatrix dpR_multinom(NumericVector X, NumericVector score, int nR, bool twostage, int nrp, int nalp, int nalp0);
 RcppExport SEXP _AIPWsubtype_dpR_multinom(SEXP XSEXP, SEXP scoreSEXP, SEXP nRSEXP, SEXP twostageSEXP, SEXP nrpSEXP, SEXP nalpSEXP, SEXP nalp0SEXP) {
@@ -214,6 +245,23 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// dpR1_multinom
+Rcpp::NumericMatrix dpR1_multinom(NumericMatrix X, NumericMatrix score, int nR, bool twostage, int nrp, int nalp, int nalp0);
+RcppExport SEXP _AIPWsubtype_dpR1_multinom(SEXP XSEXP, SEXP scoreSEXP, SEXP nRSEXP, SEXP twostageSEXP, SEXP nrpSEXP, SEXP nalpSEXP, SEXP nalp0SEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericMatrix >::type X(XSEXP);
+    Rcpp::traits::input_parameter< NumericMatrix >::type score(scoreSEXP);
+    Rcpp::traits::input_parameter< int >::type nR(nRSEXP);
+    Rcpp::traits::input_parameter< bool >::type twostage(twostageSEXP);
+    Rcpp::traits::input_parameter< int >::type nrp(nrpSEXP);
+    Rcpp::traits::input_parameter< int >::type nalp(nalpSEXP);
+    Rcpp::traits::input_parameter< int >::type nalp0(nalp0SEXP);
+    rcpp_result_gen = Rcpp::wrap(dpR1_multinom(X, score, nR, twostage, nrp, nalp, nalp0));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_AIPWsubtype_AIPW_agreg_cpp", (DL_FUNC) &_AIPWsubtype_AIPW_agreg_cpp, 31},
@@ -222,7 +270,10 @@ static const R_CallMethodDef CallEntries[] = {
     {"_AIPWsubtype_AIPW_coxscore_cpp", (DL_FUNC) &_AIPWsubtype_AIPW_coxscore_cpp, 24},
     {"_AIPWsubtype_IPW_ithealp_ag", (DL_FUNC) &_AIPWsubtype_IPW_ithealp_ag, 13},
     {"_AIPWsubtype_IPW_ithealp_cox", (DL_FUNC) &_AIPWsubtype_IPW_ithealp_cox, 10},
+    {"_AIPWsubtype_findR", (DL_FUNC) &_AIPWsubtype_findR, 5},
+    {"_AIPWsubtype_findcause", (DL_FUNC) &_AIPWsubtype_findcause, 6},
     {"_AIPWsubtype_dpR_multinom", (DL_FUNC) &_AIPWsubtype_dpR_multinom, 7},
+    {"_AIPWsubtype_dpR1_multinom", (DL_FUNC) &_AIPWsubtype_dpR1_multinom, 7},
     {NULL, NULL, 0}
 };
 

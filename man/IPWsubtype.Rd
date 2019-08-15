@@ -4,9 +4,10 @@
 \alias{IPWsubtype}
 \title{Inverse probability weighted Cox proportional hazard model for competing risks data}
 \usage{
-IPWsubtype(formula, data, id, missing_model, missing_indep = FALSE,
-  two_stage = FALSE, tstage_name = NULL, marker_name,
-  marker_rr = NULL, first_cont_rr = TRUE, second_cont_bl = FALSE,
+IPWsubtype(formula, data, id, missing_model = c("condi", "multinom"),
+  missing_formula, missing_indep = FALSE, two_stage = FALSE,
+  tstage_name = NULL, marker_name, marker_rr = NULL,
+  first_cont_rr = TRUE, second_cont_bl = FALSE,
   second_cont_rr = FALSE, constvar = NULL, init, control, x = FALSE,
   y = TRUE, model = FALSE)
 }
@@ -17,7 +18,9 @@ IPWsubtype(formula, data, id, missing_model, missing_indep = FALSE,
 
 \item{id}{a charhacter string specifying subject IDs.}
 
-\item{missing_model}{a list of the missingness model for each marker. A right side of formula object including a ~ operator. If \code{two_stage} is \code{TRUE}, a model for the first-stage missingness model should be included at the last element of a list.}
+\item{missing_model}{a character string specifying the approach of the missingness model.\code{missing_model = "condi"} represents the conditional approach and \code{missing_model = "multinom"} uses a multinomial model.}
+
+\item{missing_formula}{a list of the missingness model formula for each marker. A right side of formula object including a ~ operator. If \code{two_stage} is \code{TRUE}, a model for the first-stage missingness model should be included at the last element of a list.}
 
 \item{missing_indep}{a logical value: if \code{TRUE}, markers are assumed to be independent.}
 
@@ -73,10 +76,10 @@ The data duplication method is used so that the returned value \code{x}, \code{y
 For marker variables, 0 indicates censored events or missing values.
 }
 \examples{
-m1 <- IPWsubtype(Surv(start, time, status)~ X + W,  data = data, id = "id", missing_model = list(~time + X, ~time + X),
+m1 <- IPWsubtype(Surv(start, time, status)~ X + W,  data = data, id = "id", missing_formula = list(~time + X, ~time + X),
  two_stage = FALSE, marker_name = c("y1", "y2"), second_cont_bl = FALSE, second_cont_rr = FALSE, constvar = "W")
 
 # Two-stage missingness model
-m2 <- IPWsubtype(Surv(start, time, status)~ X + W,  data = data, id = "id", missing_model = list(~time + X, ~time + X, ~time + X + W),
+m2 <- IPWsubtype(Surv(start, time, status)~ X + W,  data = data, id = "id", missing_formula = list(~time + X, ~time + X, ~time + X + W),
  two_stage = TRUE, tstage_name = c("R0"), marker_name = c("y1", "y2"), second_cont_bl = FALSE, second_cont_rr = FALSE, constvar = "W")
 }

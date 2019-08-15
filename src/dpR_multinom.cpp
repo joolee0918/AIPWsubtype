@@ -41,3 +41,34 @@ Rcpp::NumericMatrix dpR_multinom (NumericVector X, NumericVector score, int nR, 
   return(rep);
 }
 
+
+// [[Rcpp::export]]
+Rcpp::NumericMatrix dpR1_multinom (NumericMatrix X, NumericMatrix score, int nR, bool twostage, int nrp, int nalp, int nalp0){
+
+  int i, j, k;
+  int ncp = (nalp - nalp0)/nrp;
+  int n = X.nrow();
+  int fnR;
+
+  if(twostage == TRUE) fnR = nR-1;
+  else fnR = nR;
+
+  NumericMatrix rep(n, nalp);
+
+
+  double sscore;
+  double tmp;
+
+
+  for(k=0; k<n; k++){
+    sscore = sum(score(k, _));
+    for(i=0; i<nrp; i++){
+      for(j=0; j<ncp; j++)
+        rep(k, j*nrp + i) = - score(k, i)*X(k, j)/pow(1+sscore,2);
+    }
+  }
+
+
+  return(rep);
+}
+
