@@ -377,15 +377,12 @@ IPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom")
     }
 
     newcause <- unlist(lapply(1:ndata, function(i) lf(cause[i])))
+    ccdata$pi1 <- p1
     newdata <- ccdata[rep(1:ndata, each = on_subtype), ]
-    newdata$pi1 <-  rep(1, ndata*on_subtype)
-    newdata[seq(1, ndata*on_subtype, by=on_subtype), "pi1"] <- p1
     newdata[, event] <- rep(0, ndata*on_subtype)
     newdata[seq(1, ndata*on_subtype, by=on_subtype), event] <- ccdata[, event]
     newdata[, marker_name] <- data.frame(ototal_subtype[newcause, ])
-
-    dpR1 <- matrix(0, nrow=ndata*on_subtype, ncol=nalp)
-    dpR1[seq(1, ndata*on_subtype, by=on_subtype), ] <- as.matrix(dpR)
+    dpR <- dpR[rep(seq_len(nrow(dpR)), each = n_subtype), ]
 
     term_marker <- rep(0, n_marker)
 
@@ -529,12 +526,12 @@ IPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom")
             status2 <- status[ord]
             lp2 <- lp[ord]
             weights2 <- weights[ord]
-            dpR2 <- as.matrix(dpR1[ord, ])
+            dpR2 <- as.matrix(dpR[ord, ])
 
             Ithealp <- IPW_ithealp_cox(time2, status2, lp2, newstrat, x2, dpR2, weights2, nused, nvar, nalp)
         } else {
 
-            Ithealp <- IPW_ithealp_ag(start, stop, status, lp, newstrat, sort.start, sort.end, x, as.matrix(dpR1),
+            Ithealp <- IPW_ithealp_ag(start, stop, status, lp, newstrat, sort.start, sort.end, x, as.matrix(dpR),
                 weights, nused, nvar, nalp)
         }
 
