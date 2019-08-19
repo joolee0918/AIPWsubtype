@@ -37,7 +37,7 @@ Rcpp::List AIPW_coxfit_cpp(int maxiter, NumericVector time, IntegerVector status
   int col1, col2;
   int nused, nX, nW, nevent;
   int tmp_r;
-  int doscale = 1;
+  int doscale = 0;
 
   nused = offset.size();
   nX = whereX.size();
@@ -78,10 +78,7 @@ Rcpp::List AIPW_coxfit_cpp(int maxiter, NumericVector time, IntegerVector status
 
   beta = init_beta;
 
-  /*
-   ** Subtract the mean from each covar, as this makes the regression
-   **  much more stable.
-   */
+
 
   for (person = 0; person < nused; person++) {
 
@@ -268,6 +265,11 @@ Rcpp::List AIPW_coxfit_cpp(int maxiter, NumericVector time, IntegerVector status
     }
   }
 
+  /*
+   ** Subtract the mean from each covar, as this makes the regression
+   **  much more stable.
+   */
+
 
   temp2 = nused;
 
@@ -279,16 +281,16 @@ Rcpp::List AIPW_coxfit_cpp(int maxiter, NumericVector time, IntegerVector status
     means[i] = temp;
     for (person=0; person<nused; person++) covar(person, i) -=temp;
     if (doscale==1) {  /* and also scale it */
-      temp =0;
+  temp =0;
       for (person=0; person<nused; person++) {
         temp +=  fabs(covar(person, i));
       }
       if (temp > 0) temp = temp2/temp;   /* scaling */
-      else temp=1.0; /* rare case of a constant covariate */
-      scale[i] = temp;
-      for (person=0; person<nused; person++) {
-        covar(person, i) *= temp;
-      }
+  else temp=1.0; /* rare case of a constant covariate */
+  scale[i] = temp;
+  for (person=0; person<nused; person++) {
+    covar(person, i) *= temp;
+  }
     }
   }
 

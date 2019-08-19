@@ -498,7 +498,7 @@ AIPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom"
     s_uid <- subset_data[, id]
 
     model_subtype <- clogit(s_y ~ s_X + strata(s_uid))
-    subset_data$lp <- predict(model_subtype, type = "lp")
+    subset_data$lp <- model_subtype$linear.predictors
 
     gamma <- model_subtype$coefficients
     ngamma <- length(gamma)
@@ -749,27 +749,10 @@ AIPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom"
 
         subset_data <- cbind(subset_data, s_X)
         s0 <- by(subset_data, subset_data[, id], function(x) sum(exp(x$lp)))
-        s1 <- by(subset_data, subset_data[, id], function(x) t(x[, colnames(s_X)]) %*% exp(x$lp))
-        term1 <- by(subset_data, subset_data[, id], function(x) x[, colnames(s_X)][x[, event] == 1, ])
+        s1 <- by(subset_data, subset_data[, id], function(x) t(x[, colnames(s_X)]  ) %*% exp(x$lp))
+        term1 <- by(subset_data, subset_data[, id], function(x) x[, colnames(s_X)][x[, event] == 1, ]  )
         Ugam <- lapply(1:length(term1), function(i) term1[[i]] - s1[[i]]/s0[[i]])
         Ugam <- as.matrix(rbindlist(Ugam))
-        Ugam <- cbind(as.numeric(names(term1)), Ugam)
-        colnames(Ugam)[1] <- id
-
-        Sgam <- suppressWarnings(merge(Sgam, Ugam, by = id, all = T))
-        Sgam[is.na(Sgam)] <- 0
-        Sgam <- as.matrix(Sgam[, -1])
-
-        Sgam <- as.data.frame(uniqid)
-        names(Sgam) <- id
-
-        subset_data <- cbind(subset_data, s_X)
-        s0 <- by(subset_data, subset_data[, id], function(x) sum(exp(x$lp)))
-        s1 <- by(subset_data, subset_data[, id], function(x) t(x[, colnames(s_X)]) %*% exp(x$lp))
-        term1 <- by(subset_data, subset_data[, id], function(x) x[, colnames(s_X)][x[, event] == 1, ])
-        Ugam <- lapply(1:length(term1), function(i) term1[[i]] - s1[[i]]/s0[[i]])
-        Ugam <- as.matrix(rbindlist(Ugam))
-
         Ugam <- cbind(as.numeric(names(term1)), Ugam)
         colnames(Ugam)[1] <- id
 
