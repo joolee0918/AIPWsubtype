@@ -171,7 +171,7 @@ AIPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom"
 
     level_y = list()
     for (k in 1:n_marker) {
-        level_y[[k]] <- seq(nlevels(factor(data[, marker_name[k]])), 1)
+        level_y[[k]] <- seq(nlevels(factor(marker[, k])), 1)
     }
     tmpy <- list()
     for (k in 1:n_marker) {
