@@ -18,7 +18,7 @@ Rcpp::List AIPW_coxfit_cpp(int maxiter, NumericVector time, IntegerVector status
   IntegerVector whereW,
   NumericVector gamma, NumericMatrix comb_y,
   int nvar, int n_marker, int nR, int ngamma, int nalp,
-  double eps, bool first_cont_rr, bool second_cont_bl, bool second_cont_rr, NumericVector init_beta, int doscale) {
+  double eps, bool first_cont_rr, bool second_cont_bl, bool second_cont_rr, NumericVector init_beta) {
 
   int i, j, k, l, h, person, pid, r, ty;
 
@@ -37,6 +37,7 @@ Rcpp::List AIPW_coxfit_cpp(int maxiter, NumericVector time, IntegerVector status
   int col1, col2;
   int nused, nX, nW, nevent;
   int tmp_r;
+  int doscale = 1;
 
   nused = offset.size();
   nX = whereX.size();
@@ -84,14 +85,14 @@ Rcpp::List AIPW_coxfit_cpp(int maxiter, NumericVector time, IntegerVector status
   for (i=0; i<nvar; i++) {
     temp=0;
     for (person=0; person<nused; person++)
-      temp += weights[person] * covar(person, i);
+      temp += covar(person, i);
     temp /= temp2;
     means[i] = temp;
     for (person=0; person<nused; person++) covar(person, i) -=temp;
     if (doscale==1) {  /* and also scale it */
   temp =0;
       for (person=0; person<nused; person++) {
-        temp += weights[person] * fabs(covar(person, i));
+        temp +=  fabs(covar(person, i));
       }
       if (temp > 0) temp = temp2/temp;   /* scaling */
   else temp=1.0; /* rare case of a constant covariate */
