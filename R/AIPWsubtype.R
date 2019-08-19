@@ -161,7 +161,7 @@ AIPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom"
 
     R = rep(1, n)
     if (two_stage == T)
-      R[data[, tstage_name] == 0] <- onR
+      R[data[, event]==1 & data[, tstage_name] == 0] <- onR
     R <- findR(R, data[, event], fonR, Rmat, ototal_R[, 1:n_marker])
 
     # observed R
@@ -190,6 +190,8 @@ AIPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom"
           tmpmar[i] <- j
       }
     }
+
+    tmpmar <- rep(0, nrow(umarker))
 
     ototal_subtype <- total_subtype[sort(tmpmar),]
     on_subtype <- nrow(ototal_subtype)
