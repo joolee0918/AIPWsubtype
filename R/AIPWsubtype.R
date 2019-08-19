@@ -191,8 +191,6 @@ AIPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom"
       }
     }
 
-    tmpmar <- rep(0, nrow(umarker))
-
     ototal_subtype <- total_subtype[sort(tmpmar),]
     on_subtype <- nrow(ototal_subtype)
 
