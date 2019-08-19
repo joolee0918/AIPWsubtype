@@ -18,7 +18,7 @@ Rcpp::List AIPW_coxfit_cpp(int maxiter, NumericVector time, IntegerVector status
   IntegerVector whereW,
   NumericVector gamma, NumericMatrix comb_y,
   int nvar, int n_marker, int nR, int ngamma, int nalp,
-  double eps, bool first_cont_rr, bool second_cont_bl, bool second_cont_rr, NumericVector init_beta) {
+  double eps, bool first_cont_rr, bool second_cont_bl, bool second_cont_rr, NumericVector init_beta, int doscale) {
 
   int i, j, k, l, h, person, pid, r, ty;
 
@@ -76,6 +76,39 @@ Rcpp::List AIPW_coxfit_cpp(int maxiter, NumericVector time, IntegerVector status
   NumericVector dEcov((nR - 1) * nvar * ngamma);
 
   beta = init_beta;
+
+  /*
+   ** Subtract the mean from each covar, as this makes the regression
+   **  much more stable.
+   */
+  for (i=0; i<nvar; i++) {
+    temp=0;
+    for (person=0; person<nused; person++)
+      temp += weights[person] * covar(person, i);
+    temp /= temp2;
+    means[i] = temp;
+    for (person=0; person<nused; person++) covar(person, i) -=temp;
+    if (doscale==1) {  /* and also scale it */
+  temp =0;
+      for (person=0; person<nused; person++) {
+        temp += weights[person] * fabs(covar(person, i));
+      }
+      if (temp > 0) temp = temp2/temp;   /* scaling */
+  else temp=1.0; /* rare case of a constant covariate */
+  scale[i] = temp;
+  for (person=0; person<nused; person++) {
+    covar(person, i) *= temp;
+  }
+    }
+  }
+
+  if (doscale==1) {
+    for (i=0; i<nvar; i++) beta[i] /= scale[i]; /*rescale initial betas */
+  }
+  else {
+    for (i=0; i<nvar; i++) scale[i] = 1.0;
+  }
+
 
   for (person = 0; person < nused; person++) {
 
@@ -412,6 +445,15 @@ Rcpp::List AIPW_coxfit_cpp(int maxiter, NumericVector time, IntegerVector status
 
   if (maxiter == 0 || is_na(loglik)[0] || 0 != is_infinite(loglik)[0]) {
     conv = 0;
+    for (i=0; i<nvar; i++) {
+      beta[i] *= scale[i];  /*return to original scale */
+    u[i] /= scale[i];
+    imat(i, i) *= scale[i]*scale[i];
+  for (j=0; j<i; j++) {
+    imat(j, i) *= scale[i]*scale[j];
+    imat(i, j) = imat(j, i);
+  }
+    }
     goto finish;
   }
   /*
@@ -548,6 +590,16 @@ Rcpp::List AIPW_coxfit_cpp(int maxiter, NumericVector time, IntegerVector status
 
       imat = arma::inv(imat); /* Inverse matrix */
       conv = 1;
+      for (i=0; i<nvar; i++) {
+        beta[i] = newbeta[i]*scale[i];
+        u[i] /= scale[i];
+        imat(i, i) *= scale[i]*scale[i];
+        for (j=0; j<i; j++) {
+          imat(j, i) *= scale[i]*scale[j];
+          imat(i, j) = imat(j ,i);
+        }
+      }
+
       goto finish;
     }
     /*
@@ -561,7 +613,7 @@ Rcpp::List AIPW_coxfit_cpp(int maxiter, NumericVector time, IntegerVector status
 
     if (is_nan(nnewlk)[0] || 0 != is_infinite(nnewlk)[0]) {
       for (i = 0; i < nvar; i++) newbeta[i] = beta[i];
-       maxiter++;
+       maxiter = iter+1;
       continue;
     }
 
@@ -606,6 +658,17 @@ Rcpp::List AIPW_coxfit_cpp(int maxiter, NumericVector time, IntegerVector status
   }
   imat = arma::inv(imat); /* Inverse matrix */
   conv = 2;
+
+  for (i=0; i<nvar; i++) {
+    beta[i] = newbeta[i]*scale[i];
+    u[i] /= scale[i];
+    imat(i, i) *= scale[i]*scale[i];
+    for (j=0; j<i; j++) {
+      imat(j, i) *= scale[i]*scale[j];
+      imat(i, j) = imat(j, i);
+    }
+  }
+
 
   finish:
 
