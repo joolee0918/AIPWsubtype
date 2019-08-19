@@ -748,6 +748,7 @@ Rcpp::List AIPW_coxfit_cpp(int maxiter, NumericVector time, IntegerVector status
    ** create the output list
    */
   List rlist = List::create(Named("coef") = beta,
+    Named("means") = means,
     Named("u") = u,
     Named("imat") = imat,
     Named("Ithegam") = Ithegam,

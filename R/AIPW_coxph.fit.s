@@ -110,7 +110,7 @@ AIPW_fit <- AIPW_coxfit_cpp(control$iter.max,
     }
 
     names(coef) <- dimnames(x)[[2]]
-    lp <- c(x %*% coef) + offset
+    lp <- c(x %*% coef) + offset - sum(coef*AIPW_fit$means)
 
       # Sort the data
 	    if(length(strata) == 0){
@@ -127,7 +127,7 @@ AIPW_fit <- AIPW_coxfit_cpp(control$iter.max,
 	    sx <- x[ord,]
 	    sid <- id[ord]
 	    soffset <- offset[ord]
-	    score <- exp( sx %*% coef + soffset)
+	    score <- exp(lp[ord])
 	    sR <- R[ord]
 	    smarker <- as.matrix(marker[ord,])
 	    smarker[is.na(smarker)] <- -999
