@@ -47,7 +47,7 @@ Rcpp::List AIPW_coxfit_cpp(int maxiter, NumericVector time, IntegerVector status
   arma::mat imat(nvar, nvar), cmat(nvar, nvar), cmat2(nvar, nvar);
   NumericVector a(nvar), newbeta(nvar), a2(nvar);
   NumericVector scale(nvar), u2(nvar);
-  NumericVector score(nused);
+  NumericVector score(nused), means(nused);
   double zgamma, tmp_denom;
 
   int two_y = comb_y.ncol();
@@ -82,6 +82,9 @@ Rcpp::List AIPW_coxfit_cpp(int maxiter, NumericVector time, IntegerVector status
    ** Subtract the mean from each covar, as this makes the regression
    **  much more stable.
    */
+
+  temp2 = nused;
+
   for (i=0; i<nvar; i++) {
     temp=0;
     for (person=0; person<nused; person++)
