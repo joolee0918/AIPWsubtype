@@ -267,6 +267,8 @@ Rcpp::List AIPW_agreg_cpp(int maxiter, NumericVector start, NumericVector tstop,
    **  computation much more stable.  The mean is taken per stratum,
    **  No scaling
    */
+
+  NumericMatrix covar2 = covar;
   for (i=0; i<nvar; i++) {
     person=0;
     for (istrat=0; istrat<nstrat; istrat++) {
@@ -458,7 +460,7 @@ Rcpp::List AIPW_agreg_cpp(int maxiter, NumericVector start, NumericVector tstop,
           }
           for (r = 1; r < nR; r++) {
             for (i = 0; i < ngamma; i++) {
-              Ecov(r - 1, nX + nW + i) = EZ[(r - 1) * ngamma * nevent + i * nevent + pid];
+              Ecov(r - 1, nX + nW + i) = EZ[(r - 1) * ngamma * nevent + i * nevent + pid] + (covar(p, nX + nW + i) - covar2(p, nX + nW + i));
             }
           }
 
@@ -677,7 +679,7 @@ Rcpp::List AIPW_agreg_cpp(int maxiter, NumericVector start, NumericVector tstop,
             }
             for (r = 1; r < nR; r++) {
               for (i = 0; i < ngamma; i++) {
-                Ecov(r - 1, nX + nW + i) = EZ[(r - 1) * ngamma * nevent + i * nevent + pid];
+                Ecov(r - 1, nX + nW + i) = EZ[(r - 1) * ngamma * nevent + i * nevent + pid] + (covar(p, nX + nW + i) - covar2(p, nX + nW + i));
               }
             }
 
@@ -808,6 +810,8 @@ Rcpp::List AIPW_agreg_cpp(int maxiter, NumericVector start, NumericVector tstop,
 
   finish:
 
+
+
     /* Calculate Ithealp , Ithegam */
 
     person = 0;
@@ -864,7 +868,7 @@ Rcpp::List AIPW_agreg_cpp(int maxiter, NumericVector start, NumericVector tstop,
 
           for (r = 1; r < nR; r++) {
             for (i = 0; i < ngamma; i++) {
-              Ecov(r - 1, nX + nW + i) = EZ[(r - 1) * ngamma * nevent + i * nevent + pid];
+              Ecov(r - 1, nX + nW + i) = EZ[(r - 1) * ngamma * nevent + i * nevent + pid] +  (covar(p, nX + nW + i) - covar2(p, nX + nW + i));
               for (k = 0; k < ngamma; k++) {
                 dEcov[(r - 1) * nvar * ngamma + (nX + nW + i) * ngamma + k] = dEZ[(r - 1) * ngamma * nevent * ngamma + i * nevent * ngamma + pid * ngamma + k];
               }
