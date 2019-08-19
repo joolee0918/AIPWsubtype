@@ -47,7 +47,7 @@ Rcpp::List AIPW_coxfit_cpp(int maxiter, NumericVector time, IntegerVector status
   arma::mat imat(nvar, nvar), cmat(nvar, nvar), cmat2(nvar, nvar);
   NumericVector a(nvar), newbeta(nvar), a2(nvar);
   NumericVector scale(nvar), u2(nvar);
-  NumericVector score(nused), means(nused);
+  NumericVector score(nused), means(nvar);
   double zgamma, tmp_denom;
 
   int two_y = comb_y.ncol();
