@@ -24,7 +24,7 @@ Rcpp::List AIPW_agreg_cpp(int maxiter, NumericVector start, NumericVector tstop,
 
   int indx1, p, p1;
   double denom = 0, zbeta, risk;
-  double temp;
+  double temp, temp2;
   double newlk = 0;
   double dtime;
   double meanwt;
