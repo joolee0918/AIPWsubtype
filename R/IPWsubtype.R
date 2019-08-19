@@ -150,7 +150,7 @@ IPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom")
 
     R = rep(1, n)
     if (two_stage == T)
-      R[data[, tstage_name] == 0] <- onR
+      R[data[, event]==1 & data[, tstage_name] == 0] <- onR
     R <- findR(R, data[, event], fonR, Rmat, ototal_R[, 1:n_marker])
 
     # observed R
@@ -160,7 +160,7 @@ IPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom")
 
     level_y = list()
     for (k in 1:n_marker) {
-      level_y[[k]] <- seq(nlevels(factor(data[, marker_name[k]])), 1)
+      level_y[[k]] <- seq(nlevels(factor(marker[, k])), 1)
     }
     tmpy <- list()
     for (k in 1:n_marker) {
@@ -213,10 +213,6 @@ IPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom")
     edata <- data[data[, event] == 1, ]
     eventid <- edata[, id]
     nevent <- nrow(edata)
-    obseid <- data[R == 1 & data[, event] == 1, id]
-
-    ## Drop id for incomplete data
-    dropid <- data[R != 1 & data[, event] == 1, id]
 
     model_missing <- list()
 
@@ -465,6 +461,8 @@ IPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom")
     }
 
     newformula <- update.formula(formula, paste("~.+", order_bl, order_rr, "+", "cluster", "(", id, ")"))
+
+    newformula <- update.formula(formula, paste("~.+", order_bl, order_rr)) , "+", "cluster", "(", id, ")"))
 
 
     fit <- coxph(formula = newformula, data = newdata, weights = 1/pi1, control = control, robust = T, model = TRUE, x = TRUE,
