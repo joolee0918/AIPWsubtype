@@ -83,37 +83,6 @@ Rcpp::List AIPW_coxfit_cpp(int maxiter, NumericVector time, IntegerVector status
    **  much more stable.
    */
 
-  temp2 = nused;
-
-  for (i=0; i<nvar; i++) {
-    temp=0;
-    for (person=0; person<nused; person++)
-      temp += covar(person, i);
-    temp /= temp2;
-    means[i] = temp;
-    for (person=0; person<nused; person++) covar(person, i) -=temp;
-    if (doscale==1) {  /* and also scale it */
-  temp =0;
-      for (person=0; person<nused; person++) {
-        temp +=  fabs(covar(person, i));
-      }
-      if (temp > 0) temp = temp2/temp;   /* scaling */
-  else temp=1.0; /* rare case of a constant covariate */
-  scale[i] = temp;
-  for (person=0; person<nused; person++) {
-    covar(person, i) *= temp;
-  }
-    }
-  }
-
-  if (doscale==1) {
-    for (i=0; i<nvar; i++) beta[i] /= scale[i]; /*rescale initial betas */
-  }
-  else {
-    for (i=0; i<nvar; i++) scale[i] = 1.0;
-  }
-
-
   for (person = 0; person < nused; person++) {
 
     if (status[person] == 1 && R[person] == 1) {
@@ -298,6 +267,38 @@ Rcpp::List AIPW_coxfit_cpp(int maxiter, NumericVector time, IntegerVector status
 
     }
   }
+
+
+  temp2 = nused;
+
+  for (i=0; i<nvar; i++) {
+    temp=0;
+    for (person=0; person<nused; person++)
+      temp += covar(person, i);
+    temp /= temp2;
+    means[i] = temp;
+    for (person=0; person<nused; person++) covar(person, i) -=temp;
+    if (doscale==1) {  /* and also scale it */
+      temp =0;
+      for (person=0; person<nused; person++) {
+        temp +=  fabs(covar(person, i));
+      }
+      if (temp > 0) temp = temp2/temp;   /* scaling */
+      else temp=1.0; /* rare case of a constant covariate */
+      scale[i] = temp;
+      for (person=0; person<nused; person++) {
+        covar(person, i) *= temp;
+      }
+    }
+  }
+
+  if (doscale==1) {
+    for (i=0; i<nvar; i++) beta[i] /= scale[i]; /*rescale initial betas */
+  }
+  else {
+    for (i=0; i<nvar; i++) scale[i] = 1.0;
+  }
+
 
   /*
    ** do the initial iteration step
