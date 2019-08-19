@@ -174,7 +174,7 @@ cif <- function(fit, newdata, individual = FALSE, id, na.action = na.pass){
       stop("Individual=TRUE is only valid for counting process data")
     y2 <- y2[,1:2, drop=F]  #throw away status, it's never used
 
-    newrisk <- exp(c(x2 %*% fit$coefficients) + offset2)
+    newrisk <- exp(c(x2 %*% fit$coefficients) + offset2 - sum(fit$coefficiets*colMeans(x2)))
 
     onecurve <- function(basehaz, cumhaz, x2, y2, strata2,  Strata, newrisk, n_subtype) {
     ntarget <- nrow(x2)/n_subtype
@@ -223,7 +223,7 @@ cif <- function(fit, newdata, individual = FALSE, id, na.action = na.pass){
   offset2 <- model.offset(mf2)
   if (length(offset2) == 0)  offset2 <- 0
   x2 <- model.matrix(Terms2, mf2)[,-1, drop=FALSE]  #no intercept
-  risk <- exp(c(x2 %*% fit$coefficients) + offset2)
+  risk <- exp(c(x2 %*% fit$coefficients) + offset2 - sum(fit$coefficients*colMeans(x2)))
   ntarget <- nrow(x2)/n_subtype
   newrisk <- split(risk, newdata$id)
 

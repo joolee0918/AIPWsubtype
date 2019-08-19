@@ -108,7 +108,7 @@ AIPW_fit <- AIPW_agreg_cpp(maxiter,
         if (AIPW_fit$conv == 2)
         warning("Ran out of iterations and did not converge")
     }
-    lp <- c(x %*% coef) + offset
+    lp <- c(x %*% coef) + offset - sum(coef*colMeans(x))
     names(coef) <- dimnames(x)[[2]]
 
 	  # Sort the data
@@ -125,7 +125,7 @@ AIPW_fit <- AIPW_agreg_cpp(maxiter,
 	    sx <- as.matrix(x[ord,])
             sid <- id[ord]
 	    soffset <- offset[ord]
-	    score <- exp( sx %*% coef + soffset)
+	    score <- exp( lp[ord])
 	    sR <- R[ord]
 	    smarker <- as.matrix(marker[ord,])
 	    smarker[is.na(smarker)] <- -999

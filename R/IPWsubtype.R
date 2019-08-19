@@ -487,7 +487,7 @@ IPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom")
         x <- fit$x
         weights <- fit$weights
         strata <- fit$strata
-        lp <- fit$linear.predictors + sum(fit$coefficients * fit$means)
+        lp <- fit$linear.predictors
 
         nused <- nrow(y)
         nvar <- ncol(x)
@@ -514,7 +514,7 @@ IPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom")
             }
         }
 
-        print(length(ord))
+
         if (ny == 2) {
             time2 <- time[ord]
             status2 <- status[ord]

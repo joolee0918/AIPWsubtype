@@ -184,7 +184,7 @@ subtype <- function(formula, data, id,  marker_name, marker_rr = NULL,
   }else {
     stratum <- fit$strata
   }
-  lp <- fit$linear.predictors + sum(fit$coefficients * fit$means)
+  lp <- fit$linear.predictors
   s0 <- exp(lp)
   basehaz <- baseHaz(fit$y, stratum, s0)
 

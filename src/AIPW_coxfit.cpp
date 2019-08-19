@@ -46,7 +46,7 @@ Rcpp::List AIPW_coxfit_cpp(int maxiter, NumericVector time, IntegerVector status
 
   arma::mat imat(nvar, nvar), cmat(nvar, nvar), cmat2(nvar, nvar);
   NumericVector a(nvar), newbeta(nvar), a2(nvar);
-  NumericVector scale(nvar), u2(nvar);
+  NumericVector u2(nvar);
   NumericVector score(nused), means(nvar);
   double zgamma, tmp_denom;
 
@@ -270,6 +270,7 @@ Rcpp::List AIPW_coxfit_cpp(int maxiter, NumericVector time, IntegerVector status
    **  much more stable.
    */
 
+/* Do not scaling! */
 
   temp2 = nused;
 
@@ -280,26 +281,9 @@ Rcpp::List AIPW_coxfit_cpp(int maxiter, NumericVector time, IntegerVector status
     temp /= temp2;
     means[i] = temp;
     for (person=0; person<nused; person++) covar(person, i) -=temp;
-    if (doscale==1) {  /* and also scale it */
-  temp =0;
-      for (person=0; person<nused; person++) {
-        temp +=  fabs(covar(person, i));
-      }
-      if (temp > 0) temp = temp2/temp;   /* scaling */
-  else temp=1.0; /* rare case of a constant covariate */
-  scale[i] = temp;
-  for (person=0; person<nused; person++) {
-    covar(person, i) *= temp;
-  }
-    }
+
   }
 
-  if (doscale==1) {
-    for (i=0; i<nvar; i++) beta[i] /= scale[i]; /*rescale initial betas */
-  }
-  else {
-    for (i=0; i<nvar; i++) scale[i] = 1.0;
-  }
 
 
   /*
@@ -452,15 +436,6 @@ Rcpp::List AIPW_coxfit_cpp(int maxiter, NumericVector time, IntegerVector status
 
   if (maxiter == 0 || is_na(loglik)[0] || 0 != is_infinite(loglik)[0]) {
     conv = 0;
-    for (i=0; i<nvar; i++) {
-      beta[i] *= scale[i];  /*return to original scale */
-    u[i] /= scale[i];
-    imat(i, i) *= scale[i]*scale[i];
-  for (j=0; j<i; j++) {
-    imat(j, i) *= scale[i]*scale[j];
-    imat(i, j) = imat(j, i);
-  }
-    }
     goto finish;
   }
   /*
@@ -597,16 +572,6 @@ Rcpp::List AIPW_coxfit_cpp(int maxiter, NumericVector time, IntegerVector status
 
       imat = arma::inv(imat); /* Inverse matrix */
       conv = 1;
-      for (i=0; i<nvar; i++) {
-        beta[i] = newbeta[i]*scale[i];
-        u[i] /= scale[i];
-        imat(i, i) *= scale[i]*scale[i];
-        for (j=0; j<i; j++) {
-          imat(j, i) *= scale[i]*scale[j];
-          imat(i, j) = imat(j ,i);
-        }
-      }
-
       goto finish;
     }
     /*
@@ -665,18 +630,6 @@ Rcpp::List AIPW_coxfit_cpp(int maxiter, NumericVector time, IntegerVector status
   }
   imat = arma::inv(imat); /* Inverse matrix */
   conv = 2;
-
-  for (i=0; i<nvar; i++) {
-    beta[i] = newbeta[i]*scale[i];
-    u[i] /= scale[i];
-    imat(i, i) *= scale[i]*scale[i];
-    for (j=0; j<i; j++) {
-      imat(j, i) *= scale[i]*scale[j];
-      imat(i, j) = imat(j, i);
-    }
-  }
-
-
   finish:
 
     /* Calculate Ithealp , Ithegam */

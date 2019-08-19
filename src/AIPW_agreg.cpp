@@ -263,6 +263,30 @@ Rcpp::List AIPW_agreg_cpp(int maxiter, NumericVector start, NumericVector tstop,
   }
 
   /*
+   ** Subtract the mean from each covar, as this makes the variance
+   **  computation much more stable.  The mean is taken per stratum,
+   **  No scaling
+   */
+  for (i=0; i<nvar; i++) {
+    person=0;
+    for (istrat=0; istrat<nstrat; istrat++) {
+      temp=0;
+      temp2 =0;
+      for (k=person; k<strata[istrat]; k++) {
+        j = sort2[k];
+        temp +=  covar(j, i);
+        temp2 += 1;
+      }
+      temp /= temp2;   /* mean for this covariate, this strata */
+  for (; person< strata[istrat]; person++) {
+    j = sort2[person];
+    covar(j, i) -=temp;
+  }
+    }
+
+  }
+
+  /*
    ** do the initial iteration step
    */
 
