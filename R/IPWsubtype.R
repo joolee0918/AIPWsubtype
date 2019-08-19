@@ -462,8 +462,6 @@ IPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom")
 
     newformula <- update.formula(formula, paste("~.+", order_bl, order_rr, "+", "cluster", "(", id, ")"))
 
-    newformula <- update.formula(formula, paste("~.+", order_bl, order_rr)) , "+", "cluster", "(", id, ")"))
-
 
     fit <- coxph(formula = newformula, data = newdata, weights = 1/pi1, control = control, robust = T, model = TRUE, x = TRUE,
         method = "breslow", init=init)
