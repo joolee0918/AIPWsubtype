@@ -41,7 +41,8 @@ AIPW_agreg.fit <- function(x, y, eventid, id, strata, offset, whereX, whereW, in
     status <- y[,ny,drop=TRUE]
 
 
-    x <- as.matrix(x)
+    print(head(x))
+    xx <- as.matrix(x)
     pR <- as.matrix(pR)
     marker <- as.matrix(marker)
     if (nvar==0) {
@@ -72,7 +73,7 @@ AIPW_fit <- AIPW_agreg_cpp(maxiter,
         start,
 	      stop,
 	      status,
-        x,
+        xx,
 	      eventid,
 	      id,
         offset,
@@ -123,7 +124,7 @@ AIPW_fit <- AIPW_agreg_cpp(maxiter,
 	    newstrat[n] <- 1
 
 	    sy <- as.matrix(y[ord,])
-	    sx <- as.matrix(x[ord,])
+	    sx <- as.matrix(xx[ord,])
       sid <- id[ord]
 	    soffset <- offset[ord]
 	    score <- exp( lp[ord])
