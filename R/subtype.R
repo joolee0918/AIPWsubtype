@@ -110,7 +110,7 @@ subtype <- function(formula, data, id,  marker_name, marker_rr = NULL,
   }
 
   newcause <- unlist(lapply(1:n, function(i) lf(cause[i])))
-  newdata <- ccdata[rep(1:n, each = on_subtype), ]
+  newdata <- data[rep(1:n, each = on_subtype), ]
   newdata[, event] <- rep(0, n*on_subtype)
   newdata[seq(1, n*on_subtype, by=on_subtype), event] <- data[, event]
   newdata[, marker_name] <- data.frame(ototal_subtype[newcause, ])
