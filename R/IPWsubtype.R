@@ -183,11 +183,21 @@ IPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom")
     ototal_subtype <- total_subtype[sort(tmpmar),]
     on_subtype <- nrow(ototal_subtype)
 
-    cause <- rep(NA, n)
-    cause <- findcause(R, cause, data[, event], as.matrix(marker), on_subtype, as.matrix(ototal_subtype))
+    ccdata <- data[R == 1, ]
+    ndata <- nrow(ccdata)
+    missing_prob <- rep(1, ndata)
+    newedata <- ccdata[ccdata[, event] == 1, ]
+    nnevent <- nrow(newedata)
+    nuniqid <- unique(ccdata[, id])
+    newmarker <- as.data.frame(marker[R == 1, ])
+    names(newmarker) <- marker_name
+
+    cause <- rep(NA, ndata)
+    cause <- findcause(rep(1,ndata), cause, ccdata[, event], as.matrix(newmarker), on_subtype, as.matrix(ototal_subtype))
 
     # observed cause
     ocause <- sort(unique(cause))
+
 
     for (i in 1:n_marker) {
       marker[, i] <- factor(marker[, i])
@@ -270,14 +280,6 @@ IPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom")
 
     }
 
-    ccdata <- data[R == 1, ]
-    ndata <- nrow(ccdata)
-    missing_prob <- rep(1, ndata)
-    newedata <- ccdata[ccdata[, event] == 1, ]
-    nnevent <- nrow(newedata)
-    nuniqid <- unique(ccdata[, id])
-    newmarker <- as.data.frame(marker[R == 1, ])
-    names(newmarker) <- marker_name
 
 
 
@@ -373,13 +375,14 @@ IPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom")
       res
     }
 
+
     newcause <- unlist(lapply(1:ndata, function(i) lf(cause[i])))
     ccdata$pi1 <- p1
     newdata <- ccdata[rep(1:ndata, each = on_subtype), ]
     newdata[, event] <- rep(0, ndata*on_subtype)
     newdata[seq(1, ndata*on_subtype, by=on_subtype), event] <- ccdata[, event]
     newdata[, marker_name] <- data.frame(ototal_subtype[newcause, ])
-    dpR <- dpR[rep(seq_len(nrow(dpR)), each = n_subtype), ]
+    dpR <- dpR[rep(seq_len(nrow(dpR)), each = on_subtype), ]
 
     term_marker <- rep(0, n_marker)
 
@@ -464,8 +467,8 @@ IPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom")
     newformula <- update.formula(formula, paste("~.+", order_bl, order_rr, "+", "cluster", "(", id, ")"))
 
 
-    fit <- coxph(formula = newformula, data = newdata, weights = 1/pi1, control = control, robust = T, model = TRUE, x = TRUE,
-        method = "breslow", init=init)
+    fit <- coxph(formula = newformula, data = newdata, weights = 1/pi1, control = control, robust = T, model = TRUE, x = TRUE, method = "breslow", init=init)
+
     if (!is.null(fit$fail)) {
         fit <- list(fail = fit)
         class(fit) <- "IPWcprisk"
