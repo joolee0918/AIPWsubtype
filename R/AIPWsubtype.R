@@ -220,6 +220,7 @@ AIPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom"
     data$R <- R
     edata <- data[data[, event] == 1, ]
     eventid <- edata[, id]
+    eventrid <- edata[, "rowid"]
     nevent <- nrow(edata)
     obseid <- data[R == 1 & data[, event] == 1, id]
 
@@ -503,7 +504,7 @@ AIPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom"
     gamma <- model_subtype$coefficients
     ngamma <- length(gamma)
 
-    newformula <- update.formula(formula, paste("~.+", order_bl, order_rr, "+", "cluster", "(", id, ")"))
+    newformula <- update.formula(formula, paste("~.+", order_bl, order_rr, "+", "cluster", "(", "rowid", ")"))
     mf <- model.frame(newformula, data = newdata)
     special <- c("strata", "cluster")
     Terms <- terms(newformula, special)
@@ -693,8 +694,8 @@ AIPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom"
 
         Igam <- vcov(model_subtype)
 
-        Salp = as.data.frame(uniqid)
-        names(Salp) <- id
+        Salp = as.data.frame(data$rowid)
+        names(Salp) <- "rowid"
 
         if(missing_model == "multinom"){
           Ialp <- as.matrix(vcov(model_missing[[1]]))
@@ -729,34 +730,34 @@ AIPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom"
         }
 
         if (two_stage == FALSE) {
-          Ualp <- cbind(eventid, Ualp)
+          Ualp <- cbind(eventrid, Ualp)
           colnames(Ualp)[1] <- id
         } else {
-          Ualp <- cbind(edata[edata[, tstage_name] == 1, id], Ualp)
-          colnames(Ualp)[1] <- id
-          Ualp_ts <- cbind(eventid, Ualp_ts)
-          colnames(Ualp_ts)[1] <- id
-          Ualp <- suppressWarnings(merge(Ualp, Ualp_ts, by = id, all = T))
+          Ualp <- cbind(edata[edata[, tstage_name] == 1, "rowid"], Ualp)
+          colnames(Ualp)[1] <- "rowid"
+          Ualp_ts <- cbind(eventrid, Ualp_ts)
+          colnames(Ualp_ts)[1] <- "rowid"
+          Ualp <- suppressWarnings(merge(Ualp, Ualp_ts, by = "rowid", all = T))
           Ualp[is.na(Ualp)] <- 0
         }
 
-        Salp <- suppressWarnings(merge(Salp, Ualp, by = id, all = T))
+        Salp <- suppressWarnings(merge(Salp, Ualp, by = "rowid", all = T))
         Salp[is.na(Salp)] <- 0
         Salp <- as.matrix(Salp[, -1])
 
-        Sgam <- as.data.frame(uniqid)
-        names(Sgam) <- id
+        Sgam <- as.data.frame(data$rowid)
+        names(Sgam) <- "rowid"
 
         subset_data <- cbind(subset_data, s_X)
-        s0 <- by(subset_data, subset_data[, id], function(x) sum(exp(x$lp)))
-        s1 <- by(subset_data, subset_data[, id], function(x) t(x[, colnames(s_X)]  ) %*% exp(x$lp))
-        term1 <- by(subset_data, subset_data[, id], function(x) x[, colnames(s_X)][x[, event] == 1, ]  )
+        s0 <- by(subset_data, subset_data[, "rowid"], function(x) sum(exp(x$lp)))
+        s1 <- by(subset_data, subset_data[, "rowid"], function(x) t(x[, colnames(s_X)]  ) %*% exp(x$lp))
+        term1 <- by(subset_data, subset_data[, "rowid"], function(x) x[, colnames(s_X)][x[, event] == 1, ]  )
         Ugam <- lapply(1:length(term1), function(i) term1[[i]] - s1[[i]]/s0[[i]])
         Ugam <- as.matrix(rbindlist(Ugam))
         Ugam <- cbind(as.numeric(names(term1)), Ugam)
-        colnames(Ugam)[1] <- id
+        colnames(Ugam)[1] <- "rowid"
 
-        Sgam <- suppressWarnings(merge(Sgam, Ugam, by = id, all = T))
+        Sgam <- suppressWarnings(merge(Sgam, Ugam, by = "rowid", all = T))
         Sgam[is.na(Sgam)] <- 0
         Sgam <- as.matrix(Sgam[, -1])
 

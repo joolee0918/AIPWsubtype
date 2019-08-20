@@ -281,7 +281,7 @@ Rcpp::List AIPW_agreg_cpp(int maxiter, NumericVector start, NumericVector tstop,
 */
 
   NumericMatrix stratm(nstrat, nvar);
-  NumericMatrix covar2 = covar;
+
   for (i=0; i<nvar; i++) {
     person=0;
     for (istrat=0; istrat<nstrat; istrat++) {
