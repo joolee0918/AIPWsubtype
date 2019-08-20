@@ -292,7 +292,7 @@ Rcpp::List AIPW_agreg_cpp(int maxiter, NumericVector start, NumericVector tstop,
         temp2 += 1;
       }
       temp /= temp2;   /* mean for this covariate, this strata */
-  for (; person< strata[istrat]; person++) {
+ /* for (; person< strata[istrat]; person++) {
     j = sort2[person];
     covar(j, i) -=temp;
   }
