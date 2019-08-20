@@ -700,8 +700,6 @@ AIPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom"
 
         tmp_id = edata[, id]
 
-        print(missing_model)
-
         if(missing_model == "multinom"){
           Ialp <- as.matrix(vcov(model_missing[[1]]))
           class(Ialp) <- "matrix"

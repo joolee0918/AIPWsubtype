@@ -929,6 +929,7 @@ Rcpp::List AIPW_agreg_cpp(int maxiter, NumericVector start, NumericVector tstop,
    ** create the output list
    */
   List rlist = List::create(Named("coef") = beta,
+    Named("means") = means,
     Named("u") = u,
     Named("imat") = imat,
     Named("Ithegam") = Ithegam,
