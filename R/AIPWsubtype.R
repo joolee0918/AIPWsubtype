@@ -694,12 +694,19 @@ AIPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom"
 
         Igam <- vcov(model_subtype)
 
-        Salp = as.data.frame(data$rowid)
-        names(Salp) <- "rowid"
+
+        Salp = as.data.frame(data[, id])
+        names(Salp) <- id
+
+        Salp = as.data.frame(uniqid)
+        names(Salp) <- id
+
+        tmp_id = edata[, id]
+
+
 
         if(missing_model == "multinom"){
-          Ialp <- as.matrix(vcov(model_missing[[1]]))
-          class(Ialp) <- "matrix"
+          Ialp <- vcov(model_missing[[1]])
           Ualp <- estfun(model_missing[[1]])
 
           if(two_stage == TRUE){
@@ -707,6 +714,8 @@ AIPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom"
             Ialp <- as.matrix(Ialp)
             Ualp_ts <- estfun(model_missing[[2]])
           }
+
+
         } else{
 
           Ialp <- vcov(model_missing[[1]])
@@ -730,36 +739,37 @@ AIPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom"
         }
 
         if (two_stage == FALSE) {
-          Ualp <- cbind(eventrid, Ualp)
+          Ualp <- cbind(tmp_id, Ualp)
           colnames(Ualp)[1] <- id
         } else {
-          Ualp <- cbind(edata[edata[, tstage_name] == 1, "rowid"], Ualp)
-          colnames(Ualp)[1] <- "rowid"
-          Ualp_ts <- cbind(eventrid, Ualp_ts)
-          colnames(Ualp_ts)[1] <- "rowid"
-          Ualp <- suppressWarnings(merge(Ualp, Ualp_ts, by = "rowid", all = T))
+          Ualp <- cbind(edata[edata[, tstage_name] == 1, id], Ualp)
+          colnames(Ualp)[1] <- id
+          Ualp_ts <- cbind(tmp_id, Ualp_ts)
+          colnames(Ualp_ts)[1] <- id
+          Ualp <- suppressWarnings(merge(Ualp, Ualp_ts, by = id, all = T))
           Ualp[is.na(Ualp)] <- 0
         }
 
-        Salp <- suppressWarnings(merge(Salp, Ualp, by = "rowid", all = T))
+        Salp <- suppressWarnings(merge(Salp, Ualp, by = id, all = T))
         Salp[is.na(Salp)] <- 0
         Salp <- as.matrix(Salp[, -1])
 
-        Sgam <- as.data.frame(data$rowid)
-        names(Sgam) <- "rowid"
+        Sgam <- as.data.frame(uniqid)
+        names(Sgam) <- id
 
         subset_data <- cbind(subset_data, s_X)
-        s0 <- by(subset_data, subset_data[, "rowid"], function(x) sum(exp(x$lp)))
-        s1 <- by(subset_data, subset_data[, "rowid"], function(x) t(x[, colnames(s_X)]  ) %*% exp(x$lp))
-        term1 <- by(subset_data, subset_data[, "rowid"], function(x) x[, colnames(s_X)][x[, event] == 1, ]  )
+        s0 <- by(subset_data, subset_data[, id], function(x) sum(exp(x$lp)))
+        s1 <- by(subset_data, subset_data[, id], function(x) t(x[, colnames(s_X)]) %*% exp(x$lp))
+        term1 <- by(subset_data, subset_data[, id], function(x) x[, colnames(s_X)][x[, event] == 1, ])
         Ugam <- lapply(1:length(term1), function(i) term1[[i]] - s1[[i]]/s0[[i]])
         Ugam <- as.matrix(rbindlist(Ugam))
         Ugam <- cbind(as.numeric(names(term1)), Ugam)
-        colnames(Ugam)[1] <- "rowid"
+        colnames(Ugam)[1] <- id
 
-        Sgam <- suppressWarnings(merge(Sgam, Ugam, by = "rowid", all = T))
+        Sgam <- suppressWarnings(merge(Sgam, Ugam, by = id, all = T))
         Sgam[is.na(Sgam)] <- 0
         Sgam <- as.matrix(Sgam[, -1])
+
 
         resid <- fit$resid - as.matrix(Sgam) %*% Igam %*% t(fit$Ithegam) - as.matrix(Salp) %*% Ialp %*% t(fit$Ithealp)
         var <- fit$naive.var %*% t(resid) %*% resid %*% fit$naive.var

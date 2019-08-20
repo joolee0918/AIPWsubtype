@@ -187,7 +187,7 @@ subtype <- function(formula, data, id,  marker_name, marker_rr = NULL,
   }
 
 
-  newformula <- update.formula(formula, paste("~.+", order_bl, order_rr, "+", "cluster", "(", "rowid", ")"))
+  newformula <- update.formula(formula, paste("~.+", order_bl, order_rr, "+", "cluster", "(", id, ")"))
   fit <- coxph(formula = newformula, data = newdata, control = control, robust = T, method = "breslow", model = rmodel, x = TRUE)
 
   if(is.null(fit$strata)) {
