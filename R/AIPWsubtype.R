@@ -479,8 +479,8 @@ AIPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom"
     Xformula <- as.formula(paste("~", order_bl, order_rr))
 
     Xterms <- terms(Xformula)
-    eid <- newdata[newdata[, event]==1, "rowid"]
-    subset_data <- newdata[ newdata[, "rowid"] %in% eid & newdata[, id] %in% obseid, ]
+    eid <- newdata[newdata[, event]==1, id]
+    subset_data <- newdata[ newdata[, id] %in% eid & newdata[, id] %in% obseid, ]
     s_X <- model.matrix(Xformula, data = subset_data)
 
     drop_bl <- NULL
