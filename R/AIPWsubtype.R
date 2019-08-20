@@ -361,7 +361,9 @@ AIPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom"
 
     for (r in 1:fonR) {
         a = 1
-        for (k in 1:nvecR) {
+        tt <- matrix(0, nrow = nevent, ncol = nalp)
+
+           for (k in 1:nvecR) {
             b <- length(model_missing[[k]]$coefficients)
             tmp <- model.matrix(model_missing[[k]]$formula, edata) * predict(model_missing[[k]], newdata = edata,
                 type = "response")/(1 + exp(predict(model_missing[[k]], newdata = edata))) * apply(as.matrix(est_pi[[r]][,
