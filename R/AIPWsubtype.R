@@ -695,18 +695,16 @@ AIPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom"
         Igam <- vcov(model_subtype)
 
 
-        Salp = as.data.frame(data[, id])
-        names(Salp) <- id
-
         Salp = as.data.frame(uniqid)
         names(Salp) <- id
 
         tmp_id = edata[, id]
 
-
+        print(missing_model)
 
         if(missing_model == "multinom"){
-          Ialp <- vcov(model_missing[[1]])
+          Ialp <- as.matrix(vcov(model_missing[[1]]))
+          class(Ialp) <- "matrix"
           Ualp <- estfun(model_missing[[1]])
 
           if(two_stage == TRUE){
@@ -714,8 +712,6 @@ AIPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom"
             Ialp <- as.matrix(Ialp)
             Ualp_ts <- estfun(model_missing[[2]])
           }
-
-
         } else{
 
           Ialp <- vcov(model_missing[[1]])
@@ -763,13 +759,13 @@ AIPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom"
         term1 <- by(subset_data, subset_data[, id], function(x) x[, colnames(s_X)][x[, event] == 1, ])
         Ugam <- lapply(1:length(term1), function(i) term1[[i]] - s1[[i]]/s0[[i]])
         Ugam <- as.matrix(rbindlist(Ugam))
+
         Ugam <- cbind(as.numeric(names(term1)), Ugam)
         colnames(Ugam)[1] <- id
 
         Sgam <- suppressWarnings(merge(Sgam, Ugam, by = id, all = T))
         Sgam[is.na(Sgam)] <- 0
         Sgam <- as.matrix(Sgam[, -1])
-
 
         resid <- fit$resid - as.matrix(Sgam) %*% Igam %*% t(fit$Ithegam) - as.matrix(Salp) %*% Ialp %*% t(fit$Ithealp)
         var <- fit$naive.var %*% t(resid) %*% resid %*% fit$naive.var
