@@ -328,6 +328,7 @@ IPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom")
 
 
     } else{
+      newedata <- cbind(edata, missing_data[data[, event]==1 & R==1,])
 
       nalp = 0
       for (k in 1:nvecR) {
