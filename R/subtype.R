@@ -85,6 +85,7 @@ subtype <- function(formula, data, id,  marker_name, marker_rr = NULL,
   on_subtype <- nrow(ototal_subtype)
 
   cause <- rep(NA, n)
+  R <- rep(1, n)
   cause <- findcause(R, cause, data[, event], as.matrix(marker), on_subtype, as.matrix(ototal_subtype))
 
   # observed cause
