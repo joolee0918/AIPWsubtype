@@ -673,6 +673,7 @@ AIPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom"
         fitter <- get("AIPW_agreg.fit")
     }
 
+    print(head(X))
 
     fit <- fitter(x = X, y = Y, eventid = eventid, id = newid, strata = strats, offset = offset, whereX = whereX,
         whereW = whereW, init = init, control = control, marker = newmarker, gamma = gamma, pR = pR, R = R,

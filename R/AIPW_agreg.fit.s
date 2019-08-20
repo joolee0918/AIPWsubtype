@@ -109,6 +109,7 @@ AIPW_fit <- AIPW_agreg_cpp(maxiter,
         warning("Ran out of iterations and did not converge")
     }
     lp <- c(x %*% coef) + offset - sum(coef*AIPW_fit$means)
+
     names(coef) <- dimnames(x)[[2]]
 
 	  # Sort the data
