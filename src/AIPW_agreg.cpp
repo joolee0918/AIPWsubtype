@@ -268,17 +268,18 @@ Rcpp::List AIPW_agreg_cpp(int maxiter, NumericVector start, NumericVector tstop,
    **  No scaling
    */
 
-/*  temp2 = nused;
+  NumericMatrix covar2 = covar;
+  temp2 = nused;
 
   for (i=0; i<nvar; i++) {
     temp=0;
     for (person=0; person<nused; person++)
-      temp += covar(person, i);
+      temp += covar2(person, i);
     temp /= temp2;
     means[i] = temp;
+    for (person=0; person<nused; person++) covar2(person, i) -=temp;
 
   }
-*/
 
   NumericMatrix stratm(nstrat, nvar);
 
@@ -873,16 +874,16 @@ Rcpp::List AIPW_agreg_cpp(int maxiter, NumericVector start, NumericVector tstop,
 
           for (r = 1; r < nR; r++) {
             for (l = 0; l < nX; l++) {
-              Ecov(r - 1, whereX[l] - 1) = covar(p, whereX[l] - 1);
+              Ecov(r - 1, whereX[l] - 1) = covar2(p, whereX[l] - 1);
             }
             for (l = 0; l < nW; l++) {
-              Ecov(r - 1, whereW[l] - 1) = covar(p, whereW[l] - 1);
+              Ecov(r - 1, whereW[l] - 1) = covar2(p, whereW[l] - 1);
             }
           }
 
           for (r = 1; r < nR; r++) {
             for (i = 0; i < ngamma; i++) {
-              Ecov(r - 1, nX + nW + i) = EZ[(r - 1) * ngamma * nevent + i * nevent + pid] - stratm(istrat, nX + nW + i); // - means[nX + nW + i];
+              Ecov(r - 1, nX + nW + i) = EZ[(r - 1) * ngamma * nevent + i * nevent + pid] -  - means[nX + nW + i];
               for (k = 0; k < ngamma; k++) {
                 dEcov[(r - 1) * nvar * ngamma + (nX + nW + i) * ngamma + k] = dEZ[(r - 1) * ngamma * nevent * ngamma + i * nevent * ngamma + pid * ngamma + k];
               }
@@ -892,7 +893,7 @@ Rcpp::List AIPW_agreg_cpp(int maxiter, NumericVector start, NumericVector tstop,
           for (i = 0; i < nvar; i++) {
             if (R[p] == 1) {
               for (h = 0; h < nalp; h++) {
-                Ithealp(i, h) += 1 / pow(pR(pid, 0), 2) * dpR_tmp(0, h) * covar(p, i);
+                Ithealp(i, h) += 1 / pow(pR(pid, 0), 2) * dpR_tmp(0, h) * covar2(p, i);
                 for (r = 1; r < nR; r++) {
                   Ithealp(i, h) += dpR_tmp(r, h) / pR(pid, 0) * Ecov(r - 1, i);
                   Ithealp(i, h) -= pR(pid, r) * dpR_tmp(0, h) / pow(pR(pid, 0), 2) * Ecov(r - 1, i);
