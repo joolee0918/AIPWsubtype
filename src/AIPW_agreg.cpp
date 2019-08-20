@@ -301,7 +301,7 @@ Rcpp::List AIPW_agreg_cpp(int maxiter, NumericVector start, NumericVector tstop,
     }
 
   }
-*/
+
   /*
    ** do the initial iteration step
    */
