@@ -269,17 +269,6 @@ Rcpp::List AIPW_agreg_cpp(int maxiter, NumericVector start, NumericVector tstop,
    */
 
   NumericMatrix covar2 = covar;
-  temp2 = nused;
-
-  for (i=0; i<nvar; i++) {
-    temp=0;
-    for (person=0; person<nused; person++)
-      temp += covar2(person, i);
-    temp /= temp2;
-    means[i] = temp;
-    for (person=0; person<nused; person++) covar2(person, i) -=temp;
-
-  }
 
   NumericMatrix stratm(nstrat, nvar);
 
@@ -883,7 +872,7 @@ Rcpp::List AIPW_agreg_cpp(int maxiter, NumericVector start, NumericVector tstop,
 
           for (r = 1; r < nR; r++) {
             for (i = 0; i < ngamma; i++) {
-              Ecov(r - 1, nX + nW + i) = EZ[(r - 1) * ngamma * nevent + i * nevent + pid] -  means[nX + nW + i];
+              Ecov(r - 1, nX + nW + i) = EZ[(r - 1) * ngamma * nevent + i * nevent + pid] ;
               for (k = 0; k < ngamma; k++) {
                 dEcov[(r - 1) * nvar * ngamma + (nX + nW + i) * ngamma + k] = dEZ[(r - 1) * ngamma * nevent * ngamma + i * nevent * ngamma + pid * ngamma + k];
               }
