@@ -101,6 +101,8 @@ AIPW_fit <- AIPW_agreg_cpp(maxiter,
         second_cont_rr,
         init)
 
+print(head(x))
+
     var <- matrix(AIPW_fit$imat,nvar,nvar)
     coef <- AIPW_fit$coef
 
