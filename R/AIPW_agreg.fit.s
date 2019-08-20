@@ -41,7 +41,6 @@ AIPW_agreg.fit <- function(x, y, eventid, id, strata, offset, whereX, whereW, in
     status <- y[,ny,drop=TRUE]
 
 
-    print(head(x))
     x <- as.matrix(x)
     pR <- as.matrix(pR)
     marker <- as.matrix(marker)
@@ -101,7 +100,6 @@ AIPW_fit <- AIPW_agreg_cpp(maxiter,
         second_cont_rr,
         init)
 
-print(head(x))
 
     var <- matrix(AIPW_fit$imat,nvar,nvar)
     coef <- AIPW_fit$coef

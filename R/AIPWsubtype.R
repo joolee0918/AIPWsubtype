@@ -673,14 +673,12 @@ AIPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom"
         fitter <- get("AIPW_agreg.fit")
     }
 
-    print(head(X))
 
     fit <- fitter(x = X, y = Y, eventid = eventid, id = newid, strata = strats, offset = offset, whereX = whereX,
         whereW = whereW, init = init, control = control, marker = newmarker, gamma = gamma, pR = pR, R = R,
         dpR = dpR, nR = onR, total_R = ntotal_R, marker_r = nmarker_r, two_stage = two_stage, n_marker = nc_marker, first_cont_rr = first_cont_rr, second_cont_rr = second_cont_rr,
         second_cont_bl = second_cont_bl, rownames = row.names(mf), collapse = cluster)
 
-    print(head(X))
 
     if (is.character(fit)) {
         fit <- list(fail = fit)
