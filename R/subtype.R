@@ -43,12 +43,52 @@ subtype <- function(formula, data, id,  marker_name, marker_rr = NULL,
 
 
   data <- data[order(data[, id]), ]
+  data$rowid <- seq(1, nrow(data))
+
   n <- nrow(data)
   n_marker <- length(marker_name)
-  marker <- as.data.frame(data[, marker_name])
+  marker <- data.frame(data[, marker_name])
   names(marker) <- marker_name
   marker[marker == 0] <- NA
 
+  n_subtype = 1
+  for (i in 1:n_marker) {
+    n_subtype = n_subtype * (nlevels(factor(marker[, i])))
+  }
+
+
+  # possible marker combination
+
+  level_y = list()
+  for (k in 1:n_marker) {
+    level_y[[k]] <- seq(nlevels(factor(marker[, k])), 1)
+  }
+  tmpy <- list()
+  for (k in 1:n_marker) {
+    tmpy[[k]] <- as.vector(level_y[[k]])
+  }
+  total_subtype <- as.data.frame(expand.grid(tmpy))
+  names(total_subtype) <- marker_name
+
+  ## Data frame for cause
+
+  umarker <- unique(na.omit(marker))
+  tmpmar <- rep(0, nrow(umarker))
+  for(i in 1:nrow(umarker)){
+    for (j in 1:n_subtype) {
+      if (all(umarker[i, ] == total_subtype[j, 1:n_marker]))
+        tmpmar[i] <- j
+    }
+  }
+
+  ototal_subtype <- total_subtype[sort(tmpmar),]
+  on_subtype <- nrow(ototal_subtype)
+
+  cause <- rep(NA, n)
+  cause <- findcause(R, cause, data[, event], as.matrix(marker), on_subtype, as.matrix(ototal_subtype))
+
+  # observed cause
+  ocause <- sort(unique(cause))
 
   for (i in 1:n_marker) {
     marker[, i] <- factor(marker[, i])
@@ -56,51 +96,22 @@ subtype <- function(formula, data, id,  marker_name, marker_rr = NULL,
   marker <- as.data.frame(marker)
   data[, marker_name] <- marker
 
-  n_subtype = 1
-  for (i in 1:n_marker) {
-    n_subtype = n_subtype * (nlevels(factor(data[, marker_name[i]])))
-  }
-
-  # possible marker combination
-
-  level_y = list()
-  for (k in 1:n_marker) {
-    level_y[[k]] <- seq(nlevels(factor(data[, marker_name[k]])), 1)
-  }
-  tmpy = list()
-  for (k in 1:n_marker) {
-    tmpy[[k]] <- as.vector(level_y[[k]])
-  }
-  total_subtype <- as.data.frame(expand.grid(tmpy))
-
-  ## Data frame for cause
-
-  cause <- rep(0, n)
-  for (i in 1:n) {
-    if (anyNA(marker[i, ])) {
-      cause[i] <- NA
-    } else {
-      for (j in 1:n_subtype) {
-        if (all(marker[i, ] == total_subtype[j, 1:n_marker]))
-          cause[i] <- j
-      }
-    }
-  }
 
   event <- tail(survival:::terms.inner(formula[1:2]), 1)
   lf <- function(x) {
     if (!is.na(x)) {
-      res <- c(x, seq(1, n_subtype)[!(seq(1, n_subtype) %in% x)])
+      res <- c(x, ocause[!(ocause %in% x)])
     } else {
-      res <- seq(1, n_subtype)
+      res <- ocause
     }
     res
   }
+
   newcause <- unlist(lapply(1:n, function(i) lf(cause[i])))
-  newdata <- data[rep(1:n, each = n_subtype), ]
-  newdata[, event] <- rep(0, n*n_subtype)
-  newdata[seq(1, n*n_subtype, by=n_subtype), event] <- data[, event]
-  newdata[, marker_name] <- data.frame(total_subtype[newcause, ])
+  newdata <- ccdata[rep(1:n, each = on_subtype), ]
+  newdata[, event] <- rep(0, n*on_subtype)
+  newdata[seq(1, n*on_subtype, by=on_subtype), event] <- data[, event]
+  newdata[, marker_name] <- data.frame(ototal_subtype[newcause, ])
   term_marker <- rep(0, n_marker)
 
   for (i in 1:n_marker) term_marker[i] <- paste("factor(", marker_name[i], ")", sep = "")
@@ -176,7 +187,7 @@ subtype <- function(formula, data, id,  marker_name, marker_rr = NULL,
   }
 
 
-  newformula <- update.formula(formula, paste("~.+", order_bl, order_rr, "+", "cluster", "(", id, ")"))
+  newformula <- update.formula(formula, paste("~.+", order_bl, order_rr, "+", "cluster", "(", "rowid", ")"))
   fit <- coxph(formula = newformula, data = newdata, control = control, robust = T, method = "breslow", model = rmodel, x = TRUE)
 
   if(is.null(fit$strata)) {
@@ -189,7 +200,7 @@ subtype <- function(formula, data, id,  marker_name, marker_rr = NULL,
   basehaz <- baseHaz(fit$y, stratum, s0)
 
   fit$n <- n
-  fit$subtype = list(n_subtype = n_subtype, marker_name = marker_name, total_subtype = total_subtype, marker_rr = marker_rr)
+  fit$subtype = list(n_subtype = on_subtype, marker_name = marker_name, total_subtype = ototal_subtype, marker_rr = marker_rr)
   fit$basehaz <- basehaz
   fit$call <- Call
 
