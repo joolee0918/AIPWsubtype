@@ -680,6 +680,8 @@ AIPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom"
         dpR = dpR, nR = onR, total_R = ntotal_R, marker_r = nmarker_r, two_stage = two_stage, n_marker = nc_marker, first_cont_rr = first_cont_rr, second_cont_rr = second_cont_rr,
         second_cont_bl = second_cont_bl, rownames = row.names(mf), collapse = cluster)
 
+    print(head(X))
+
     if (is.character(fit)) {
         fit <- list(fail = fit)
         class(fit) <- "AIPWcprisk"
