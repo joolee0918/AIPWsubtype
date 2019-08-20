@@ -504,7 +504,7 @@ AIPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom"
     gamma <- model_subtype$coefficients
     ngamma <- length(gamma)
 
-    newformula <- update.formula(formula, paste("~.+", order_bl, order_rr, "+", "cluster", "(", "rowid", ")"))
+    newformula <- update.formula(formula, paste("~.+", order_bl, order_rr, "+", "cluster", "(", id, ")"))
     mf <- model.frame(newformula, data = newdata)
     special <- c("strata", "cluster")
     Terms <- terms(newformula, special)
