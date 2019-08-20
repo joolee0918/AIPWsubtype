@@ -268,7 +268,7 @@ Rcpp::List AIPW_agreg_cpp(int maxiter, NumericVector start, NumericVector tstop,
    **  No scaling
    */
 
-  NumericMatrix covar2 = covar;
+ /* NumericMatrix covar2 = covar;
 
   NumericMatrix stratm(nstrat, nvar);
 
@@ -283,7 +283,7 @@ Rcpp::List AIPW_agreg_cpp(int maxiter, NumericVector start, NumericVector tstop,
         temp2 += 1;
       }
       temp /= temp2;   /* mean for this covariate, this strata */
-      stratm(istrat, i) = temp;
+ /*     stratm(istrat, i) = temp;
   for (; person< strata[istrat]; person++) {
     j = sort2[person];
     covar(j, i) -=temp;
@@ -291,6 +291,28 @@ Rcpp::List AIPW_agreg_cpp(int maxiter, NumericVector start, NumericVector tstop,
     }
 
   }
+
+  */
+  /*
+   ** Subtract the mean from each covar, as this makes the regression
+   **  much more stable.
+   */
+
+  /* Do not scaling! */
+
+  temp2 = nused;
+
+  for (i=0; i<nvar; i++) {
+    temp=0;
+    for (person=0; person<nused; person++)
+      temp += covar(person, i);
+    temp /= temp2;
+    means[i] = temp;
+    for (person=0; person<nused; person++) covar(person, i) -=temp;
+
+  }
+
+
 
   /*
    ** do the initial iteration step
@@ -464,7 +486,7 @@ Rcpp::List AIPW_agreg_cpp(int maxiter, NumericVector start, NumericVector tstop,
           }
           for (r = 1; r < nR; r++) {
             for (i = 0; i < ngamma; i++) {
-              Ecov(r - 1, nX + nW + i) = EZ[(r - 1) * ngamma * nevent + i * nevent + pid] - stratm(istrat, nX + nW + i); //- means[nX + nW + i];
+              Ecov(r - 1, nX + nW + i) = EZ[(r - 1) * ngamma * nevent + i * nevent + pid] - means[nX + nW + i]; //- stratm(istrat, nX + nW + i); //
             }
           }
 
@@ -683,7 +705,7 @@ Rcpp::List AIPW_agreg_cpp(int maxiter, NumericVector start, NumericVector tstop,
             }
             for (r = 1; r < nR; r++) {
               for (i = 0; i < ngamma; i++) {
-                Ecov(r - 1, nX + nW + i) = EZ[(r - 1) * ngamma * nevent + i * nevent + pid] - stratm(istrat, nX + nW + i); // - means[nX + nW + i];
+                Ecov(r - 1, nX + nW + i) = EZ[(r - 1) * ngamma * nevent + i * nevent + pid] - means[nX + nW + i]; //- stratm(istrat, nX + nW + i); //
               }
             }
 
@@ -863,16 +885,16 @@ Rcpp::List AIPW_agreg_cpp(int maxiter, NumericVector start, NumericVector tstop,
 
           for (r = 1; r < nR; r++) {
             for (l = 0; l < nX; l++) {
-              Ecov(r - 1, whereX[l] - 1) = covar2(p, whereX[l] - 1);
+              Ecov(r - 1, whereX[l] - 1) = covar(p, whereX[l] - 1);
             }
             for (l = 0; l < nW; l++) {
-              Ecov(r - 1, whereW[l] - 1) = covar2(p, whereW[l] - 1);
+              Ecov(r - 1, whereW[l] - 1) = covar(p, whereW[l] - 1);
             }
           }
 
           for (r = 1; r < nR; r++) {
             for (i = 0; i < ngamma; i++) {
-              Ecov(r - 1, nX + nW + i) = EZ[(r - 1) * ngamma * nevent + i * nevent + pid] ;
+              Ecov(r - 1, nX + nW + i) = EZ[(r - 1) * ngamma * nevent + i * nevent + pid] - means[nX + nW + i]; ;
               for (k = 0; k < ngamma; k++) {
                 dEcov[(r - 1) * nvar * ngamma + (nX + nW + i) * ngamma + k] = dEZ[(r - 1) * ngamma * nevent * ngamma + i * nevent * ngamma + pid * ngamma + k];
               }
@@ -882,7 +904,7 @@ Rcpp::List AIPW_agreg_cpp(int maxiter, NumericVector start, NumericVector tstop,
           for (i = 0; i < nvar; i++) {
             if (R[p] == 1) {
               for (h = 0; h < nalp; h++) {
-                Ithealp(i, h) += 1 / pow(pR(pid, 0), 2) * dpR_tmp(0, h) * covar2(p, i);
+                Ithealp(i, h) += 1 / pow(pR(pid, 0), 2) * dpR_tmp(0, h) * covar(p, i);
                 for (r = 1; r < nR; r++) {
                   Ithealp(i, h) += dpR_tmp(r, h) / pR(pid, 0) * Ecov(r - 1, i);
                   Ithealp(i, h) -= pR(pid, r) * dpR_tmp(0, h) / pow(pR(pid, 0), 2) * Ecov(r - 1, i);
