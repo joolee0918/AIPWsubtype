@@ -212,6 +212,7 @@ IPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom")
     data$R <- R
     edata <- data[data[, event] == 1, ]
     eventid <- edata[, id]
+    eventrid <- edata[, "rowid"]
     nevent <- nrow(edata)
 
     model_missing <- list()
