@@ -80,6 +80,7 @@ Rcpp::List AIPW_agreg_cpp(int maxiter, NumericVector start, NumericVector tstop,
   NumericVector dEcov((nR - 1) * nvar * ngamma);
 
   beta = init_beta;
+  covar = clone(covar);
 
   for (person = 0; person < nused; person++) {
 
