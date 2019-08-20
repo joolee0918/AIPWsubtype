@@ -246,7 +246,7 @@ AIPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom"
       }
     } else{
 
-      edata <- cbind(edata, missing_data[data[data, event]==1,])
+      edata <- cbind(edata, missing_data[data[, event]==1,])
 
     model_missing <- list()
     tmp_model <- as.formula(paste(missing_name[1], paste(missing_formula[[1]], collapse = "")))
