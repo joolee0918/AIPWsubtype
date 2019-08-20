@@ -84,6 +84,8 @@ subtype <- function(formula, data, id,  marker_name, marker_rr = NULL,
   ototal_subtype <- total_subtype[sort(tmpmar),]
   on_subtype <- nrow(ototal_subtype)
 
+  event <- tail(survival:::terms.inner(formula[1:2]), 1)
+
   cause <- rep(NA, n)
   R <- rep(1, n)
   cause <- findcause(R, cause, data[, event], as.matrix(marker), on_subtype, as.matrix(ototal_subtype))
@@ -98,7 +100,6 @@ subtype <- function(formula, data, id,  marker_name, marker_rr = NULL,
   data[, marker_name] <- marker
 
 
-  event <- tail(survival:::terms.inner(formula[1:2]), 1)
   lf <- function(x) {
     if (!is.na(x)) {
       res <- c(x, ocause[!(ocause %in% x)])
