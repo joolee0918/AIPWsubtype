@@ -278,8 +278,9 @@ Rcpp::List AIPW_agreg_cpp(int maxiter, NumericVector start, NumericVector tstop,
     means[i] = temp;
 
   }
+*/
 
-
+  NumericMatrix stratm(nstrat, nvar);
   NumericMatrix covar2 = covar;
   for (i=0; i<nvar; i++) {
     person=0;
@@ -292,7 +293,8 @@ Rcpp::List AIPW_agreg_cpp(int maxiter, NumericVector start, NumericVector tstop,
         temp2 += 1;
       }
       temp /= temp2;   /* mean for this covariate, this strata */
- /* for (; person< strata[istrat]; person++) {
+      stratm(istrat, i) = temp;
+  for (; person< strata[istrat]; person++) {
     j = sort2[person];
     covar(j, i) -=temp;
   }
@@ -472,7 +474,7 @@ Rcpp::List AIPW_agreg_cpp(int maxiter, NumericVector start, NumericVector tstop,
           }
           for (r = 1; r < nR; r++) {
             for (i = 0; i < ngamma; i++) {
-              Ecov(r - 1, nX + nW + i) = EZ[(r - 1) * ngamma * nevent + i * nevent + pid] ; //- means[nX + nW + i];
+              Ecov(r - 1, nX + nW + i) = EZ[(r - 1) * ngamma * nevent + i * nevent + pid] - stratm(istrat, nX + nW + i); //- means[nX + nW + i];
             }
           }
 
@@ -691,7 +693,7 @@ Rcpp::List AIPW_agreg_cpp(int maxiter, NumericVector start, NumericVector tstop,
             }
             for (r = 1; r < nR; r++) {
               for (i = 0; i < ngamma; i++) {
-                Ecov(r - 1, nX + nW + i) = EZ[(r - 1) * ngamma * nevent + i * nevent + pid]; // - means[nX + nW + i];
+                Ecov(r - 1, nX + nW + i) = EZ[(r - 1) * ngamma * nevent + i * nevent + pid] - stratm(istrat, nX + nW + i); // - means[nX + nW + i];
               }
             }
 
@@ -880,7 +882,7 @@ Rcpp::List AIPW_agreg_cpp(int maxiter, NumericVector start, NumericVector tstop,
 
           for (r = 1; r < nR; r++) {
             for (i = 0; i < ngamma; i++) {
-              Ecov(r - 1, nX + nW + i) = EZ[(r - 1) * ngamma * nevent + i * nevent + pid]; // - means[nX + nW + i];
+              Ecov(r - 1, nX + nW + i) = EZ[(r - 1) * ngamma * nevent + i * nevent + pid] - stratm(istrat, nX + nW + i); // - means[nX + nW + i];
               for (k = 0; k < ngamma; k++) {
                 dEcov[(r - 1) * nvar * ngamma + (nX + nW + i) * ngamma + k] = dEZ[(r - 1) * ngamma * nevent * ngamma + i * nevent * ngamma + pid * ngamma + k];
               }
