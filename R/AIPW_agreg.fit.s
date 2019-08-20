@@ -42,14 +42,14 @@ AIPW_agreg.fit <- function(x, y, eventid, id, strata, offset, whereX, whereW, in
 
 
     print(head(x))
-    covar <- as.matrix(x)
+    x <- as.matrix(x)
     pR <- as.matrix(pR)
     marker <- as.matrix(marker)
     if (nvar==0) {
         # A special case: Null model.
         #  (This is why I need the rownames arg- can't use x' names)
         # Set things up for 0 iterations on a dummy variable
-        covar <- matrix(as.double(1:n), ncol=1)
+        x <- matrix(as.double(1:n), ncol=1)
         nullmodel <- TRUE
         nvar <- 1
         init <- 0
@@ -73,7 +73,7 @@ AIPW_fit <- AIPW_agreg_cpp(maxiter,
         start,
 	      stop,
 	      status,
-        covar,
+        x,
 	      eventid,
 	      id,
         offset,
@@ -126,7 +126,7 @@ print(head(x))
 	    newstrat[n] <- 1
 
 	    sy <- as.matrix(y[ord,])
-	    sx <- as.matrix(covar[ord,])
+	    sx <- as.matrix(x[ord,])
       sid <- id[ord]
 	    soffset <- offset[ord]
 	    score <- exp( lp[ord])
