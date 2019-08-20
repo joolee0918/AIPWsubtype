@@ -77,7 +77,7 @@ Rcpp::List AIPW_coxfit_cpp(int maxiter, NumericVector time, IntegerVector status
   NumericVector dEcov((nR - 1) * nvar * ngamma);
 
   beta = init_beta;
-
+  covar = clone(covar);
 
 
   for (person = 0; person < nused; person++) {
