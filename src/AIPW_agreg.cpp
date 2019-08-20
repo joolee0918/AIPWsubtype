@@ -46,7 +46,7 @@ Rcpp::List AIPW_agreg_cpp(int maxiter, NumericVector start, NumericVector tstop,
 
   arma::mat imat(nvar, nvar), cmat(nvar, nvar), cmat2(nvar, nvar);
   NumericVector a(nvar), newbeta(nvar), eta(nused), a2(nvar);
-  NumericVector scale(nvar), u2(nvar);
+  NumericVector means(nvar), u2(nvar);
   NumericVector score(nused);
   double zgamma, tmp_denom;
   IntegerVector keep(nused);
@@ -268,6 +268,18 @@ Rcpp::List AIPW_agreg_cpp(int maxiter, NumericVector start, NumericVector tstop,
    **  No scaling
    */
 
+  temp2 = nused;
+
+  for (i=0; i<nvar; i++) {
+    temp=0;
+    for (person=0; person<nused; person++)
+      temp += covar(person, i);
+    temp /= temp2;
+    means[i] = temp;
+
+  }
+
+
   NumericMatrix covar2 = covar;
   for (i=0; i<nvar; i++) {
     person=0;
@@ -460,7 +472,7 @@ Rcpp::List AIPW_agreg_cpp(int maxiter, NumericVector start, NumericVector tstop,
           }
           for (r = 1; r < nR; r++) {
             for (i = 0; i < ngamma; i++) {
-              Ecov(r - 1, nX + nW + i) = EZ[(r - 1) * ngamma * nevent + i * nevent + pid] + (covar(p, nX + nW + i) - covar2(p, nX + nW + i));
+              Ecov(r - 1, nX + nW + i) = EZ[(r - 1) * ngamma * nevent + i * nevent + pid] - means[nX + nW + i];
             }
           }
 
@@ -679,7 +691,7 @@ Rcpp::List AIPW_agreg_cpp(int maxiter, NumericVector start, NumericVector tstop,
             }
             for (r = 1; r < nR; r++) {
               for (i = 0; i < ngamma; i++) {
-                Ecov(r - 1, nX + nW + i) = EZ[(r - 1) * ngamma * nevent + i * nevent + pid] + (covar(p, nX + nW + i) - covar2(p, nX + nW + i));
+                Ecov(r - 1, nX + nW + i) = EZ[(r - 1) * ngamma * nevent + i * nevent + pid] - means[nX + nW + i];
               }
             }
 
@@ -868,7 +880,7 @@ Rcpp::List AIPW_agreg_cpp(int maxiter, NumericVector start, NumericVector tstop,
 
           for (r = 1; r < nR; r++) {
             for (i = 0; i < ngamma; i++) {
-              Ecov(r - 1, nX + nW + i) = EZ[(r - 1) * ngamma * nevent + i * nevent + pid] +  (covar(p, nX + nW + i) - covar2(p, nX + nW + i));
+              Ecov(r - 1, nX + nW + i) = EZ[(r - 1) * ngamma * nevent + i * nevent + pid] - means[nX + nW + i];
               for (k = 0; k < ngamma; k++) {
                 dEcov[(r - 1) * nvar * ngamma + (nX + nW + i) * ngamma + k] = dEZ[(r - 1) * ngamma * nevent * ngamma + i * nevent * ngamma + pid * ngamma + k];
               }
