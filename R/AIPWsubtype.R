@@ -478,7 +478,7 @@ AIPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom"
 
 
 
-    Xformula <- as.formula(paste("~", order_bl, order_rr))
+    Xformula <- as.formula(paste("~", order_bl))
 
     Xterms <- terms(Xformula)
     eid <- newdata[newdata[, event]==1, id]
