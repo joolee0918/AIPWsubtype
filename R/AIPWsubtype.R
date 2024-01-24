@@ -138,7 +138,7 @@ AIPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom"
 
     ### Marker
 
-    event <- tail(survival:::terms.inner(formula[1:2]), 1)
+    event <- tail(terms.inner(formula[1:2]), 1)
     Rmat <- matrix(1, nrow = n, ncol = n_marker)
     for (i in 1:n_marker) {
       Rmat[, i] <- ifelse(data[, event] == 1, 1 - as.integer(is.na(marker[, i])), 1)
