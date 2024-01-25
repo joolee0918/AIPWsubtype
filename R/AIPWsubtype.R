@@ -526,7 +526,7 @@ AIPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom"
          s_y <- subset_data[, event]
          s_uid <- subset_data[, id]
 
-          model_subtype <- clogit(s_y ~ s_X + strata(s_uid), , method="breslow")
+          model_subtype <- clogit(s_y ~ s_X + strata(s_uid), method="breslow")
      }
     subset_data$lp <- model_subtype$linear.predictors
 
