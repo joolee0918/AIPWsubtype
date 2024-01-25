@@ -478,35 +478,55 @@ AIPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom"
 
 
 
-    Xformula <- as.formula(paste("~", order_bl, order_rr))
-
-    Xterms <- terms(Xformula)
-    eid <- newdata[newdata[, event]==1, id]
-    subset_data <- newdata[ newdata[, id] %in% eid & newdata[, id] %in% obseid, ]
-    s_X <- model.matrix(Xformula, data = subset_data)
-
-    drop_bl <- NULL
-    if (second_cont_bl == FALSE & second_cont_rr == TRUE) {
-      drop_bl <- rep(0, ncol(pairm))
-      for (i in 1:ncol(pairm)) {
-        drop_bl[i] <- paste(term_marker[pairm[1, i]], term_marker[pairm[2, i]], sep = ":")
-      }
-      order_bl <- paste("-", paste(drop_bl, collapse = "-"))
-    }
-
-    whichdrop <- which(dimnames(attr(Xterms, "factors"))[[2]] %in% c(unconstvar, drop_bl))
-    xdrop <- attributes(s_X)$assign %in% c(0, whichdrop)
-    s_X <- s_X[, !xdrop, drop = FALSE]
-    s_y <- subset_data[, event]
-    s_uid <- subset_data[, id]
-
+    
     if(marker_formula==FALSE) {
-         model_subtype <- clogit(s_y ~ 1 + strata(s_uid))  
-         print(model_subtype)
+         Xformula <- as.formula(paste("~", order_bl))
+
+         Xterms <- terms(Xformula)
+         eid <- newdata[newdata[, event]==1, id]
+         subset_data <- newdata[ newdata[, id] %in% eid & newdata[, id] %in% obseid, ]
+         s_X <- model.matrix(Xformula, data = subset_data)
+
+         drop_bl <- NULL
+         if (second_cont_bl == FALSE & second_cont_rr == TRUE) {
+           drop_bl <- rep(0, ncol(pairm))
+           for (i in 1:ncol(pairm)) {
+             drop_bl[i] <- paste(term_marker[pairm[1, i]], term_marker[pairm[2, i]], sep = ":")
+           }
+           order_bl <- paste("-", paste(drop_bl, collapse = "-"))
+         }
+
+         whichdrop <- which(dimnames(attr(Xterms, "factors"))[[2]] %in% c(unconstvar, drop_bl))
+         xdrop <- attributes(s_X)$assign %in% c(0, whichdrop)
+         s_X <- s_X[, !xdrop, drop = FALSE]
+         s_y <- subset_data[, event]
+         s_uid <- subset_data[, id]
+         model_subtype <- clogit(s_y ~ s_X + strata(s_uid))  
          }
      else {
+          Xformula <- as.formula(paste("~", order_bl, order_rr))
+
+         Xterms <- terms(Xformula)
+         eid <- newdata[newdata[, event]==1, id]
+         subset_data <- newdata[ newdata[, id] %in% eid & newdata[, id] %in% obseid, ]
+         s_X <- model.matrix(Xformula, data = subset_data)
+
+         drop_bl <- NULL
+         if (second_cont_bl == FALSE & second_cont_rr == TRUE) {
+           drop_bl <- rep(0, ncol(pairm))
+           for (i in 1:ncol(pairm)) {
+             drop_bl[i] <- paste(term_marker[pairm[1, i]], term_marker[pairm[2, i]], sep = ":")
+           }
+           order_bl <- paste("-", paste(drop_bl, collapse = "-"))
+         }
+
+         whichdrop <- which(dimnames(attr(Xterms, "factors"))[[2]] %in% c(unconstvar, drop_bl))
+         xdrop <- attributes(s_X)$assign %in% c(0, whichdrop)
+         s_X <- s_X[, !xdrop, drop = FALSE]
+         s_y <- subset_data[, event]
+         s_uid <- subset_data[, id]
+
           model_subtype <- clogit(s_y ~ s_X + strata(s_uid))
-          print(model_subtype)
      }
     subset_data$lp <- model_subtype$linear.predictors
 
