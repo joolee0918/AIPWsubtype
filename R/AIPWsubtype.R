@@ -68,7 +68,7 @@
 #'
 #'
 #' @export
-AIPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom"), missing_formula, missing_indep = FALSE, two_stage = FALSE, tstage_name = NULL,
+AIPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom"), missing_formula, marker_formula, missing_indep = FALSE, two_stage = FALSE, tstage_name = NULL,
      marker_name, marker_rr = NULL, first_cont_rr = TRUE, second_cont_bl = FALSE,  second_cont_rr = FALSE, constvar = NULL, init, control, x = FALSE, y = TRUE, model = FALSE) {
 
 
@@ -500,7 +500,7 @@ AIPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom"
     s_y <- subset_data[, event]
     s_uid <- subset_data[, id]
 
-    model_subtype <- clogit(s_y ~ s_X + strata(s_uid))
+    model_subtype <- clogit(marker_fomula)  #s_y ~ s_X + strata(s_uid)
     subset_data$lp <- model_subtype$linear.predictors
 
     gamma <- model_subtype$coefficients
