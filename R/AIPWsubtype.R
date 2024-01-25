@@ -502,11 +502,11 @@ AIPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom"
 
     if(marker_formula==FALSE) {
          model_subtype <- clogit(s_y ~ 1 + strata(s_uid))  
-         print(summary(model_subtype))
+         summary(model_subtype)
          }
      else {
           model_subtype <- clogit(s_y ~ s_X + strata(s_uid))
-          print(summary(model_subtype))
+          summary(model_subtype)
      }
     subset_data$lp <- model_subtype$linear.predictors
 
