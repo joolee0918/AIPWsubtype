@@ -211,6 +211,7 @@ AIPW_fit <- AIPW_coxfit_cpp(control$iter.max,
     score0 = rr0,
     method='AIPW')
 
+    rm(AIPW_fit, resid)
     return(afit)
 
 }
