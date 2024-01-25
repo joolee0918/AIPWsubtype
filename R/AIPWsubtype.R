@@ -501,7 +501,7 @@ AIPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom"
          s_X <- s_X[, !xdrop, drop = FALSE]
          s_y <- subset_data[, event]
          s_uid <- subset_data[, id]
-         model_subtype <- clogit(s_y ~ s_X + strata(s_uid))  
+         model_subtype <- clogit(s_y ~ s_X + strata(s_uid), method="breslow")  
          }
      else {
           Xformula <- as.formula(paste("~", order_bl, order_rr))
@@ -526,7 +526,7 @@ AIPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom"
          s_y <- subset_data[, event]
          s_uid <- subset_data[, id]
 
-          model_subtype <- clogit(s_y ~ s_X + strata(s_uid))
+          model_subtype <- clogit(s_y ~ s_X + strata(s_uid), , method="breslow")
      }
     subset_data$lp <- model_subtype$linear.predictors
 
@@ -781,15 +781,20 @@ AIPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom"
         Sgam <- as.data.frame(uniqid)
         names(Sgam) <- id
 
-        subset_data <- cbind(subset_data, s_X)
-        s0 <- by(subset_data, subset_data[, id], function(x) sum(exp(x$lp)))
-        s1 <- by(subset_data, subset_data[, id], function(x) t(x[, colnames(s_X)]) %*% exp(x$lp))
-        term1 <- by(subset_data, subset_data[, id], function(x) x[, colnames(s_X)][x[, event] == 1, ])
-        Ugam <- lapply(1:length(term1), function(i) term1[[i]] - s1[[i]]/s0[[i]])
-        Ugam <- as.matrix(rbindlist(Ugam))
-
-        Ugam <- cbind(as.numeric(names(term1)), Ugam)
+        tmp <- as.data.frame(estfun(model_subtype))
+        tmp$id <- subset_data[, id]
+        Ugam <- aggregate(.~id, tmp, sum)
         colnames(Ugam)[1] <- id
+         
+        #subset_data <- cbind(subset_data, s_X)
+        #s0 <- by(subset_data, subset_data[, id], function(x) sum(exp(x$lp)))
+        #s1 <- by(subset_data, subset_data[, id], function(x) t(x[, colnames(s_X)]) %*% exp(x$lp))
+        #term1 <- by(subset_data, subset_data[, id], function(x) x[, colnames(s_X)][x[, event] == 1, ])
+        #Ugam <- lapply(1:length(term1), function(i) term1[[i]] - s1[[i]]/s0[[i]])
+        #Ugam <- as.matrix(rbindlist(Ugam))
+
+        #Ugam <- cbind(as.numeric(names(term1)), Ugam)
+        #colnames(Ugam)[1] <- id
 
         Sgam <- suppressWarnings(merge(Sgam, Ugam, by = id, all = T))
         Sgam[is.na(Sgam)] <- 0
