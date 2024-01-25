@@ -500,7 +500,8 @@ AIPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom"
     s_y <- subset_data[, event]
     s_uid <- subset_data[, id]
 
-    model_subtype <- clogit(as.formula(marker_formula))  #s_y ~ s_X + strata(s_uid)
+    if(marker_formula==FALSE) model_subtype <- clogit(s_y ~ 1 + strata(s_uid))  
+     else model_subtype <- clogit(s_y ~ s_X + strata(s_uid))  
     subset_data$lp <- model_subtype$linear.predictors
 
     gamma <- model_subtype$coefficients
