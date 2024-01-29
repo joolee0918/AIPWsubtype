@@ -55,6 +55,10 @@ Rcpp::List AIPW_coxfit_cpp(int maxiter, NumericVector time, IntegerVector status
   ny = ny_rr = n_marker;
   if (second_cont_bl == TRUE) ny = ny + two_y;
   if (second_cont_rr == TRUE) ny_rr = ny + two_y;
+  int tngamma;
+  tngamma = ny + n_marker*nX;
+  if (second_cont_rr == TRUE) ny + n_marker*nX + two_y*nX;
+  
 
   NumericVector beta(nvar);
   NumericVector u(nvar);
@@ -66,15 +70,15 @@ Rcpp::List AIPW_coxfit_cpp(int maxiter, NumericVector time, IntegerVector status
 
   NumericVector tmp_y(ny);
   NumericVector tmp_yr(ny_rr);
-  NumericVector tmp_num(ngamma);
-  NumericVector tmp_w(ngamma);
-  NumericVector tmp_numw(ngamma);
-  NumericMatrix tmp_mat(ngamma, ngamma);
+  NumericVector tmp_num(tngamma);
+  NumericVector tmp_w(tngamma);
+  NumericVector tmp_numw(tngamma);
+  NumericMatrix tmp_mat(tngamma, tngamma);
   NumericMatrix Ecov(nR - 1, nvar);
 
-  NumericVector EZ((nR - 1) * ngamma * nevent);
-  NumericVector dEZ((nR - 1) * ngamma * nevent * ngamma);
-  NumericVector dEcov((nR - 1) * nvar * ngamma);
+  NumericVector EZ((nR - 1) * tngamma * nevent);
+  NumericVector dEZ((nR - 1) * tngamma * nevent * tngamma);
+  NumericVector dEcov((nR - 1) * nvar * tngamma);
 
   beta = init_beta;
   covar = clone(covar);
@@ -93,13 +97,13 @@ Rcpp::List AIPW_coxfit_cpp(int maxiter, NumericVector time, IntegerVector status
 
       for (r = 1; r < nR; r++) {
         tmp_denom = 0;
-        for (i = 0; i < ngamma; i++) {
+        for (i = 0; i < tngamma; i++) {
           tmp_num[i] = 0;
-          for (j = 0; j < ngamma; j++) {
+          for (j = 0; j < tngamma; j++) {
             tmp_mat(i, j) = 0;
           }
         }
-        for (j = 0; j < ngamma; j++) {
+        for (j = 0; j < tngamma; j++) {
           tmp_numw[j] = 0;
         }
 
@@ -152,22 +156,22 @@ Rcpp::List AIPW_coxfit_cpp(int maxiter, NumericVector time, IntegerVector status
             zgamma += gamma[l] * tmp_w[l];
           }
           tmp_denom += exp(zgamma);
-          for (i = 0; i < ngamma; i++) {
+          for (i = 0; i < tngamma; i++) {
             tmp_num[i] += tmp_w[i] * exp(zgamma);
-            for (j = 0; j < ngamma; j++) {
+            for (j = 0; j < tngamma; j++) {
               tmp_mat(i, j) += tmp_w[i] * tmp_w[j] * exp(zgamma);
             }
           }
 
-          for (j = 0; j < ngamma; j++) {
+          for (j = 0; j < tngamma; j++) {
             tmp_numw[j] += tmp_w[j] * exp(zgamma);
           }
 
         }
-        for (i = 0; i < ngamma; i++) {
-          EZ[(r - 1) * ngamma * nevent + i * nevent + pid] = tmp_num[i] / tmp_denom;
-          for (j = 0; j < ngamma; j++) {
-            dEZ[(r - 1) * ngamma * nevent * ngamma + i * nevent * ngamma + pid * ngamma + j] = (tmp_mat(i, j) - tmp_num[i] / tmp_denom * tmp_numw[j]) / tmp_denom;
+        for (i = 0; i < tngamma; i++) {
+          EZ[(r - 1) * tngamma * nevent + i * nevent + pid] = tmp_num[i] / tmp_denom;
+          for (j = 0; j < tngamma; j++) {
+            dEZ[(r - 1) * tngamma * nevent * tngamma + i * nevent * tngamma + pid * tngamma + j] = (tmp_mat(i, j) - tmp_num[i] / tmp_denom * tmp_numw[j]) / tmp_denom;
           }
         }
 
@@ -184,13 +188,13 @@ Rcpp::List AIPW_coxfit_cpp(int maxiter, NumericVector time, IntegerVector status
       }
 
       tmp_denom = 0;
-      for (i = 0; i < ngamma; i++) {
+      for (i = 0; i < tngamma; i++) {
         tmp_num[i] = 0;
-        for (j = 0; j < ngamma; j++) {
+        for (j = 0; j < tngamma; j++) {
           tmp_mat(i, j) = 0;
         }
       }
-      for (j = 0; j < ngamma; j++) {
+      for (j = 0; j < tngamma; j++) {
         tmp_numw[j] = 0;
       }
 
@@ -243,22 +247,22 @@ Rcpp::List AIPW_coxfit_cpp(int maxiter, NumericVector time, IntegerVector status
           zgamma += gamma[l] * tmp_w[l];
         }
         tmp_denom += exp(zgamma);
-        for (i = 0; i < ngamma; i++) {
+        for (i = 0; i < tngamma; i++) {
           tmp_num[i] += tmp_w[i] * exp(zgamma);
-          for (j = 0; j < ngamma; j++) {
+          for (j = 0; j < tngamma; j++) {
             tmp_mat(i, j) += tmp_w[i] * tmp_w[j] * exp(zgamma);
           }
         }
 
-        for (j = 0; j < ngamma; j++) {
+        for (j = 0; j < tngamma; j++) {
           tmp_numw[j] += tmp_w[j] * exp(zgamma);
         }
 
        }
-      for (i = 0; i < ngamma; i++) {
-        EZ[(tmp_r - 1) * ngamma * nevent + i * nevent + pid] = tmp_num[i] / tmp_denom;
-        for (j = 0; j < ngamma; j++) {
-          dEZ[(tmp_r - 1) * ngamma * nevent * ngamma + i * nevent * ngamma + pid * ngamma + j] = (tmp_mat(i, j) - tmp_num[i] / tmp_denom * tmp_numw[j]) / tmp_denom;
+      for (i = 0; i < tngamma; i++) {
+        EZ[(tmp_r - 1) * tngamma * nevent + i * nevent + pid] = tmp_num[i] / tmp_denom;
+        for (j = 0; j < tngamma; j++) {
+          dEZ[(tmp_r - 1) * tngamma * nevent * tngamma + i * nevent * tngamma + pid * tngamma + j] = (tmp_mat(i, j) - tmp_num[i] / tmp_denom * tmp_numw[j]) / tmp_denom;
         }
       }
 
@@ -350,8 +354,8 @@ Rcpp::List AIPW_coxfit_cpp(int maxiter, NumericVector time, IntegerVector status
         }
 
         for (r = 1; r < nR; r++) {
-          for (i = 0; i < ngamma; i++) {
-            Ecov(r - 1, nX + nW + i) = EZ[(r - 1) * ngamma * nevent + i * nevent + pid];
+          for (i = 0; i < tngamma; i++) {
+            Ecov(r - 1, nX + nW + i) = EZ[(r - 1) * tngamma * nevent + i * nevent + pid];
           }
         }
 
@@ -506,8 +510,8 @@ Rcpp::List AIPW_coxfit_cpp(int maxiter, NumericVector time, IntegerVector status
             }
           }
           for (r = 1; r < nR; r++) {
-            for (i = 0; i < ngamma; i++) {
-              Ecov(r - 1, nX + nW + i) = EZ[(r - 1) * ngamma * nevent + i * nevent + pid] - means[nX + nW + i];
+            for (i = 0; i < tngamma; i++) {
+              Ecov(r - 1, nX + nW + i) = EZ[(r - 1) * tngamma * nevent + i * nevent + pid] - means[nX + nW + i];
             }
           }
 
@@ -663,10 +667,10 @@ Rcpp::List AIPW_coxfit_cpp(int maxiter, NumericVector time, IntegerVector status
           }
 
           for (r = 1; r < nR; r++) {
-            for (i = 0; i < ngamma; i++) {
-              Ecov(r - 1, nX + nW + i) = EZ[(r - 1) * ngamma * nevent + i * nevent + pid] - means[nX + nW + i];
-              for (k = 0; k < ngamma; k++) {
-                dEcov[(r - 1) * nvar * ngamma + (nX + nW + i) * ngamma + k] = dEZ[(r - 1) * ngamma * nevent * ngamma + i * nevent * ngamma + pid * ngamma + k];
+            for (i = 0; i < tngamma; i++) {
+              Ecov(r - 1, nX + nW + i) = EZ[(r - 1) * tngamma * nevent + i * nevent + pid] - means[nX + nW + i];
+              for (k = 0; k < tngamma; k++) {
+                dEcov[(r - 1) * nvar * tngamma + (nX + nW + i) * tngamma + k] = dEZ[(r - 1) * tngamma * nevent * tngamma + i * nevent * tngamma + pid * tngamma + k];
               }
             }
           }
@@ -682,13 +686,13 @@ Rcpp::List AIPW_coxfit_cpp(int maxiter, NumericVector time, IntegerVector status
               }
               for (k = 0; k < ngamma; k++)
                 for (r = 1; r < nR; r++) {
-                  Ithegam(i, k) += pR(pid, r) / pR(pid, 0) * dEcov[(r - 1) * nvar * ngamma + i * ngamma + k];
+                  Ithegam(i, k) += pR(pid, r) / pR(pid, 0) * dEcov[(r - 1) * nvar * tngamma + i * tngamma + k];
 
                 }
 
             } else {
               for (k = 0; k < ngamma; k++) {
-                Ithegam(i, k) -= dEcov[(R[person] - 2) * nvar * ngamma + i * ngamma + k];
+                Ithegam(i, k) -= dEcov[(R[person] - 2) * nvar * tngamma + i * tngamma + k];
               }
 
             }
