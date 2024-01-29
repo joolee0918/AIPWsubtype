@@ -42,17 +42,20 @@ Rcpp::NumericMatrix AIPW_coxscore_cpp(NumericVector time, NumericVector status,
   ny = ny_rr = n_marker;
   if (second_cont_bl == TRUE) ny = ny + two_y;
   if (second_cont_rr == TRUE) ny_rr = ny + two_y;
-
+  int tngamma;
+  tngamma = ny + n_marker*nX;
+  if (second_cont_rr == TRUE) ny + n_marker*nX + two_y*nX;
+  
 
   NumericMatrix resid(nused, nvar);
   double tmp_denom;
   NumericVector tmp_y(ny);
   NumericVector tmp_yr(ny_rr);
-  NumericVector tmp_num(ngamma);
-  NumericVector tmp_w(ngamma);
+  NumericVector tmp_num(tngamma);
+  NumericVector tmp_w(tngamma);
 
   NumericMatrix Ecov(nR - 1, nvar);
-  NumericVector EZ((nR - 1) * ngamma * nevent);
+  NumericVector EZ((nR - 1) * tngamma * nevent);
 
   int r, ty;
   int tmp_r;
@@ -71,7 +74,7 @@ Rcpp::NumericMatrix AIPW_coxscore_cpp(NumericVector time, NumericVector status,
 
       for (r = 1; r < nR; r++) {
         tmp_denom = 0;
-        for (i = 0; i < ngamma; i++) {
+        for (i = 0; i < tngamma; i++) {
           tmp_num[i] = 0;
 
         }
@@ -125,12 +128,12 @@ Rcpp::NumericMatrix AIPW_coxscore_cpp(NumericVector time, NumericVector status,
             zgamma += gamma[l] * tmp_w[l];
           }
           tmp_denom += exp(zgamma);
-          for (i = 0; i < ngamma; i++) {
+          for (i = 0; i < tngamma; i++) {
             tmp_num[i] += tmp_w[i] * exp(zgamma);
           }
         }
-        for (i = 0; i < ngamma; i++) {
-          EZ[(r - 1) * ngamma * nevent + i * nevent + pid] = tmp_num[i] / tmp_denom;
+        for (i = 0; i < tngamma; i++) {
+          EZ[(r - 1) * tngamma * nevent + i * nevent + pid] = tmp_num[i] / tmp_denom;
         }
 
       }
@@ -147,7 +150,7 @@ Rcpp::NumericMatrix AIPW_coxscore_cpp(NumericVector time, NumericVector status,
       }
 
       tmp_denom = 0;
-      for (i = 0; i < ngamma; i++) {
+      for (i = 0; i < tngamma; i++) {
         tmp_num[i] = 0;
 
       }
@@ -201,7 +204,7 @@ Rcpp::NumericMatrix AIPW_coxscore_cpp(NumericVector time, NumericVector status,
           zgamma += gamma[l] * tmp_w[l];
         }
         tmp_denom += exp(zgamma);
-        for (i = 0; i < ngamma; i++) {
+        for (i = 0; i < tngamma; i++) {
           tmp_num[i] += tmp_w[i] * exp(zgamma);
 
         }
@@ -210,8 +213,8 @@ Rcpp::NumericMatrix AIPW_coxscore_cpp(NumericVector time, NumericVector status,
          for(i=0;i<nvar;i++)
          Rcout<<tmp_num[i]<<"\n"; */
       }
-      for (i = 0; i < ngamma; i++) {
-        EZ[(tmp_r - 1) * ngamma * nevent + i * nevent + pid] = tmp_num[i] / tmp_denom;
+      for (i = 0; i < tngamma; i++) {
+        EZ[(tmp_r - 1) * tngamma * nevent + i * nevent + pid] = tmp_num[i] / tmp_denom;
 
       }
 
@@ -279,8 +282,8 @@ Rcpp::NumericMatrix AIPW_coxscore_cpp(NumericVector time, NumericVector status,
               }
             }
             for (r = 1; r < nR; r++) {
-              for (l = 0; l < ngamma; l++) {
-                Ecov(r - 1, nX + nW + l) = EZ[(r - 1) * ngamma * nevent + l * nevent + pid];
+              for (l = 0; l < tngamma; l++) {
+                Ecov(r - 1, nX + nW + l) = EZ[(r - 1) * tngamma * nevent + l * nevent + pid];
 
               }
             }
