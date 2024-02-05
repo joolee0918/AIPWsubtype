@@ -285,8 +285,7 @@ IPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom")
 
     if(missing_model == "multinom"){
 
-      nalp <- length(coef(model_missing[[1]])) + length(model_missing[[2]]$coefficients)
-
+      
       nalp0 = 0
       if (two_stage == T)
         nalp0 = length(model_missing[[2]]$coefficients)
@@ -299,7 +298,7 @@ IPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom")
         tmpp1 <- model_missing[[1]]$probabilities[whereR1 ,1]
 
         p1[ccdata[, event] == 1] <- tmpp1
-
+        nalp <- length(coef(model_missing[[1]]))
       }else {
 
         edata$RR <- ifelse(edata$R == max(oR), 1, edata$R)
@@ -310,6 +309,7 @@ IPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom")
         p0 <-  as.vector(predict(model_missing[[2]], newdata = newedata, type = "response"))
 
         p1[ccdata[, event] == 1] <- tmpp1*p0
+        nalp <- length(coef(model_missing[[1]])) + length(model_missing[[2]]$coefficients)
 
       }
 
