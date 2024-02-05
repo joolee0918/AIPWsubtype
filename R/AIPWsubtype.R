@@ -295,7 +295,7 @@ AIPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom"
 
           tmpdata <- mlogit.data(edata, shape="wide", choice="R")
           pR <- predict(model_missing[[1]], type="probs", newdata=tmpdata)
-
+          nalp <- length(coef(model_missing[[1]])) 
         }else {
           edata$RR <- ifelse(edata$R == max(oR), 1, edata$R)
           tmpdata <- mlogit.data(edata, shape="wide", choice="RR")
@@ -303,9 +303,8 @@ AIPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom"
 
           pR <-  cbind(pR, as.vector(1 - predict(model_missing[[2]], newdata = edata, type = "response")))
           pR[, 1:(onR-1)] <- pR[, 1:(onR-1)]*(1-pR[, onR])
+          nalp <- length(coef(model_missing[[1]])) + length(model_missing[[2]]$coefficients)
         }
-
-        nalp <- length(coef(model_missing[[1]])) + length(model_missing[[2]]$coefficients)
 
         nalp0 = 0
         if (two_stage == T)
