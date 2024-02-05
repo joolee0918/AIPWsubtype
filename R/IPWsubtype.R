@@ -292,7 +292,8 @@ IPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom")
 
       p1 <- rep(1, ndata)
       if(two_stage == FALSE){
-        tmpdata <- mlogit.data(edata, shape="wide", choice="RR")
+
+        tmpdata <- mlogit.data(edata, shape="wide", choice="R")
 
         whereR1 <- (edata$R == 1)
         tmpp1 <- model_missing[[1]]$probabilities[whereR1 ,1]
