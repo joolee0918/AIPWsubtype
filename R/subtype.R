@@ -84,7 +84,7 @@ subtype <- function(formula, data, id,  marker_name, marker_rr = NULL,
   ototal_subtype <- total_subtype[sort(tmpmar),]
   on_subtype <- nrow(ototal_subtype)
 
-  event <- tail(survival:::terms.inner(formula[1:2]), 1)
+  event <- tail(terms.inner(formula[1:2]), 1)
 
   cause <- rep(NA, n)
   R <- rep(1, n)
