@@ -68,7 +68,7 @@
 #'
 #'
 #' @export
-AIPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom"), missing_formula,  marker_formula, missing_indep = FALSE, two_stage = FALSE, tstage_name = NULL,
+AIPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom"), missing_formula, missing_indep = FALSE, two_stage = FALSE, tstage_name = NULL,
      marker_name, marker_rr = NULL, first_cont_rr = TRUE, second_cont_bl = FALSE,  second_cont_rr = FALSE, constvar = NULL, init, control, x = FALSE, y = TRUE, model = FALSE) {
 
 
@@ -475,7 +475,7 @@ AIPWsubtype <- function(formula, data, id, missing_model = c("condi", "multinom"
     }
 
 
-
+     marker_formula = TRUE # marker model including X as default 
     
     if(marker_formula==FALSE) {
          Xformula <- as.formula(paste("~", order_bl))
